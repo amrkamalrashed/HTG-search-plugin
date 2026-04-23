@@ -20,7 +20,7 @@ function ratingBar(label: string, score: number): FrameNode {
   row.counterAxisAlignItems = 'CENTER';
   row.primaryAxisAlignItems = 'SPACE_BETWEEN';
   row.layoutAlign = 'STRETCH';
-  row.resize(300, 0);
+  row.resize(300, 1);
   row.primaryAxisSizingMode = 'FIXED';
 
   row.appendChild(makeText('label', label, FONT.regular, 13, BRAND.textPrimary));
@@ -137,8 +137,16 @@ export function buildReviews(
     const reviewsRow = figma.createFrame();
     reviewsRow.name = 'reviewsRow';
     reviewsRow.layoutMode = platform === 'web' ? 'HORIZONTAL' : 'VERTICAL';
-    reviewsRow.primaryAxisSizingMode = 'FIXED';
-    reviewsRow.counterAxisSizingMode = 'AUTO';
+    // Sizing modes are axis-relative: primary = layout direction, counter
+    // = perpendicular. Swap them with the layout mode so the fixed width
+    // and hugged height always line up on the right axes.
+    if (platform === 'web') {
+      reviewsRow.primaryAxisSizingMode = 'FIXED'; // horizontal = FIXED width
+      reviewsRow.counterAxisSizingMode = 'AUTO'; // vertical = hug
+    } else {
+      reviewsRow.primaryAxisSizingMode = 'AUTO'; // vertical = hug
+      reviewsRow.counterAxisSizingMode = 'FIXED'; // horizontal = FIXED width
+    }
     reviewsRow.resize(innerWidth, 1);
     reviewsRow.itemSpacing = platform === 'web' ? 16 : 12;
     reviewsRow.fills = [];
