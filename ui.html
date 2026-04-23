@@ -1,0 +1,23 @@
+<style>
+  body { font-family: sans-serif; padding: 16px; background: #f5f5f5; }
+  h3 { font-size: 14px; margin-top: 0; margin-bottom: 12px;}
+  button { 
+    display: block; width: 100%; padding: 10px; margin-bottom: 8px; 
+    background: #0d99ff; color: white; border: none; 
+    border-radius: 6px; cursor: pointer; font-weight: bold;
+  }
+  button:hover { background: #007be5; }
+</style>
+
+<h3>Select a Room Card, then apply a case:</h3>
+<button id="case-bedroom">🛏 Case: Standard Bedroom</button>
+<button id="case-complex">🛏 Case: Complex Multi-bed</button>
+<button id="case-bathroom">🛁 Case: Bathroom (Missing 'Sleeps')</button>
+<button id="case-long">⚠️ Edge Case: Extreme Text</button>
+
+<script>
+  document.getElementById('case-bedroom').onclick = () => parent.postMessage({ pluginMessage: { type: 'populate', case: 'bedroom' } }, '*');
+  document.getElementById('case-complex').onclick = () => parent.postMessage({ pluginMessage: { type: 'populate', case: 'complex' } }, '*');
+  document.getElementById('case-bathroom').onclick = () => parent.postMessage({ pluginMessage: { type: 'populate', case: 'bathroom' } }, '*');
+  document.getElementById('case-long').onclick = () => parent.postMessage({ pluginMessage: { type: 'populate', case: 'long' } }, '*');
+</script>
