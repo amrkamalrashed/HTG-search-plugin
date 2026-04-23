@@ -5,6 +5,75 @@ in ISO-8601 (YYYY-MM-DD).
 
 ## [Unreleased]
 
+### 0.3.0 — 2026-04-23 — Locale, platform, Phase A detail sections
+
+**Added**
+- **Locale support** — English, German, Spanish, French.
+  - New `src/shared/locales.ts` with a strings table (`STRINGS[locale][key]`)
+    covering card labels ("View deal", "Promoted by", "for N nights",
+    "New listing", "Last-minute deal", "km to center", "reviews") plus
+    section headings and property-type labels.
+  - `formatPrice(amount, currency, locale)` is now locale-aware:
+    `de-DE` → `€1.234`, `en-GB` → `£1,234`, `es-ES` / `fr-FR` → `1.234 €`.
+  - Layer-name populate path accepts a `locale` arg so designers get
+    correctly-localised strings when populating their own components.
+- **Platform variants** — Web, iPhone, Android.
+  - New `src/shared/platforms.ts` defines `Platform` + `PLATFORM_SPEC`
+    (card dimensions, radii, shadows, font sizes per platform).
+  - Web: existing horizontal 880×320 card.
+  - iPhone: vertical 375-wide card, image top, rounded 12px radii,
+    subtle shadow (iOS-style).
+  - Android: vertical 360-wide card, 8px radii, stronger elevation,
+    no stroke (Material-style).
+- **Two-level navigation** in the plugin UI:
+  - Level 1: property search (existing).
+  - Level 2: property detail. Each tile gets an "→" button that opens
+    a Detail view — breadcrumb, hero, section-selection grid, insert
+    button. A single "Open details →" button is also added to the
+    preview modal.
+- **Phase A detail sections (Level 2 insert)** — `src/main/sections/`:
+  - `gallery.ts` — hero + 2×2 thumbnail grid + "Show all N photos" pill.
+  - `amenities.ts` — icon + label list grouped by category (Internet &
+    TV, Kitchen, Outdoor, Heating & cooling, …) with i18n category
+    labels. "Show all N amenities" outlined button below.
+  - `reviews.ts` — overall score + sub-rating bars (Cleanliness,
+    Location, Value, Communication) with gradient fills + 3 review
+    cards (avatar, name, date, stars, body).
+  - `priceBreakdown.ts` — line items (€128 × 7 nights, cleaning, service
+    fee, taxes), divider, total, gradient "View deal" CTA.
+  - Each section stamps `setPluginData('htgSectionKind', …)` so the
+    Refresh button re-renders sections too.
+- **Level-2 insert** assembles selected sections in a single
+  "HTG Detail · {offer}" vertical auto-layout container at the viewport
+  centre — effectively rebuilds the full rental page in one click.
+- **Enriched mock data** for 3 offers (Berlin apartment, Mallorca villa,
+  Amsterdam boutique hotel): 5–6 images each, `fullDescription`,
+  `highlights`, `amenitiesByCategory`, `reviewDetails` (overall +
+  sub-ratings + 3 review items), and `priceBreakdown`. The other 7
+  offers stay lean on purpose to cover the "missing data" path.
+
+**Changed**
+- `Offer` type now includes optional `fullDescription`, `highlights`,
+  `amenitiesByCategory`, `reviewDetails`, `priceBreakdown`, plus a
+  new `hotel` property type and an `AmenityCategory` union.
+- `InsertPayload` is now a discriminated union (`kind: 'cards'` vs
+  `kind: 'sections'`); old call sites updated.
+- `UiState` now carries `locale` and `platform` so they persist across
+  plugin opens via `figma.clientStorage`.
+- Plugin UI gets a new **LocaleBar** row under the header: 4-way
+  locale pills (EN/DE/ES/FR) + 3-way platform pills (Web/iPhone/Android).
+- `ProductTile` now has two hover actions (`i` for preview, `→` for
+  open-details).
+- `PreviewModal` footer now has **Open details →** alongside
+  **Insert card**.
+
+**Infra / DX**
+- Refresh command preserves `locale`, `platform`, and `sectionKind`
+  from the stamped `setPluginData` on re-render, so updating
+  `products.json` + running `npm run build` + clicking Refresh in
+  Figma updates every kind of inserted artifact — card, list, grid,
+  detail section, or full detail page.
+
 ### 0.2.0 — 2026-04-23 — UX polish batch
 
 **Fixed**

@@ -13,6 +13,17 @@ export type PropertyType =
   | 'bungalow'
   | 'hotel';
 
+export type AmenityCategory =
+  | 'internet_tv'
+  | 'kitchen'
+  | 'bathroom'
+  | 'bedroom'
+  | 'outdoor'
+  | 'cooling_heating'
+  | 'parking_accessibility'
+  | 'services'
+  | 'policies';
+
 export type Amenity =
   | 'wifi'
   | 'kitchen'
@@ -47,25 +58,55 @@ export type Badge =
   | 'free_cancellation'
   | 'eco_friendly';
 
+/**
+ * Detail-page review breakdown. Mirrors what HomeToGo surfaces on
+ * the property detail page: an overall score and sub-ratings on a
+ * 0–5 scale, plus individual review items.
+ */
+export interface ReviewDetails {
+  overall: number;
+  count: number;
+  subRatings: Partial<{
+    cleanliness: number;
+    location: number;
+    value: number;
+    communication: number;
+  }>;
+  items: Array<{
+    author: string;
+    date: string;
+    rating: number;
+    text: string;
+    avatarUrl?: string;
+  }>;
+}
+
+export interface PriceBreakdown {
+  lineItems: Array<{
+    /** 'perNight' | 'serviceFee' | 'taxes' | 'cleaning' | custom */
+    key: string;
+    label?: string;
+    amount: number;
+    /** Shown as "€128 × 7 nights" when set. */
+    quantity?: number;
+    quantityLabel?: string;
+  }>;
+  total: number;
+  currency: Currency;
+}
+
 export interface Offer {
   id: string;
-  /** Human title, e.g. "De Bedstee Boutique Capsules". */
   title: string;
   propertyType: PropertyType;
-  /**
-   * Optional label shown above the title ("Hotel", "1-star hotel",
-   * "Boutique apartment"). If absent, the plugin falls back to a
-   * capitalised propertyType.
-   */
+  /** Localised or custom override for the category label above the title. */
   categoryLabel?: string;
   location: {
     city: string;
     region?: string;
     country: string;
     countryCode: string;
-    /** Sub-area shown in the location line, e.g. "Amsterdam Oud-Zuid". */
     neighborhood?: string;
-    /** Distance to city centre in km, rendered as "X km to center". */
     distanceToCenterKm?: number;
     lat?: number;
     lng?: number;
@@ -80,7 +121,6 @@ export interface Offer {
   discount?: {
     percent: number;
     originalPerNight: number;
-    /** E.g. "Last-minute deal". Rendered inside the discount pill. */
     label?: string;
   };
   rating?: {
@@ -94,6 +134,8 @@ export interface Offer {
     beds: number;
   };
   amenities: Amenity[];
+  /** Optional grouping used by the Amenities detail section. */
+  amenitiesByCategory?: Partial<Record<AmenityCategory, Amenity[]>>;
   badges: Badge[];
   provider: {
     name: string;
@@ -102,4 +144,12 @@ export interface Offer {
   cancellation: 'free_until_7d' | 'free_until_24h' | 'non_refundable' | 'flexible';
   url: string;
   shortDescription?: string;
+  /** Full description for the About section on the detail page. */
+  fullDescription?: string;
+  /** Bullet highlights shown alongside the description. */
+  highlights?: string[];
+  /** Detail-page review breakdown (optional — only on enriched offers). */
+  reviewDetails?: ReviewDetails;
+  /** Detail-page price breakdown (optional). */
+  priceBreakdown?: PriceBreakdown;
 }

@@ -7,9 +7,10 @@ interface Props {
   offer: Offer;
   onClose: () => void;
   onInsert: () => void;
+  onOpenDetail: () => void;
 }
 
-export function PreviewModal({ offer, onClose, onInsert }: Props) {
+export function PreviewModal({ offer, onClose, onInsert, onOpenDetail }: Props) {
   return (
     <div class={styles.modalOverlay} onClick={onClose}>
       <div class={styles.modal} onClick={(e) => e.stopPropagation()}>
@@ -84,10 +85,16 @@ export function PreviewModal({ offer, onClose, onInsert }: Props) {
         </div>
         <div class={styles.modalActions}>
           <button
+            class={`${styles.btn} ${styles.btnGhost}`}
+            onClick={onOpenDetail}
+          >
+            Open details →
+          </button>
+          <button
             class={`${styles.btn} ${styles.btnPrimary} ${styles.modalActionsBtn}`}
             onClick={onInsert}
           >
-            Insert into canvas
+            Insert card
           </button>
         </div>
       </div>

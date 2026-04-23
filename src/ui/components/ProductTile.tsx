@@ -8,9 +8,10 @@ interface Props {
   selected: boolean;
   onToggle: () => void;
   onPreview: () => void;
+  onOpen: () => void;
 }
 
-export function ProductTile({ offer, selected, onToggle, onPreview }: Props) {
+export function ProductTile({ offer, selected, onToggle, onPreview, onOpen }: Props) {
   const badge = offer.badges[0];
   const isDeal = badge === 'great_deal';
 
@@ -32,16 +33,28 @@ export function ProductTile({ offer, selected, onToggle, onPreview }: Props) {
           <span class={styles.tileDiscount}>-{offer.discount.percent}%</span>
         )}
         {selected && <span class={styles.tileCheck}>✓</span>}
-        <button
-          class={styles.tilePreviewBtn}
-          onClick={(e) => {
-            e.stopPropagation();
-            onPreview();
-          }}
-          title="Preview details"
-        >
-          i
-        </button>
+        <div class={styles.tileHoverActions}>
+          <button
+            class={styles.tileHoverBtn}
+            onClick={(e) => {
+              e.stopPropagation();
+              onPreview();
+            }}
+            title="Preview details"
+          >
+            i
+          </button>
+          <button
+            class={styles.tileHoverBtn}
+            onClick={(e) => {
+              e.stopPropagation();
+              onOpen();
+            }}
+            title="Open property detail (insert sections)"
+          >
+            →
+          </button>
+        </div>
       </div>
       <div class={styles.tileBody}>
         <div class={styles.tileTitleRow}>

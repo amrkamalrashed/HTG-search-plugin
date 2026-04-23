@@ -9,17 +9,17 @@ runtime — TypeScript checks it at build time because of `resolveJsonModule`.
 ```ts
 interface Offer {
   id: string;                      // "offer_20394857"
-  title: string;                   // "Charming Apartment near Prenzlauer Berg"
-  propertyType: PropertyType;      // 'apartment' | 'villa' | 'cabin' | ...
-  categoryLabel?: string;          // "Apartment" | "1-star hotel" | "Boutique villa"
+  title: string;
+  propertyType: PropertyType;      // 'apartment' | 'villa' | ... | 'hotel'
+  categoryLabel?: string;          // "Apartment" | "1-star hotel" | ...
 
   location: {
-    city: string;                  // "Berlin"
-    region?: string;               // "Berlin" (state/province)
-    country: string;               // "Germany"
-    countryCode: string;           // "DE"
-    neighborhood?: string;         // "Prenzlauer Berg"
-    distanceToCenterKm?: number;   // 3.4
+    city: string;
+    region?: string;
+    country: string;
+    countryCode: string;
+    neighborhood?: string;
+    distanceToCenterKm?: number;
     lat?: number;
     lng?: number;
   };
@@ -27,21 +27,21 @@ interface Offer {
   images: Array<{ url: string; alt?: string }>;
 
   price: {
-    perNight: number;              // 128
-    total: number;                 // 896
+    perNight: number;
+    total: number;
     currency: 'EUR' | 'USD' | 'GBP';
-    nights: number;                // 7
+    nights: number;
   };
 
   discount?: {
-    percent: number;               // 15
-    originalPerNight: number;      // 151
-    label?: string;                // "Last-minute deal"
+    percent: number;
+    originalPerNight: number;
+    label?: string;
   };
 
   rating?: {
-    average: number;               // 4.7
-    count: number;                 // 284
+    average: number;
+    count: number;
   };
 
   capacity: {
@@ -51,19 +51,57 @@ interface Offer {
     beds: number;
   };
 
-  amenities: Amenity[];            // see enum below
+  amenities: Amenity[];
+  amenitiesByCategory?: Partial<Record<AmenityCategory, Amenity[]>>;
 
-  badges: Badge[];                 // 'top_rated' | 'great_deal' | ...
+  badges: Badge[];
 
   provider: {
-    name: string;                  // "Vrbo" | "Booking.com" | ...
+    name: string;
     logoUrl?: string;
   };
 
   cancellation: 'free_until_7d' | 'free_until_24h' | 'non_refundable' | 'flexible';
+  url: string;
 
-  url: string;                     // "https://www.hometogo.com/offer/20394857"
+  // Card
   shortDescription?: string;
+
+  // Detail-page sections (optional — only on enriched offers)
+  fullDescription?: string;
+  highlights?: string[];
+  reviewDetails?: ReviewDetails;
+  priceBreakdown?: PriceBreakdown;
+}
+
+interface ReviewDetails {
+  overall: number;
+  count: number;
+  subRatings: Partial<{
+    cleanliness: number;
+    location: number;
+    value: number;
+    communication: number;
+  }>;
+  items: Array<{
+    author: string;
+    date: string;
+    rating: number;
+    text: string;
+    avatarUrl?: string;
+  }>;
+}
+
+interface PriceBreakdown {
+  lineItems: Array<{
+    key: string;                 // 'perNight' | 'cleaning' | 'serviceFee' | 'taxes' | custom
+    label?: string;
+    amount: number;
+    quantity?: number;
+    quantityLabel?: string;      // "€128 × 7 nights"
+  }>;
+  total: number;
+  currency: Currency;
 }
 ```
 
@@ -80,6 +118,17 @@ type Amenity =
   | 'garden' | 'bbq' | 'fireplace' | 'sea_view' | 'mountain_view'
   | 'pets_allowed' | 'smoking_allowed' | 'wheelchair_accessible'
   | 'ev_charger' | 'tv' | 'hair_dryer' | 'elevator' | 'breakfast';
+
+type AmenityCategory =
+  | 'internet_tv'           // Wi-Fi, TV
+  | 'kitchen'               // kitchen, kitchenware
+  | 'bathroom'              // hair dryer, toiletries
+  | 'bedroom'               // bed-linen, crib
+  | 'outdoor'               // pool, bbq, terrace, sea view
+  | 'cooling_heating'       // AC, heating
+  | 'parking_accessibility' // parking, wheelchair access, EV charger
+  | 'services'              // breakfast, washer, dryer
+  | 'policies';             // pets, smoking
 
 type Badge =
   | 'top_rated' | 'great_deal' | 'instant_book' | 'new_listing'

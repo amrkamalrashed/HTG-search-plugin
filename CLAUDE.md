@@ -31,29 +31,63 @@ integration later.
 ```
 src/
   main/         # Figma sandbox (QuickJS). Owns all figma.* API calls.
-    index.ts    # showUI + message router
-    generate.ts # Adaptive card builder — builds the HTG card from scratch.
-    populate.ts # Populates a user-selected frame via #fieldName layers.
-    brand.ts    # Canvas-side design tokens (colors, fonts, gradient paint).
-    icons.ts    # Inline SVGs for amenity/share/heart/fullscreen icons.
-    images.ts   # figma.createImageAsync wrapper.
-    fonts.ts    # Parallel font loader.
-  ui/           # Preact iframe. Handles browse/search/filter/preview.
+    index.ts       # showUI + message router
+    generate.ts    # Platform-aware card builder (web + iOS + Android)
+    populate.ts    # #fieldName populator (locale-aware)
+    brand.ts       # Canvas-side tokens (colors, fonts, gradient paint)
+    icons.ts       # Inline SVG icon set (amenities/share/heart/…)
+    images.ts      # figma.createImageAsync wrapper
+    fonts.ts       # Parallel font loader
+    sections/      # Phase A detail-page section builders
+      gallery.ts
+      amenities.ts
+      reviews.ts
+      priceBreakdown.ts
+  ui/           # Preact iframe. Search + detail + pickers.
     index.tsx
-    App.tsx
+    App.tsx         # Level-1 search + Level-2 detail state machine
     styles.css
-    components/ # Header, SearchBar, FilterBar, ProductTile, PreviewModal
+    components/     # Header, LocaleBar, SearchBar, FilterBar, SortBar,
+                    # ProductTile, PreviewModal, DetailView
   shared/       # Consumed by both threads (no DOM / no figma.* API).
-    types.ts      # Offer type and its enums.
-    messages.ts   # postMessage contracts (InsertMessage, LoadedMessage).
-    layer-names.ts # #fieldName convention + value formatters.
+    types.ts        # Offer + ReviewDetails + PriceBreakdown + enums
+    messages.ts     # Insert*Payload + SectionKind + UiState
+    locales.ts      # Locale + strings table + t(key, locale, vars)
+    platforms.ts    # Platform + PLATFORM_SPEC (card dims per platform)
+    format.ts       # Locale-aware price formatter
+    layer-names.ts  # #fieldName spec + textForKey(offer, locale)
   data/
-    products.json # 10 seed offers, with variation (discount/no-discount,
-                  # rated/unrated, varying amenities, umlauts).
+    products.json  # 10 offers; 3 enriched with detail-page data
+                   # (gallery 5–6 imgs, amenitiesByCategory, reviewDetails,
+                   # priceBreakdown) — the rest stay lean to cover the
+                   # adaptive "missing data" path.
 ```
 
 Main and UI threads communicate via `emit` / `on` from
 `@create-figma-plugin/utilities` (typed wrappers over `postMessage`).
+
+## Locale + Platform
+
+Every card and section is rendered in the selected locale
+(`en` / `de` / `es` / `fr`) and platform (`web` / `ios` / `android`).
+Locale drives the strings table in `src/shared/locales.ts` and the
+price formatter in `src/shared/format.ts`. Platform drives card
+dimensions, corner radii, shadow strength, and (iOS vs Android)
+whether the card has a stroke — all tokens in
+`src/shared/platforms.ts#PLATFORM_SPEC`.
+
+Both values persist via `figma.clientStorage` and are stamped on
+every inserted node via `setPluginData('htgLocale', ...)` and
+`setPluginData('htgPlatform', ...)` so Refresh can round-trip
+without losing presentation.
+
+## Two-level navigation
+
+- Level 1 (Search): browse / filter / sort / insert cards.
+- Level 2 (Detail): drill into one property via the `→` button on
+  each tile, pick any subset of Gallery / Amenities / Reviews /
+  Price breakdown sections, insert them as an auto-layout container
+  that rebuilds the full rental page.
 
 ## Three insert modes (all adaptive to the offer)
 

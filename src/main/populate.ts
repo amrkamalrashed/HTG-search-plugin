@@ -1,4 +1,5 @@
 import type { Offer } from '@shared/types';
+import type { Locale } from '@shared/locales';
 import { imageUrlForKey, isImageKey, matchLayerKey, textForKey } from '@shared/layer-names';
 import { loadImageHash, applyImageFill } from './images';
 
@@ -18,7 +19,11 @@ function isTarget(node: BaseNode): node is TargetNode {
  * the #fieldName convention (see docs/LAYER_NAMING_SPEC.md). Returns the
  * number of layers populated.
  */
-export async function populateSelection(root: TargetNode, offer: Offer): Promise<number> {
+export async function populateSelection(
+  root: TargetNode,
+  offer: Offer,
+  locale: Locale = 'en',
+): Promise<number> {
   let filled = 0;
   const candidates = root.findAll((n) => n.name.startsWith('#'));
 
@@ -39,7 +44,7 @@ export async function populateSelection(root: TargetNode, offer: Offer): Promise
     }
 
     if (node.type !== 'TEXT') continue;
-    const value = textForKey(key, offer);
+    const value = textForKey(key, offer, locale);
     if (value === null) continue;
     await figma.loadFontAsync(node.fontName as FontName);
     (node as TextNode).characters = value;
@@ -47,6 +52,7 @@ export async function populateSelection(root: TargetNode, offer: Offer): Promise
   }
 
   root.setPluginData('htgOfferId', offer.id);
+  root.setPluginData('htgLocale', locale);
   root.setPluginData('htgInsertedAt', new Date().toISOString());
   return filled;
 }

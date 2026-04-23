@@ -67,6 +67,22 @@ To hide a layer entirely when empty, wrap it in an auto-layout frame and use
 Figma's native "Hide when empty" toggle (or toggle visibility in your own
 code / component properties — the plugin does not set `.visible`).
 
+## Locale
+
+When the plugin calls `populateSelection(frame, offer, locale)`, all
+text keys resolve in the chosen locale:
+
+| Locale | `#pricePerNight` | `#priceSuffix` | `#providerLine` | `#ratingLine` |
+|--------|------------------|----------------|-----------------|---------------|
+| en | `£128` / `€128` | `for 7 nights, incl. fees` | `Promoted by Vrbo` | `★ 4.7 (284 reviews)` |
+| de | `€128` | `für 7 Nächte, inkl. Gebühren` | `Angeboten von Vrbo` | `★ 4.7 (284 Bewertungen)` |
+| es | `128 €` | `por 7 noches, tasas incluidas` | `Ofrecido por Vrbo` | `★ 4.7 (284 opiniones)` |
+| fr | `128 €` | `pour 7 nuits, frais inclus` | `Proposé par Vrbo` | `★ 4.7 (284 avis)` |
+
+The locale is selected from the plugin UI's LocaleBar and stamped on
+populated frames via `setPluginData('htgLocale', locale)` so the
+Refresh action re-renders in the same language.
+
 ## Fallback — the plugin ships its own card
 
 If you don't adopt the convention, `Single` mode with no matching selection

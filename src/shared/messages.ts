@@ -1,9 +1,21 @@
 import type { EventHandler } from '@create-figma-plugin/utilities';
 import type { Offer, PropertyType } from './types';
+import type { Locale } from './locales';
+import type { Platform } from './platforms';
 
 export type InsertMode = 'single' | 'list' | 'grid';
 
 export type SortKey = 'default' | 'priceAsc' | 'priceDesc' | 'ratingDesc' | 'newest';
+
+/** Keys of the detail-page sections the plugin can render. */
+export type SectionKind = 'gallery' | 'amenities' | 'reviews' | 'priceBreakdown';
+
+export const SECTION_KINDS: SectionKind[] = [
+  'gallery',
+  'amenities',
+  'reviews',
+  'priceBreakdown',
+];
 
 export interface UiFilters {
   propertyType?: PropertyType;
@@ -17,14 +29,31 @@ export interface UiState {
   search: string;
   sort: SortKey;
   gridColumns: number;
+  locale: Locale;
+  platform: Platform;
   filters: UiFilters;
 }
 
-export interface InsertPayload {
+/** Level-1 insert (property cards). */
+export interface InsertCardsPayload {
+  kind: 'cards';
   offers: Offer[];
   mode: InsertMode;
   gridColumns: number;
+  locale: Locale;
+  platform: Platform;
 }
+
+/** Level-2 insert (detail-page sections for a single offer). */
+export interface InsertSectionsPayload {
+  kind: 'sections';
+  offerId: string;
+  sections: SectionKind[];
+  locale: Locale;
+  platform: Platform;
+}
+
+export type InsertPayload = InsertCardsPayload | InsertSectionsPayload;
 
 export interface LoadedPayload {
   offers: Offer[];

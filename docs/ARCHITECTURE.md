@@ -36,29 +36,42 @@ They talk via `postMessage`, wrapped here by `emit` / `on` from
 ```
 src/
 ├── main/                  # main-thread (QuickJS)
-│   ├── index.ts           # entry — showUI + message router (+ insertCards)
-│   ├── generate.ts        # adaptive card builder (buildCard)
-│   ├── populate.ts        # #fieldName layer populator
-│   ├── brand.ts           # BRAND, FONT, CARD, VIEW_DEAL_GRADIENT tokens
+│   ├── index.ts           # entry — showUI + message router
+│   ├── generate.ts        # platform-aware card builder (web + iOS + Android)
+│   ├── populate.ts        # #fieldName layer populator (locale-aware)
+│   ├── brand.ts           # BRAND, FONT, VIEW_DEAL_GRADIENT tokens
 │   ├── icons.ts           # inline SVGs + placeIcon()
 │   ├── images.ts          # loadImageHash, applyImageFill
-│   └── fonts.ts           # loadBrandFonts (parallel + memoised)
+│   ├── fonts.ts           # loadBrandFonts (parallel + memoised)
+│   └── sections/          # Phase A detail-page section builders
+│       ├── index.ts       # buildSection(kind, offer, locale)
+│       ├── common.ts      # sectionFrame/heading helpers
+│       ├── gallery.ts
+│       ├── amenities.ts
+│       ├── reviews.ts
+│       └── priceBreakdown.ts
 ├── ui/                    # iframe
 │   ├── index.tsx          # render(App)
-│   ├── App.tsx            # state machine, emits INSERT
+│   ├── App.tsx            # state machine (Level 1 + Level 2), emits INSERT
 │   ├── styles.css         # CSS Modules, HTG tokens as custom properties
 │   └── components/
-│       ├── Header.tsx     # logo + Single/List/Grid toggle
-│       ├── SearchBar.tsx  # free-text search
-│       ├── FilterBar.tsx  # price / rating / guests / property-type chips
-│       ├── ProductTile.tsx # card thumbnail + select/preview buttons
-│       └── PreviewModal.tsx # bottom-sheet detail view
+│       ├── Header.tsx     # logo + Single/List/Grid toggle + refresh btn
+│       ├── LocaleBar.tsx  # locale + platform pills
+│       ├── SearchBar.tsx
+│       ├── FilterBar.tsx
+│       ├── SortBar.tsx    # result count + sort dropdown + grid-col stepper
+│       ├── ProductTile.tsx # card thumbnail + preview/open buttons
+│       ├── PreviewModal.tsx # bottom-sheet detail view
+│       └── DetailView.tsx # Level 2 — section-selection grid
 ├── shared/                # imported by both threads
-│   ├── types.ts           # Offer + enums
-│   ├── messages.ts        # InsertMessage, LoadedMessage, InsertMode
-│   └── layer-names.ts     # LAYER_KEYS, textForKey(), matchLayerKey()
+│   ├── types.ts           # Offer + enums + ReviewDetails + PriceBreakdown
+│   ├── messages.ts        # Insert*Payload, UiState, Section kinds
+│   ├── locales.ts         # Locale, STRINGS table, t() helper
+│   ├── platforms.ts       # Platform + PLATFORM_SPEC per platform
+│   ├── format.ts          # formatPrice(amount, currency, locale)
+│   └── layer-names.ts     # LAYER_KEYS, textForKey(offer, locale)
 └── data/
-    └── products.json      # 10 seed offers
+    └── products.json      # 10 offers; 3 enriched with detail-page data
 ```
 
 ## Bundling
@@ -114,6 +127,31 @@ offer doesn't populate:
 
 This is implemented inline in `src/main/generate.ts` — no separate variants
 needed, no "default" placeholder text.
+
+## Two-level navigation + locale + platform
+
+The plugin UI has two levels:
+
+- **Level 1 — Search.** Browse, filter, sort, select N properties,
+  insert as single card / list / grid. The `→` button on each tile
+  (and the **Open details →** button in the preview modal) drills
+  into Level 2.
+- **Level 2 — Property detail.** Breadcrumb + hero strip + a
+  4-section selection grid (Gallery, Amenities, Reviews, Price
+  breakdown). Selected sections insert as one auto-layout container
+  that rebuilds the full rental page.
+
+Every card and section is rendered in the chosen **locale** (en / de /
+es / fr — selected via the LocaleBar pills) and **platform**
+(Web / iPhone / Android). Locale flows through to `formatPrice`,
+category labels, amenity section headings, sub-rating labels, CTAs —
+every visible string. Platform changes card dimensions, corner radii,
+shadow strength, and (iOS vs Android) whether the card has a stroke.
+
+Both choices are persisted via `figma.clientStorage` and re-applied
+when the plugin reopens. Inserted nodes also stamp their locale and
+platform via `setPluginData`, so the Refresh action can round-trip
+them against the current data without losing presentation.
 
 ## Three insert modes
 

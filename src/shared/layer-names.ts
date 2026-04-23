@@ -1,14 +1,13 @@
 import type { Currency, Offer } from './types';
+import type { Locale } from './locales';
+import { t } from './locales';
 import { formatPrice } from './format';
 
 /**
  * Layer-name contract: when a designer selects a frame containing layers
  * named with these keys (with a `#` prefix), the plugin will populate
  * those layers with the offer's data. Match is case-insensitive and ignores
- * spaces, underscores, and hyphens (so `#PricePerNight`, `#price_per_night`,
- * and `#price-per-night` are all equivalent).
- *
- * See docs/LAYER_NAMING_SPEC.md for the designer-facing specification.
+ * spaces, underscores, and hyphens.
  */
 export const LAYER_KEYS = [
   'title',
@@ -50,23 +49,22 @@ export function normalizeLayerName(name: string): string {
   return name.replace(/^#/, '').replace(/[\s_-]+/g, '').toLowerCase();
 }
 
-const formatCurrency = (amount: number, currency: string): string =>
-  formatPrice(amount, currency as Currency);
-
 /**
- * Produces the string value that should replace a text layer matched by key.
- * Image layers are handled separately in the main thread.
+ * Produces the string value that should replace a text layer matched by key,
+ * in the chosen locale.
  */
-export function textForKey(key: LayerKey, offer: Offer): string | null {
+export function textForKey(key: LayerKey, offer: Offer, locale: Locale = 'en'): string | null {
   switch (key) {
     case 'title':
       return offer.title;
     case 'categoryLabel':
-      return offer.categoryLabel ?? offer.propertyType.charAt(0).toUpperCase() + offer.propertyType.slice(1);
+      return offer.categoryLabel ?? t(offer.propertyType, locale);
     case 'location': {
       const parts: string[] = [];
       if (offer.location.distanceToCenterKm !== undefined) {
-        parts.push(`${offer.location.distanceToCenterKm.toFixed(1)} km to center`);
+        parts.push(
+          t('kmToCenter', locale, { n: offer.location.distanceToCenterKm.toFixed(1) }),
+        );
       }
       if (offer.location.neighborhood) {
         parts.push(`${offer.location.city} ${offer.location.neighborhood}`);
@@ -83,44 +81,48 @@ export function textForKey(key: LayerKey, offer: Offer): string | null {
       return offer.location.neighborhood ?? '';
     case 'distance':
       return offer.location.distanceToCenterKm !== undefined
-        ? `${offer.location.distanceToCenterKm.toFixed(1)} km to center`
+        ? t('kmToCenter', locale, { n: offer.location.distanceToCenterKm.toFixed(1) })
         : '';
     case 'propertyType':
-      return offer.propertyType.charAt(0).toUpperCase() + offer.propertyType.slice(1);
+      return t(offer.propertyType, locale);
     case 'pricePerNight':
-      return formatCurrency(offer.price.perNight, offer.price.currency);
-    case 'priceSuffix':
-      return `for ${offer.price.nights} ${offer.price.nights === 1 ? 'night' : 'nights'}, incl. fees`;
+      return formatPrice(offer.price.perNight, offer.price.currency, locale);
+    case 'priceSuffix': {
+      const k = offer.price.nights === 1 ? 'forNight' : 'forNights';
+      return t(k, locale, { n: offer.price.nights });
+    }
     case 'priceTotal':
-      return `${formatCurrency(offer.price.total, offer.price.currency)} total`;
+      return `${formatPrice(offer.price.total, offer.price.currency, locale)} ${t('total', locale)}`;
     case 'priceOriginal':
       return offer.discount
-        ? formatCurrency(offer.discount.originalPerNight, offer.price.currency)
+        ? formatPrice(offer.discount.originalPerNight, offer.price.currency, locale)
         : '';
     case 'discountPercent':
       return offer.discount ? `-${offer.discount.percent}%` : '';
     case 'discountLabel':
       return offer.discount
-        ? `${offer.discount.label ?? 'Deal'}: -${offer.discount.percent}%`
+        ? `${offer.discount.label ?? t('lastMinuteDeal', locale)}: -${offer.discount.percent}%`
         : '';
     case 'currency':
       return offer.price.currency;
     case 'ratingAverage':
-      return offer.rating ? offer.rating.average.toFixed(1) : 'New';
+      return offer.rating ? offer.rating.average.toFixed(1) : t('newListing', locale);
     case 'ratingCount':
-      return offer.rating ? `(${offer.rating.count.toLocaleString('en-US')} reviews)` : '';
+      return offer.rating
+        ? `(${offer.rating.count.toLocaleString()} ${t('reviews', locale)})`
+        : '';
     case 'ratingLine':
       return offer.rating
-        ? `★ ${offer.rating.average.toFixed(1)} (${offer.rating.count.toLocaleString('en-US')} reviews)`
-        : 'New listing';
+        ? `★ ${offer.rating.average.toFixed(1)} (${offer.rating.count.toLocaleString()} ${t('reviews', locale)})`
+        : t('newListing', locale);
     case 'guests':
-      return `${offer.capacity.guests} guests`;
+      return `${offer.capacity.guests} ${t('guests', locale)}`;
     case 'bedrooms':
-      return `${offer.capacity.bedrooms} bedrooms`;
+      return `${offer.capacity.bedrooms} ${t('bedrooms', locale)}`;
     case 'bathrooms':
-      return `${offer.capacity.bathrooms} bathrooms`;
+      return `${offer.capacity.bathrooms} ${t('bathrooms', locale)}`;
     case 'beds':
-      return `${offer.capacity.beds} beds`;
+      return `${offer.capacity.beds} ${t('beds', locale)}`;
     case 'amenities':
       return offer.amenities.slice(0, 4).map((a) => a.replace(/_/g, ' ')).join(' · ');
     case 'badge':
@@ -128,15 +130,15 @@ export function textForKey(key: LayerKey, offer: Offer): string | null {
     case 'provider':
       return offer.provider.name;
     case 'providerLine':
-      return `Promoted by ${offer.provider.name}`;
+      return t('promotedBy', locale, { name: offer.provider.name });
     case 'cancellation':
       return offer.cancellation === 'free_until_7d'
-        ? 'Free cancellation'
+        ? t('freeCancellation', locale)
         : offer.cancellation === 'free_until_24h'
-          ? 'Free cancellation within 24h'
+          ? t('freeCancellationShort', locale)
           : offer.cancellation === 'flexible'
-            ? 'Flexible cancellation'
-            : 'Non-refundable';
+            ? t('freeCancellationFlex', locale)
+            : t('nonRefundable', locale);
     case 'url':
       return offer.url;
     case 'description':

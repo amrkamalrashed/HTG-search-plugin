@@ -16,17 +16,55 @@
     },
     "images": [
       { "url": "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&q=80", "alt": "Bright living room with large windows" },
-      { "url": "https://images.unsplash.com/photo-1560185007-cde436f6a4d0?w=800&q=80", "alt": "Kitchen" }
+      { "url": "https://images.unsplash.com/photo-1560185007-cde436f6a4d0?w=800&q=80", "alt": "Kitchen" },
+      { "url": "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&q=80", "alt": "Master bedroom" },
+      { "url": "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=800&q=80", "alt": "Bathroom" },
+      { "url": "https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0?w=800&q=80", "alt": "Balcony" }
     ],
     "price": { "perNight": 128, "total": 896, "currency": "EUR", "nights": 7 },
     "rating": { "average": 4.7, "count": 284 },
     "capacity": { "guests": 4, "bedrooms": 2, "bathrooms": 1, "beds": 3 },
     "amenities": ["wifi", "kitchen", "washer", "balcony", "heating", "parking", "tv"],
+    "amenitiesByCategory": {
+      "internet_tv": ["wifi", "tv"],
+      "kitchen": ["kitchen"],
+      "outdoor": ["balcony"],
+      "cooling_heating": ["heating"],
+      "parking_accessibility": ["parking"],
+      "services": ["washer"]
+    },
     "badges": ["top_rated", "instant_book"],
     "provider": { "name": "Vrbo" },
     "cancellation": "free_until_7d",
     "url": "https://www.hometogo.com/offer/20394857",
-    "shortDescription": "Stylish two-bedroom apartment in a quiet courtyard, 4 minutes from U-Bahn and surrounded by cafes."
+    "shortDescription": "Stylish two-bedroom apartment in a quiet courtyard, 4 minutes from U-Bahn and surrounded by cafes.",
+    "fullDescription": "Our two-bedroom apartment sits in a leafy courtyard of a restored 1890 Prenzlauer Berg building. The light-filled open plan has a full chef's kitchen, two king bedrooms, and a south-facing balcony overlooking chestnut trees. 4 minutes' walk from Eberswalder Straße U-Bahn, and surrounded by cafés, bakeries, and the famous Sunday flea market at Mauerpark.",
+    "highlights": [
+      "4 min walk to U-Bahn",
+      "Full chef's kitchen",
+      "Private south-facing balcony",
+      "Quiet inner-courtyard location"
+    ],
+    "reviewDetails": {
+      "overall": 4.7,
+      "count": 284,
+      "subRatings": { "cleanliness": 4.8, "location": 4.9, "value": 4.5, "communication": 4.7 },
+      "items": [
+        { "author": "Marta K.", "date": "March 2026", "rating": 5, "text": "Perfect Berlin stay. Quiet, beautifully renovated, right next to everything we wanted to see." },
+        { "author": "Tom S.", "date": "February 2026", "rating": 4, "text": "Comfortable, stylish. The balcony was a highlight on warmer days. Kitchen well-stocked." },
+        { "author": "Ines P.", "date": "January 2026", "rating": 5, "text": "Loved it. The host left us a bottle of wine and local tips. Would absolutely return." }
+      ]
+    },
+    "priceBreakdown": {
+      "lineItems": [
+        { "key": "perNight", "amount": 896, "quantity": 7, "quantityLabel": "€128 × 7 nights" },
+        { "key": "cleaning", "amount": 60 },
+        { "key": "serviceFee", "amount": 35 },
+        { "key": "taxes", "amount": 48 }
+      ],
+      "total": 1039,
+      "currency": "EUR"
+    }
   },
   {
     "id": "offer_39104820",
@@ -46,18 +84,55 @@
     "images": [
       { "url": "https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?w=800&q=80", "alt": "Infinity pool overlooking the sea" },
       { "url": "https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=800&q=80", "alt": "Mediterranean exterior" },
-      { "url": "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=800&q=80", "alt": "Sunset terrace" }
+      { "url": "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=800&q=80", "alt": "Sunset terrace" },
+      { "url": "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800&q=80", "alt": "Living room" },
+      { "url": "https://images.unsplash.com/photo-1570213489059-0aac6626cade?w=800&q=80", "alt": "Master suite" },
+      { "url": "https://images.unsplash.com/photo-1518302057166-c990a3585cc3?w=800&q=80", "alt": "Kitchen" }
     ],
     "price": { "perNight": 624, "total": 4368, "currency": "EUR", "nights": 7 },
     "discount": { "percent": 15, "originalPerNight": 734, "label": "Last-minute deal" },
     "rating": { "average": 4.9, "count": 112 },
     "capacity": { "guests": 10, "bedrooms": 5, "bathrooms": 4, "beds": 7 },
     "amenities": ["wifi", "pool", "kitchen", "sea_view", "air_conditioning", "parking", "bbq", "terrace"],
+    "amenitiesByCategory": {
+      "internet_tv": ["wifi"],
+      "kitchen": ["kitchen"],
+      "outdoor": ["pool", "sea_view", "bbq", "terrace"],
+      "cooling_heating": ["air_conditioning"],
+      "parking_accessibility": ["parking"]
+    },
     "badges": ["top_rated", "great_deal"],
     "provider": { "name": "Interhome" },
     "cancellation": "free_until_7d",
     "url": "https://www.hometogo.com/offer/39104820",
-    "shortDescription": "Private villa with direct beach access, infinity pool, and panoramic Mediterranean views."
+    "shortDescription": "Private villa with direct beach access, infinity pool, and panoramic Mediterranean views.",
+    "fullDescription": "A showcase beachfront villa on Cala d'Or's quietest cove. Five ensuite bedrooms across two wings, a 14-metre infinity pool that seems to spill into the Mediterranean, and a fully-equipped outdoor kitchen with wood-fired oven. Private pathway leads directly to a pocket beach with turquoise water. Sleeps 10 in comfort, perfect for multi-generational trips.",
+    "highlights": [
+      "Direct beach access",
+      "14m heated infinity pool",
+      "Outdoor kitchen with wood-fired oven",
+      "5 ensuite bedrooms, all sea-facing"
+    ],
+    "reviewDetails": {
+      "overall": 4.9,
+      "count": 112,
+      "subRatings": { "cleanliness": 4.9, "location": 5.0, "value": 4.7, "communication": 4.9 },
+      "items": [
+        { "author": "Andreas M.", "date": "April 2026", "rating": 5, "text": "Une expérience exceptionnelle. La vue depuis la piscine est à couper le souffle." },
+        { "author": "Sofia R.", "date": "March 2026", "rating": 5, "text": "Impecable. Diez de nosotros y todos tuvimos nuestro propio espacio." },
+        { "author": "Jack B.", "date": "February 2026", "rating": 5, "text": "Outstanding villa. The beach path is a game-changer — you feel like you own the cove." }
+      ]
+    },
+    "priceBreakdown": {
+      "lineItems": [
+        { "key": "perNight", "amount": 4368, "quantity": 7, "quantityLabel": "€624 × 7 nights" },
+        { "key": "cleaning", "amount": 350 },
+        { "key": "serviceFee", "amount": 220 },
+        { "key": "taxes", "amount": 285 }
+      ],
+      "total": 5223,
+      "currency": "EUR"
+    }
   },
   {
     "id": "offer_10283746",
@@ -273,16 +348,53 @@
     "images": [
       { "url": "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&q=80", "alt": "Boutique hotel interior" },
       { "url": "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=800&q=80", "alt": "Lobby" },
-      { "url": "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=800&q=80", "alt": "Facade" }
+      { "url": "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=800&q=80", "alt": "Facade" },
+      { "url": "https://images.unsplash.com/photo-1611892440504-42a792e24d32?w=800&q=80", "alt": "Bedroom" },
+      { "url": "https://images.unsplash.com/photo-1590490360182-c33d57733427?w=800&q=80", "alt": "Bathroom" },
+      { "url": "https://images.unsplash.com/photo-1540518614846-7eded433c457?w=800&q=80", "alt": "Breakfast" }
     ],
     "price": { "perNight": 81, "total": 81, "currency": "EUR", "nights": 1 },
     "rating": { "average": 4.1, "count": 2235 },
     "capacity": { "guests": 2, "bedrooms": 1, "bathrooms": 1, "beds": 1 },
     "amenities": ["air_conditioning", "wifi", "pets_allowed", "smoking_allowed", "hair_dryer", "parking", "tv", "breakfast"],
+    "amenitiesByCategory": {
+      "internet_tv": ["wifi", "tv"],
+      "cooling_heating": ["air_conditioning"],
+      "bathroom": ["hair_dryer"],
+      "services": ["breakfast"],
+      "parking_accessibility": ["parking"],
+      "policies": ["pets_allowed", "smoking_allowed"]
+    },
     "badges": ["instant_book"],
     "provider": { "name": "Booking.com" },
     "cancellation": "free_until_24h",
     "url": "https://www.hometogo.com/offer/88113025",
-    "shortDescription": "Boutique capsule hotel in Amsterdam Oud-Zuid. Compact, design-forward rooms with full amenities."
+    "shortDescription": "Boutique capsule hotel in Amsterdam Oud-Zuid. Compact, design-forward rooms with full amenities.",
+    "fullDescription": "Design-forward capsule hotel in the heart of Amsterdam Oud-Zuid. Each sleeping pod features premium bedding, personalised climate control, sound-isolated walls, and a private workspace. Shared spaces include a self-service breakfast bar, co-working lounge, and rooftop terrace with canal views. Two minutes' walk from Albert Cuyp Market, six minutes to the Rijksmuseum.",
+    "highlights": [
+      "2 min walk to Albert Cuyp Market",
+      "Breakfast included",
+      "Rooftop terrace with canal views",
+      "Pet-friendly pods"
+    ],
+    "reviewDetails": {
+      "overall": 4.1,
+      "count": 2235,
+      "subRatings": { "cleanliness": 4.4, "location": 4.8, "value": 4.0, "communication": 3.9 },
+      "items": [
+        { "author": "Lena V.", "date": "April 2026", "rating": 4, "text": "Clever design, surprisingly comfortable for a capsule. Breakfast was excellent." },
+        { "author": "Matteo D.", "date": "April 2026", "rating": 5, "text": "Perfect for a solo trip. Quiet, clean, stylish. Would stay again." },
+        { "author": "Hannah W.", "date": "March 2026", "rating": 3, "text": "Location unbeatable. Pods are cosy but walls are thinner than they look — bring earplugs." }
+      ]
+    },
+    "priceBreakdown": {
+      "lineItems": [
+        { "key": "perNight", "amount": 81, "quantity": 1, "quantityLabel": "€81 × 1 night" },
+        { "key": "serviceFee", "amount": 8 },
+        { "key": "taxes", "amount": 6 }
+      ],
+      "total": 95,
+      "currency": "EUR"
+    }
   }
 ]
