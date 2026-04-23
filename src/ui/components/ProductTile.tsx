@@ -1,6 +1,7 @@
 import { h } from 'preact';
 import styles from '../styles.css';
 import type { Offer } from '@shared/types';
+import { formatPrice } from '@shared/format';
 
 interface Props {
   offer: Offer;
@@ -8,8 +9,6 @@ interface Props {
   onToggle: () => void;
   onPreview: () => void;
 }
-
-const symbol = (c: string) => (c === 'EUR' ? '€' : c === 'GBP' ? '£' : '$');
 
 export function ProductTile({ offer, selected, onToggle, onPreview }: Props) {
   const badge = offer.badges[0];
@@ -60,13 +59,11 @@ export function ProductTile({ offer, selected, onToggle, onPreview }: Props) {
         <div class={styles.tilePriceRow}>
           {offer.discount && (
             <span class={styles.tilePriceOriginal}>
-              {symbol(offer.price.currency)}
-              {offer.discount.originalPerNight}
+              {formatPrice(offer.discount.originalPerNight, offer.price.currency)}
             </span>
           )}
           <span class={styles.tilePrice}>
-            {symbol(offer.price.currency)}
-            {offer.price.perNight}
+            {formatPrice(offer.price.perNight, offer.price.currency)}
           </span>
           <span class={styles.tilePriceSuffix}>/ night</span>
         </div>

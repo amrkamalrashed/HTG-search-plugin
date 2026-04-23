@@ -1,14 +1,13 @@
 import { h } from 'preact';
 import styles from '../styles.css';
 import type { Offer } from '@shared/types';
+import { formatPrice } from '@shared/format';
 
 interface Props {
   offer: Offer;
   onClose: () => void;
   onInsert: () => void;
 }
-
-const symbol = (c: string) => (c === 'EUR' ? '€' : c === 'GBP' ? '£' : '$');
 
 export function PreviewModal({ offer, onClose, onInsert }: Props) {
   return (
@@ -69,20 +68,17 @@ export function PreviewModal({ offer, onClose, onInsert }: Props) {
             <div class={styles.modalPriceRow}>
               {offer.discount && (
                 <span class={styles.modalPriceOriginal}>
-                  {symbol(offer.price.currency)}
-                  {offer.discount.originalPerNight}
+                  {formatPrice(offer.discount.originalPerNight, offer.price.currency)}
                 </span>
               )}
               <span class={styles.modalPrice}>
-                {symbol(offer.price.currency)}
-                {offer.price.perNight}
+                {formatPrice(offer.price.perNight, offer.price.currency)}
               </span>
               <span class={styles.modalPriceSuffix}>/ night</span>
             </div>
             <div class={styles.modalProvider}>
               by {offer.provider.name} · {offer.price.nights} nights:{' '}
-              {symbol(offer.price.currency)}
-              {offer.price.total.toLocaleString('en-US')} total
+              {formatPrice(offer.price.total, offer.price.currency)} total
             </div>
           </div>
         </div>

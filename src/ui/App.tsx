@@ -1,29 +1,58 @@
 import { h } from 'preact';
-import { useMemo, useState } from 'preact/hooks';
+import { useEffect, useMemo, useState } from 'preact/hooks';
 import { emit } from '@create-figma-plugin/utilities';
 import type { Offer } from '@shared/types';
-import type { InsertHandler, InsertMode, LoadedPayload } from '@shared/messages';
+import type {
+  InsertHandler,
+  InsertMode,
+  LoadedPayload,
+  RefreshHandler,
+  SaveStateHandler,
+  SortKey,
+  UiState,
+} from '@shared/messages';
 import { Header } from './components/Header';
 import { SearchBar } from './components/SearchBar';
 import { FilterBar, type Filters } from './components/FilterBar';
+import { SortBar } from './components/SortBar';
 import { ProductTile } from './components/ProductTile';
 import { PreviewModal } from './components/PreviewModal';
 import styles from './styles.css';
 
+const DEFAULT_STATE: UiState = {
+  mode: 'single',
+  search: '',
+  sort: 'default',
+  gridColumns: 2,
+  filters: {},
+};
+
 export function App(props: LoadedPayload) {
-  const [mode, setMode] = useState<InsertMode>('single');
-  const [search, setSearch] = useState('');
-  const [filters, setFilters] = useState<Filters>({});
+  const saved = props.savedState ?? DEFAULT_STATE;
+
+  const [mode, setMode] = useState<InsertMode>(saved.mode);
+  const [search, setSearch] = useState(saved.search);
+  const [sort, setSort] = useState<SortKey>(saved.sort);
+  const [gridColumns, setGridColumns] = useState<number>(saved.gridColumns);
+  const [filters, setFilters] = useState<Filters>(saved.filters);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [previewId, setPreviewId] = useState<string | null>(null);
 
   const offers = props.offers;
 
+  // Persist UI state (debounced so we don't spam the bridge on every keypress)
+  useEffect(() => {
+    const handle = setTimeout(() => {
+      emit<SaveStateHandler>('SAVE_STATE', { mode, search, sort, gridColumns, filters });
+    }, 250);
+    return () => clearTimeout(handle);
+  }, [mode, search, sort, gridColumns, filters]);
+
   const visible = useMemo(() => {
     const q = search.trim().toLowerCase();
-    return offers.filter((o) => {
+    const filtered = offers.filter((o) => {
       if (q) {
-        const hay = `${o.title} ${o.location.city} ${o.location.country}`.toLowerCase();
+        const hay = `${o.title} ${o.location.city} ${o.location.country} ${o.location.neighborhood ?? ''}`.toLowerCase();
         if (!hay.includes(q)) return false;
       }
       if (filters.propertyType && o.propertyType !== filters.propertyType) return false;
@@ -32,7 +61,8 @@ export function App(props: LoadedPayload) {
       if (filters.minGuests && o.capacity.guests < filters.minGuests) return false;
       return true;
     });
-  }, [offers, search, filters]);
+    return sortOffers(filtered, sort);
+  }, [offers, search, filters, sort]);
 
   const toggle = (id: string) => {
     setSelectedIds((prev) => {
@@ -64,12 +94,51 @@ export function App(props: LoadedPayload) {
     emit<InsertHandler>('INSERT', {
       offers: payload,
       mode: offerOverride ? 'single' : mode,
+      gridColumns,
     });
   };
 
   const selectAllVisible = () => {
     setSelectedIds(new Set(visible.map((o) => o.id)));
   };
+
+  const clearSelection = () => {
+    setSelectedIds(new Set());
+  };
+
+  const clearAllFilters = () => {
+    setFilters({});
+    setSearch('');
+    setSort('default');
+  };
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const inInput = document.activeElement && ['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName);
+      if (e.key === 'Escape') {
+        if (previewId) {
+          setPreviewId(null);
+          e.preventDefault();
+        } else if (selectedIds.size > 0) {
+          clearSelection();
+          e.preventDefault();
+        }
+        return;
+      }
+      if (e.key === 'Enter' && !inInput && selectedIds.size > 0) {
+        insert();
+        e.preventDefault();
+        return;
+      }
+      if ((e.metaKey || e.ctrlKey) && e.key === 'a' && mode !== 'single') {
+        e.preventDefault();
+        selectAllVisible();
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [selectedIds, previewId, mode, visible]);
 
   const previewOffer = previewId ? offers.find((o) => o.id === previewId) : null;
   const count = selectedIds.size;
@@ -82,29 +151,70 @@ export function App(props: LoadedPayload) {
   };
 
   const showBulkBar = mode !== 'single';
+  const hasActiveFilters =
+    !!search ||
+    sort !== 'default' ||
+    Object.values(filters).some((v) => v !== undefined);
 
   return (
     <div class={styles.root}>
-      <Header mode={mode} onModeChange={handleModeChange} />
+      <Header
+        mode={mode}
+        onModeChange={handleModeChange}
+        onRefresh={() => emit<RefreshHandler>('REFRESH')}
+      />
       <SearchBar value={search} onChange={setSearch} />
       <FilterBar filters={filters} onChange={setFilters} />
+      <SortBar
+        count={visible.length}
+        total={offers.length}
+        sort={sort}
+        onSortChange={setSort}
+        mode={mode}
+        gridColumns={gridColumns}
+        onGridColumnsChange={setGridColumns}
+      />
 
       {showBulkBar && (
         <div class={styles.bulkBar}>
           <span class={styles.bulkBarText}>
             {count === 0
-              ? `Pick multiple properties to insert as ${mode}`
+              ? `Pick properties to insert as ${mode}`
               : `${count} selected`}
           </span>
-          <button class={styles.bulkBarBtn} onClick={selectAllVisible}>
-            Select all {visible.length}
-          </button>
+          <div class={styles.bulkBarActions}>
+            <button
+              class={styles.bulkBarBtn}
+              onClick={selectAllVisible}
+              disabled={count === visible.length}
+            >
+              Select all {visible.length}
+            </button>
+            <button
+              class={styles.bulkBarBtnGhost}
+              onClick={clearSelection}
+              disabled={count === 0}
+            >
+              Clear
+            </button>
+          </div>
         </div>
       )}
 
       <div class={styles.scroll}>
         {visible.length === 0 ? (
-          <div class={styles.empty}>No properties match your filters.</div>
+          <div class={styles.empty}>
+            <div class={styles.emptyIcon}>⌕</div>
+            <div class={styles.emptyTitle}>No properties match</div>
+            <div class={styles.emptySubtitle}>
+              Try widening the filters or searching for a different city.
+            </div>
+            {hasActiveFilters && (
+              <button class={styles.emptyBtn} onClick={clearAllFilters}>
+                Clear all filters
+              </button>
+            )}
+          </div>
         ) : (
           <div class={styles.grid}>
             {visible.map((o) => (
@@ -123,8 +233,8 @@ export function App(props: LoadedPayload) {
       <div class={styles.footer}>
         <div class={`${styles.footerInfo} ${count > 0 ? styles.footerInfoActive : ''}`}>
           {count === 0
-            ? `${visible.length} of ${offers.length} properties`
-            : `${count} selected`}
+            ? hintFor(mode)
+            : `${count} selected · ⏎ to insert`}
         </div>
         <button
           class={`${styles.btn} ${styles.btnPrimary}`}
@@ -147,4 +257,36 @@ export function App(props: LoadedPayload) {
       )}
     </div>
   );
+}
+
+function hintFor(mode: InsertMode): string {
+  if (mode === 'single') return 'Click a property to select';
+  if (mode === 'list') return 'Pick multiple to stack as a list';
+  return 'Pick multiple to arrange as a grid';
+}
+
+function sortOffers(offers: Offer[], key: SortKey): Offer[] {
+  const a = [...offers];
+  switch (key) {
+    case 'priceAsc':
+      a.sort((x, y) => x.price.perNight - y.price.perNight);
+      break;
+    case 'priceDesc':
+      a.sort((x, y) => y.price.perNight - x.price.perNight);
+      break;
+    case 'ratingDesc':
+      a.sort((x, y) => (y.rating?.average ?? 0) - (x.rating?.average ?? 0));
+      break;
+    case 'newest':
+      a.sort((x, y) => {
+        const xNew = x.badges.includes('new_listing') ? 1 : 0;
+        const yNew = y.badges.includes('new_listing') ? 1 : 0;
+        return yNew - xNew;
+      });
+      break;
+    case 'default':
+    default:
+      break;
+  }
+  return a;
 }

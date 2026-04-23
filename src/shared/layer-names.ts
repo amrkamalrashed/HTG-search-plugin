@@ -1,4 +1,5 @@
-import type { Offer } from './types';
+import type { Currency, Offer } from './types';
+import { formatPrice } from './format';
 
 /**
  * Layer-name contract: when a designer selects a frame containing layers
@@ -49,10 +50,8 @@ export function normalizeLayerName(name: string): string {
   return name.replace(/^#/, '').replace(/[\s_-]+/g, '').toLowerCase();
 }
 
-const formatCurrency = (amount: number, currency: string): string => {
-  const symbol = currency === 'EUR' ? '€' : currency === 'GBP' ? '£' : '$';
-  return `${symbol}${amount.toLocaleString('en-US')}`;
-};
+const formatCurrency = (amount: number, currency: string): string =>
+  formatPrice(amount, currency as Currency);
 
 /**
  * Produces the string value that should replace a text layer matched by key.

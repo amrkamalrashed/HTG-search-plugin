@@ -1,0 +1,53 @@
+name: Build plugin bundle
+
+on:
+  push:
+    branches:
+      - main
+      - claude/figma-plugin-json-demo-qpF2n
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    # Skip when the commit was created by this workflow to avoid loops.
+    if: "!contains(github.event.head_commit.message, '[skip ci]')"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build plugin
+        run: npm run build
+
+      - name: Commit manifest + build/ if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add manifest.json build/
+          if git diff --staged --quiet; then
+            echo "Bundle is already in sync with source — nothing to commit."
+          else
+            git commit -m "chore: auto-build manifest + bundle [skip ci]"
+            git push
+          fi
+
+      - name: Upload bundle as workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: figma-plugin-bundle
+          path: |
+            manifest.json
+            build/
+          retention-days: 30

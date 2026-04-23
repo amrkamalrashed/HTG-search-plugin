@@ -1,25 +1,41 @@
 import { on, showUI } from '@create-figma-plugin/utilities';
 import productsJson from '@data/products.json';
 import type { Offer } from '@shared/types';
-import type { InsertHandler, InsertMode, LoadedPayload } from '@shared/messages';
+import type {
+  InsertHandler,
+  InsertMode,
+  LoadedPayload,
+  RefreshHandler,
+  SaveStateHandler,
+  UiState,
+} from '@shared/messages';
 import { buildCard } from './generate';
 import { CARD } from './brand';
 import { firstTargetInSelection, populateSelection } from './populate';
 
 const OFFERS = productsJson as unknown as Offer[];
-const GRID_COLUMNS = 2;
+const OFFER_BY_ID: Record<string, Offer> = Object.fromEntries(
+  OFFERS.map((o) => [o.id, o]),
+);
 const LAYOUT_GAP = 16;
 const CONTAINER_PADDING = 20;
+const UI_STATE_KEY = 'htgUiState';
 
-export default function () {
-  const initialData: LoadedPayload = { offers: OFFERS };
+export default async function () {
+  const savedState = (await figma.clientStorage.getAsync(UI_STATE_KEY)) as
+    | UiState
+    | undefined;
+
+  const initialData: LoadedPayload = { offers: OFFERS, savedState };
   showUI({ width: 420, height: 680 }, { ...initialData });
 
-  on<InsertHandler>('INSERT', async ({ offers, mode }) => {
+  on<SaveStateHandler>('SAVE_STATE', async (state) => {
+    await figma.clientStorage.setAsync(UI_STATE_KEY, state);
+  });
+
+  on<InsertHandler>('INSERT', async ({ offers, mode, gridColumns }) => {
     if (offers.length === 0) return;
 
-    // Hybrid: if the user has a component/frame selected and picked single,
-    // try the #fieldName populate path first.
     const target = firstTargetInSelection(figma.currentPage.selection);
     if (target && mode === 'single' && offers.length === 1) {
       const filled = await populateSelection(target, offers[0]);
@@ -34,7 +50,7 @@ export default function () {
       );
     }
 
-    const created = await insertCards(offers, mode);
+    const created = await insertCards(offers, mode, gridColumns);
     figma.currentPage.selection = created;
     figma.viewport.scrollAndZoomIntoView(created);
 
@@ -45,9 +61,64 @@ export default function () {
         : `Inserted ${offers.length} properties as a ${verb}`,
     );
   });
+
+  on<RefreshHandler>('REFRESH', async () => {
+    const selection = figma.currentPage.selection;
+    if (selection.length === 0) {
+      figma.notify('Select one or more HomeToGo cards first.', { error: true });
+      return;
+    }
+    const tagged = collectTaggedFrames(selection);
+    if (tagged.length === 0) {
+      figma.notify('No inserted HomeToGo cards in the current selection.', { error: true });
+      return;
+    }
+    let refreshed = 0;
+    const fresh: SceneNode[] = [];
+    for (const node of tagged) {
+      const offerId = node.getPluginData('htgOfferId');
+      const offer = OFFER_BY_ID[offerId];
+      if (!offer) continue;
+      const parent = node.parent;
+      if (!parent || !('children' in parent)) continue;
+      const card = await buildCard(offer);
+      card.x = node.x;
+      card.y = node.y;
+      const idx = parent.children.indexOf(node);
+      parent.insertChild(idx, card);
+      node.remove();
+      fresh.push(card);
+      refreshed++;
+    }
+    if (fresh.length > 0) figma.currentPage.selection = fresh;
+    figma.notify(
+      refreshed === 0
+        ? 'Nothing refreshed — offer data not found.'
+        : `Refreshed ${refreshed} HomeToGo card${refreshed === 1 ? '' : 's'}`,
+    );
+  });
 }
 
-async function insertCards(offers: Offer[], mode: InsertMode): Promise<SceneNode[] > {
+function collectTaggedFrames(selection: readonly SceneNode[]): FrameNode[] {
+  const out: FrameNode[] = [];
+  const visit = (node: SceneNode) => {
+    if (node.type === 'FRAME' && node.getPluginData('htgOfferId')) {
+      out.push(node);
+      return;
+    }
+    if ('children' in node) {
+      for (const child of node.children) visit(child);
+    }
+  };
+  for (const s of selection) visit(s);
+  return out;
+}
+
+async function insertCards(
+  offers: Offer[],
+  mode: InsertMode,
+  gridColumns: number,
+): Promise<SceneNode[]> {
   if (mode === 'single') {
     const created: SceneNode[] = [];
     let x = figma.viewport.center.x - CARD.width / 2;
@@ -58,7 +129,6 @@ async function insertCards(offers: Offer[], mode: InsertMode): Promise<SceneNode
       card.y = y;
       figma.currentPage.appendChild(card);
       created.push(card);
-      // stagger if multiple in single mode (rare but possible)
       x += 40;
       y += 40;
     }
@@ -71,27 +141,33 @@ async function insertCards(offers: Offer[], mode: InsertMode): Promise<SceneNode
       ? `HTG Search Grid (${offers.length})`
       : `HTG Search Results (${offers.length})`;
   container.layoutMode = mode === 'grid' ? 'HORIZONTAL' : 'VERTICAL';
-  container.primaryAxisSizingMode = mode === 'grid' ? 'FIXED' : 'AUTO';
-  container.counterAxisSizingMode = 'AUTO';
   container.itemSpacing = LAYOUT_GAP;
-  if (mode === 'grid') {
-    container.layoutWrap = 'WRAP';
-    container.counterAxisSpacing = LAYOUT_GAP;
-    const gridWidth =
-      GRID_COLUMNS * CARD.width +
-      (GRID_COLUMNS - 1) * LAYOUT_GAP +
-      CONTAINER_PADDING * 2;
-    container.resize(gridWidth, 1);
-  }
   container.paddingTop = container.paddingBottom = CONTAINER_PADDING;
   container.paddingLeft = container.paddingRight = CONTAINER_PADDING;
   container.cornerRadius = 20;
   container.fills = [{ type: 'SOLID', color: { r: 0.969, g: 0.976, b: 0.988 } }];
 
+  if (mode === 'grid') {
+    const cols = Math.max(1, Math.min(4, gridColumns || 2));
+    container.layoutWrap = 'WRAP';
+    container.counterAxisSpacing = LAYOUT_GAP;
+    const gridWidth =
+      cols * CARD.width + (cols - 1) * LAYOUT_GAP + CONTAINER_PADDING * 2;
+    container.resizeWithoutConstraints(gridWidth, 1);
+    container.primaryAxisSizingMode = 'FIXED';
+  } else {
+    container.primaryAxisSizingMode = 'AUTO';
+  }
+  container.counterAxisSizingMode = 'AUTO';
+
   for (const offer of offers) {
     const card = await buildCard(offer);
     container.appendChild(card);
   }
+
+  // Re-affirm hug so Figma recomputes the counter-axis size after the
+  // wrap layout has measured all children (fixes the grid-hug issue).
+  container.counterAxisSizingMode = 'AUTO';
 
   container.x = figma.viewport.center.x - container.width / 2;
   container.y = figma.viewport.center.y - container.height / 2;

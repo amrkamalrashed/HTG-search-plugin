@@ -1,13 +1,9 @@
-import type { Amenity, Offer } from '@shared/types';
+import type { Amenity, Currency, Offer } from '@shared/types';
+import { formatPrice } from '@shared/format';
 import { BRAND, CARD, FONT, VIEW_DEAL_GRADIENT } from './brand';
 import { loadBrandFonts } from './fonts';
 import { applyImageFill, loadImageHash } from './images';
 import { placeIcon, type IconName } from './icons';
-
-const formatPrice = (amount: number, currency: string): string => {
-  const symbol = currency === 'EUR' ? '€' : currency === 'GBP' ? '£' : '$';
-  return `${symbol}${amount.toLocaleString('en-US')}`;
-};
 
 const AMENITY_TO_ICON: Partial<Record<Amenity, IconName>> = {
   wifi: 'wifi',
