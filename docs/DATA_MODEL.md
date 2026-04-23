@@ -1,0 +1,127 @@
+# Data model
+
+`src/shared/types.ts` is the single source of truth. `src/data/products.json`
+must round-trip through this type. The plugin never validates the JSON at
+runtime — TypeScript checks it at build time because of `resolveJsonModule`.
+
+## The `Offer` shape
+
+```ts
+interface Offer {
+  id: string;                      // "offer_20394857"
+  title: string;                   // "Charming Apartment near Prenzlauer Berg"
+  propertyType: PropertyType;      // 'apartment' | 'villa' | 'cabin' | ...
+  categoryLabel?: string;          // "Apartment" | "1-star hotel" | "Boutique villa"
+
+  location: {
+    city: string;                  // "Berlin"
+    region?: string;               // "Berlin" (state/province)
+    country: string;               // "Germany"
+    countryCode: string;           // "DE"
+    neighborhood?: string;         // "Prenzlauer Berg"
+    distanceToCenterKm?: number;   // 3.4
+    lat?: number;
+    lng?: number;
+  };
+
+  images: Array<{ url: string; alt?: string }>;
+
+  price: {
+    perNight: number;              // 128
+    total: number;                 // 896
+    currency: 'EUR' | 'USD' | 'GBP';
+    nights: number;                // 7
+  };
+
+  discount?: {
+    percent: number;               // 15
+    originalPerNight: number;      // 151
+    label?: string;                // "Last-minute deal"
+  };
+
+  rating?: {
+    average: number;               // 4.7
+    count: number;                 // 284
+  };
+
+  capacity: {
+    guests: number;
+    bedrooms: number;
+    bathrooms: number;
+    beds: number;
+  };
+
+  amenities: Amenity[];            // see enum below
+
+  badges: Badge[];                 // 'top_rated' | 'great_deal' | ...
+
+  provider: {
+    name: string;                  // "Vrbo" | "Booking.com" | ...
+    logoUrl?: string;
+  };
+
+  cancellation: 'free_until_7d' | 'free_until_24h' | 'non_refundable' | 'flexible';
+
+  url: string;                     // "https://www.hometogo.com/offer/20394857"
+  shortDescription?: string;
+}
+```
+
+## Enums
+
+```ts
+type PropertyType =
+  | 'apartment' | 'house' | 'villa' | 'cabin' | 'chalet'
+  | 'cottage' | 'studio' | 'penthouse' | 'castle' | 'bungalow' | 'hotel';
+
+type Amenity =
+  | 'wifi' | 'kitchen' | 'washer' | 'dryer' | 'parking' | 'pool'
+  | 'hot_tub' | 'air_conditioning' | 'heating' | 'balcony' | 'terrace'
+  | 'garden' | 'bbq' | 'fireplace' | 'sea_view' | 'mountain_view'
+  | 'pets_allowed' | 'smoking_allowed' | 'wheelchair_accessible'
+  | 'ev_charger' | 'tv' | 'hair_dryer' | 'elevator' | 'breakfast';
+
+type Badge =
+  | 'top_rated' | 'great_deal' | 'instant_book' | 'new_listing'
+  | 'free_cancellation' | 'eco_friendly';
+```
+
+## Reference — HomeToGo offer fields observed on the site
+
+The PoC shape mirrors what's visible on `hometogo.com/search/*`:
+
+- **Identity**: title, category label ("Hotel", "1-star hotel", "Apartment"),
+  property type.
+- **Location**: distance to centre, city + neighbourhood.
+- **Visual**: at least one image; cards show pagination dots when multiple.
+- **Price**: per-night (prominent), "for N nights, incl. fees" suffix,
+  strikethrough original when discounted. Currency as symbol.
+- **Discount**: soft-coral pill "Last-minute deal: -N%".
+- **Rating**: purple star, decimal average, parenthesised review count.
+- **Amenity icons**: 6–8 line icons inline. Variable set per property.
+- **Provider attribution**: "Promoted by <provider>".
+- **CTA**: gradient **View deal** button.
+
+All of these map 1:1 to fields on `Offer`. When the real API spec lands, any
+extra fields should be added here first, then wired into `products.json` and
+`src/main/generate.ts`.
+
+## Edge-case coverage in `products.json`
+
+The 10 seed offers cover:
+
+- **No discount, no "deal" pill**: `offer_20394857` (Berlin apartment).
+- **Discount + last-minute deal pill + strikethrough price**: `offer_39104820`
+  (Mallorca villa), `offer_55882019` (Paris penthouse), `offer_22057183`
+  (Algarve villa).
+- **No rating ("New listing" fallback)**: `offer_10283746` (Black Forest cabin).
+- **High-review-count hotel matching the reference screenshot style**:
+  `offer_88113025` (De Bedstee Boutique Capsules, Amsterdam).
+- **Long title with German umlauts**: `offer_55882019` (Paris penthouse).
+- **Non-EUR currency (GBP)**: `offer_90384726` (Scottish castle),
+  `offer_66401298` (Cotswolds cottage).
+- **1 image only (no pagination dots)**: several.
+- **Varying amenity counts** (3 → 9): ensures the icon row grows/shrinks.
+- **No neighbourhood** (falls back to "City, Country"): `offer_10283746`,
+  `offer_48271056`.
+- **Country coverage**: DE, ES, FR, NL, AT, GB, PT, GR.

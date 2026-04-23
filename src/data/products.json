@@ -1,0 +1,288 @@
+[
+  {
+    "id": "offer_20394857",
+    "title": "Charming Apartment near Prenzlauer Berg",
+    "propertyType": "apartment",
+    "categoryLabel": "Apartment",
+    "location": {
+      "city": "Berlin",
+      "region": "Berlin",
+      "country": "Germany",
+      "countryCode": "DE",
+      "neighborhood": "Prenzlauer Berg",
+      "distanceToCenterKm": 3.4,
+      "lat": 52.5396,
+      "lng": 13.4127
+    },
+    "images": [
+      { "url": "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&q=80", "alt": "Bright living room with large windows" },
+      { "url": "https://images.unsplash.com/photo-1560185007-cde436f6a4d0?w=800&q=80", "alt": "Kitchen" }
+    ],
+    "price": { "perNight": 128, "total": 896, "currency": "EUR", "nights": 7 },
+    "rating": { "average": 4.7, "count": 284 },
+    "capacity": { "guests": 4, "bedrooms": 2, "bathrooms": 1, "beds": 3 },
+    "amenities": ["wifi", "kitchen", "washer", "balcony", "heating", "parking", "tv"],
+    "badges": ["top_rated", "instant_book"],
+    "provider": { "name": "Vrbo" },
+    "cancellation": "free_until_7d",
+    "url": "https://www.hometogo.com/offer/20394857",
+    "shortDescription": "Stylish two-bedroom apartment in a quiet courtyard, 4 minutes from U-Bahn and surrounded by cafes."
+  },
+  {
+    "id": "offer_39104820",
+    "title": "Cala d'Or Beachfront Villa with Infinity Pool",
+    "propertyType": "villa",
+    "categoryLabel": "Villa",
+    "location": {
+      "city": "Mallorca",
+      "region": "Balearic Islands",
+      "country": "Spain",
+      "countryCode": "ES",
+      "neighborhood": "Cala d'Or",
+      "distanceToCenterKm": 0.4,
+      "lat": 39.3717,
+      "lng": 3.2300
+    },
+    "images": [
+      { "url": "https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?w=800&q=80", "alt": "Infinity pool overlooking the sea" },
+      { "url": "https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=800&q=80", "alt": "Mediterranean exterior" },
+      { "url": "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=800&q=80", "alt": "Sunset terrace" }
+    ],
+    "price": { "perNight": 624, "total": 4368, "currency": "EUR", "nights": 7 },
+    "discount": { "percent": 15, "originalPerNight": 734, "label": "Last-minute deal" },
+    "rating": { "average": 4.9, "count": 112 },
+    "capacity": { "guests": 10, "bedrooms": 5, "bathrooms": 4, "beds": 7 },
+    "amenities": ["wifi", "pool", "kitchen", "sea_view", "air_conditioning", "parking", "bbq", "terrace"],
+    "badges": ["top_rated", "great_deal"],
+    "provider": { "name": "Interhome" },
+    "cancellation": "free_until_7d",
+    "url": "https://www.hometogo.com/offer/39104820",
+    "shortDescription": "Private villa with direct beach access, infinity pool, and panoramic Mediterranean views."
+  },
+  {
+    "id": "offer_10283746",
+    "title": "Blockhütte am Titisee – Schwarzwald",
+    "propertyType": "cabin",
+    "categoryLabel": "Cabin",
+    "location": {
+      "city": "Titisee-Neustadt",
+      "region": "Baden-Württemberg",
+      "country": "Germany",
+      "countryCode": "DE",
+      "distanceToCenterKm": 1.2,
+      "lat": 47.9102,
+      "lng": 8.1447
+    },
+    "images": [
+      { "url": "https://images.unsplash.com/photo-1510798831971-661eb04b3739?w=800&q=80", "alt": "Wooden cabin in snow" }
+    ],
+    "price": { "perNight": 89, "total": 623, "currency": "EUR", "nights": 7 },
+    "capacity": { "guests": 4, "bedrooms": 2, "bathrooms": 1, "beds": 2 },
+    "amenities": ["wifi", "kitchen", "heating", "fireplace", "mountain_view", "parking", "pets_allowed"],
+    "badges": ["new_listing", "eco_friendly"],
+    "provider": { "name": "NOVASOL" },
+    "cancellation": "flexible",
+    "url": "https://www.hometogo.com/offer/10283746",
+    "shortDescription": "Rustic cabin near the Black Forest lakes. Wood-burning stove and forest hiking trails outside the door."
+  },
+  {
+    "id": "offer_55882019",
+    "title": "Luxuriöses Penthouse mit Eiffelturmblick über den Dächern von Paris",
+    "propertyType": "penthouse",
+    "categoryLabel": "Penthouse",
+    "location": {
+      "city": "Paris",
+      "region": "Île-de-France",
+      "country": "France",
+      "countryCode": "FR",
+      "neighborhood": "7e arrondissement",
+      "distanceToCenterKm": 1.8,
+      "lat": 48.8566,
+      "lng": 2.3522
+    },
+    "images": [
+      { "url": "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&q=80", "alt": "Paris rooftop view" },
+      { "url": "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=800&q=80", "alt": "Master bedroom" }
+    ],
+    "price": { "perNight": 512, "total": 3584, "currency": "EUR", "nights": 7 },
+    "discount": { "percent": 20, "originalPerNight": 640, "label": "Last-minute deal" },
+    "rating": { "average": 4.8, "count": 67 },
+    "capacity": { "guests": 6, "bedrooms": 3, "bathrooms": 2, "beds": 4 },
+    "amenities": ["wifi", "kitchen", "air_conditioning", "balcony", "ev_charger", "washer", "dryer", "elevator"],
+    "badges": ["great_deal", "instant_book"],
+    "provider": { "name": "Booking.com" },
+    "cancellation": "free_until_24h",
+    "url": "https://www.hometogo.com/offer/55882019",
+    "shortDescription": "Top-floor penthouse with wraparound terrace and direct views of the Eiffel Tower."
+  },
+  {
+    "id": "offer_71029384",
+    "title": "Canal-side Studio in Jordaan",
+    "propertyType": "studio",
+    "categoryLabel": "Studio",
+    "location": {
+      "city": "Amsterdam",
+      "region": "North Holland",
+      "country": "Netherlands",
+      "countryCode": "NL",
+      "neighborhood": "Jordaan",
+      "distanceToCenterKm": 0.9,
+      "lat": 52.3740,
+      "lng": 4.8897
+    },
+    "images": [
+      { "url": "https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0?w=800&q=80", "alt": "Compact canal apartment" }
+    ],
+    "price": { "perNight": 145, "total": 1015, "currency": "EUR", "nights": 7 },
+    "rating": { "average": 4.5, "count": 412 },
+    "capacity": { "guests": 2, "bedrooms": 1, "bathrooms": 1, "beds": 1 },
+    "amenities": ["wifi", "kitchen", "heating", "tv"],
+    "badges": ["instant_book"],
+    "provider": { "name": "Airbnb" },
+    "cancellation": "free_until_7d",
+    "url": "https://www.hometogo.com/offer/71029384",
+    "shortDescription": "Cozy canal-facing studio in the heart of Jordaan. Perfect for couples."
+  },
+  {
+    "id": "offer_48271056",
+    "title": "Alpine Chalet with Hot Tub — Kitzbühel",
+    "propertyType": "chalet",
+    "categoryLabel": "Chalet",
+    "location": {
+      "city": "Kitzbühel",
+      "region": "Tyrol",
+      "country": "Austria",
+      "countryCode": "AT",
+      "distanceToCenterKm": 2.6,
+      "lat": 47.4467,
+      "lng": 12.3923
+    },
+    "images": [
+      { "url": "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=800&q=80", "alt": "Alpine chalet exterior" },
+      { "url": "https://images.unsplash.com/photo-1518302057166-c990a3585cc3?w=800&q=80", "alt": "Living room with stone fireplace" }
+    ],
+    "price": { "perNight": 389, "total": 2723, "currency": "EUR", "nights": 7 },
+    "rating": { "average": 4.9, "count": 156 },
+    "capacity": { "guests": 8, "bedrooms": 3, "bathrooms": 3, "beds": 5 },
+    "amenities": ["wifi", "kitchen", "hot_tub", "fireplace", "mountain_view", "parking", "pets_allowed", "heating", "balcony"],
+    "badges": ["top_rated", "free_cancellation"],
+    "provider": { "name": "Belvilla" },
+    "cancellation": "free_until_7d",
+    "url": "https://www.hometogo.com/offer/48271056",
+    "shortDescription": "Traditional Tyrolean chalet with outdoor hot tub and ski-in/ski-out access in winter."
+  },
+  {
+    "id": "offer_90384726",
+    "title": "Highland Castle Keep — Private Estate",
+    "propertyType": "castle",
+    "categoryLabel": "Castle",
+    "location": {
+      "city": "Inverness",
+      "region": "Scottish Highlands",
+      "country": "United Kingdom",
+      "countryCode": "GB",
+      "distanceToCenterKm": 18.3,
+      "lat": 57.4778,
+      "lng": -4.2247
+    },
+    "images": [
+      { "url": "https://images.unsplash.com/photo-1596627116790-af6f96d60f44?w=800&q=80", "alt": "Scottish castle exterior" }
+    ],
+    "price": { "perNight": 850, "total": 5950, "currency": "GBP", "nights": 7 },
+    "rating": { "average": 5.0, "count": 28 },
+    "capacity": { "guests": 12, "bedrooms": 6, "bathrooms": 5, "beds": 8 },
+    "amenities": ["wifi", "kitchen", "fireplace", "garden", "parking", "heating", "pets_allowed"],
+    "badges": ["top_rated"],
+    "provider": { "name": "Tripadvisor Rentals" },
+    "cancellation": "non_refundable",
+    "url": "https://www.hometogo.com/offer/90384726",
+    "shortDescription": "Historic 16th-century castle keep on a private 40-acre estate. Sleeps 12 across six suites."
+  },
+  {
+    "id": "offer_22057183",
+    "title": "Ocean-view Villa on the Algarve Coast",
+    "propertyType": "villa",
+    "categoryLabel": "Villa",
+    "location": {
+      "city": "Lagos",
+      "region": "Algarve",
+      "country": "Portugal",
+      "countryCode": "PT",
+      "neighborhood": "Praia da Luz",
+      "distanceToCenterKm": 5.1,
+      "lat": 37.1028,
+      "lng": -8.6739
+    },
+    "images": [
+      { "url": "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=800&q=80", "alt": "Modern villa with pool" },
+      { "url": "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800&q=80", "alt": "Terrace" }
+    ],
+    "price": { "perNight": 298, "total": 2086, "currency": "EUR", "nights": 7 },
+    "discount": { "percent": 10, "originalPerNight": 331, "label": "Last-minute deal" },
+    "rating": { "average": 4.6, "count": 89 },
+    "capacity": { "guests": 8, "bedrooms": 4, "bathrooms": 3, "beds": 5 },
+    "amenities": ["wifi", "pool", "sea_view", "kitchen", "air_conditioning", "bbq", "terrace", "parking"],
+    "badges": ["great_deal", "instant_book"],
+    "provider": { "name": "Vrbo" },
+    "cancellation": "free_until_7d",
+    "url": "https://www.hometogo.com/offer/22057183",
+    "shortDescription": "Contemporary four-bedroom villa with private pool, 400m from Praia da Luz."
+  },
+  {
+    "id": "offer_66401298",
+    "title": "Cotswolds Stone Cottage",
+    "propertyType": "cottage",
+    "categoryLabel": "Cottage",
+    "location": {
+      "city": "Bourton-on-the-Water",
+      "region": "Gloucestershire",
+      "country": "United Kingdom",
+      "countryCode": "GB",
+      "distanceToCenterKm": 0.3,
+      "lat": 51.8855,
+      "lng": -1.7552
+    },
+    "images": [
+      { "url": "https://images.unsplash.com/photo-1449844908441-8829872d2607?w=800&q=80", "alt": "Stone cottage with garden" }
+    ],
+    "price": { "perNight": 175, "total": 1225, "currency": "GBP", "nights": 7 },
+    "rating": { "average": 4.8, "count": 203 },
+    "capacity": { "guests": 5, "bedrooms": 2, "bathrooms": 2, "beds": 3 },
+    "amenities": ["wifi", "kitchen", "fireplace", "garden", "parking", "heating", "washer", "dryer"],
+    "badges": ["top_rated", "eco_friendly"],
+    "provider": { "name": "Sykes Cottages" },
+    "cancellation": "free_until_7d",
+    "url": "https://www.hometogo.com/offer/66401298",
+    "shortDescription": "Honey-stone cottage in the quintessential Cotswolds village. Private walled garden."
+  },
+  {
+    "id": "offer_88113025",
+    "title": "De Bedstee Boutique Capsules",
+    "propertyType": "hotel",
+    "categoryLabel": "Hotel",
+    "location": {
+      "city": "Amsterdam",
+      "region": "North Holland",
+      "country": "Netherlands",
+      "countryCode": "NL",
+      "neighborhood": "Oud-Zuid",
+      "distanceToCenterKm": 2.0,
+      "lat": 52.3461,
+      "lng": 4.8727
+    },
+    "images": [
+      { "url": "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&q=80", "alt": "Boutique hotel interior" },
+      { "url": "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=800&q=80", "alt": "Lobby" },
+      { "url": "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=800&q=80", "alt": "Facade" }
+    ],
+    "price": { "perNight": 81, "total": 81, "currency": "EUR", "nights": 1 },
+    "rating": { "average": 4.1, "count": 2235 },
+    "capacity": { "guests": 2, "bedrooms": 1, "bathrooms": 1, "beds": 1 },
+    "amenities": ["air_conditioning", "wifi", "pets_allowed", "smoking_allowed", "hair_dryer", "parking", "tv", "breakfast"],
+    "badges": ["instant_book"],
+    "provider": { "name": "Booking.com" },
+    "cancellation": "free_until_24h",
+    "url": "https://www.hometogo.com/offer/88113025",
+    "shortDescription": "Boutique capsule hotel in Amsterdam Oud-Zuid. Compact, design-forward rooms with full amenities."
+  }
+]

@@ -1,2 +1,109 @@
-# HTG-search-plugin
-HTG search plugin
+# HomeToGo Data — Figma Plugin (PoC)
+
+A Figma plugin that lets HomeToGo designers drop real vacation-rental product
+data straight into their designs. Open it, browse 10 mock properties, and
+click once to insert a fully-populated HomeToGo product card, a list, or a
+grid.
+
+> **Status:** Proof of concept. Data is a bundled JSON file (`src/data/products.json`).
+> v2 will wire this up to the internal HTG search/product API.
+
+---
+
+## Quick start
+
+```bash
+npm install
+npm run build    # produces build/main.js, build/ui.js, manifest.json
+```
+
+In Figma desktop:
+
+1. **Plugins → Development → Import plugin from manifest…**
+2. Pick the generated `manifest.json` at the repo root.
+3. **Run → HomeToGo Data → Browse properties.**
+
+For iterative development:
+
+```bash
+npm run watch
+```
+
+Then click **Plugins → Development → HomeToGo Data** again; Figma reloads the
+plugin on each run.
+
+---
+
+## What it does
+
+![three insert modes](docs/mode-reference.png)
+
+- **Single** — one card at viewport centre. If you have a frame selected with
+  `#title` / `#pricePerNight` / `#image` layers, the plugin populates those
+  instead of creating a new card.
+- **List** — N cards stacked in an auto-layout frame.
+- **Grid** — N cards in a 2-column wrapping auto-layout frame.
+
+The card itself matches HomeToGo's production search-result layout: image
+left, content middle, actions column right with the purple→pink gradient
+"View deal" button. Every field is **adaptive** — no rating, no discount, no
+neighbourhood, fewer amenities? The card trims those sections automatically
+so it always looks right without cleanup.
+
+---
+
+## Project layout
+
+See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for the full tour.
+
+```
+src/
+  main/      Figma sandbox code (all figma.* API calls)
+  ui/        Preact iframe UI (browse, search, filter, preview)
+  shared/    Types, message contracts, and the #fieldName spec
+  data/      Mock JSON (10 offers)
+docs/
+  SCOPE.md            What's in and out of the PoC
+  ARCHITECTURE.md     Threads, bundling, message flow
+  DATA_MODEL.md       The Offer shape, reference fields from HTG
+  LAYER_NAMING_SPEC.md How to name Figma layers so the plugin can populate them
+  DEVELOPMENT.md      Local dev, common tasks, gotchas
+  BRAND.md            Palette, typography, screenshots of the reference card
+```
+
+---
+
+## Populate your own component
+
+Name your layers with a `#` prefix matching one of the documented keys, and
+the plugin's **Single** mode will override them in place. A few examples:
+
+| Layer name | Gets set to |
+|------------|-------------|
+| `#title` | Offer title |
+| `#pricePerNight` | `€128` |
+| `#priceOriginal` | `€151` (strikethrough-ready; set your own text decoration) |
+| `#discountLabel` | `Last-minute deal: -15%` |
+| `#ratingAverage` | `4.7` |
+| `#ratingCount` | `(284 reviews)` |
+| `#location` | `3.4 km to center · Berlin Prenzlauer Berg` |
+| `#providerLine` | `Promoted by Vrbo` |
+| `#image` | Hero image as an image fill |
+| `#imageSecondary` | Second image |
+
+Full spec in [`docs/LAYER_NAMING_SPEC.md`](docs/LAYER_NAMING_SPEC.md). Match is
+case- and separator-insensitive (`#PricePerNight` = `#price_per_night` =
+`#price-per-night`).
+
+---
+
+## Docs
+
+- [CLAUDE.md](CLAUDE.md) — project context for AI collaborators
+- [CHANGELOG.md](CHANGELOG.md) — what changed and when
+- [docs/SCOPE.md](docs/SCOPE.md) — PoC scope and non-goals
+- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — two-thread architecture
+- [docs/DATA_MODEL.md](docs/DATA_MODEL.md) — the `Offer` schema
+- [docs/LAYER_NAMING_SPEC.md](docs/LAYER_NAMING_SPEC.md) — for designers
+- [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) — dev loop, tasks, gotchas
+- [docs/BRAND.md](docs/BRAND.md) — HomeToGo palette + card reference

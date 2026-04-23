@@ -1,0 +1,76 @@
+import { h } from 'preact';
+import styles from '../styles.css';
+import type { Offer } from '@shared/types';
+
+interface Props {
+  offer: Offer;
+  selected: boolean;
+  onToggle: () => void;
+  onPreview: () => void;
+}
+
+const symbol = (c: string) => (c === 'EUR' ? '€' : c === 'GBP' ? '£' : '$');
+
+export function ProductTile({ offer, selected, onToggle, onPreview }: Props) {
+  const badge = offer.badges[0];
+  const isDeal = badge === 'great_deal';
+
+  return (
+    <div
+      class={`${styles.tile} ${selected ? styles.tileSelected : ''}`}
+      onClick={onToggle}
+    >
+      <div
+        class={styles.tileImage}
+        style={{ backgroundImage: `url(${offer.images[0]?.url})` }}
+      >
+        {badge && (
+          <span class={`${styles.tileBadge} ${isDeal ? styles.tileBadgeGreen : ''}`}>
+            {badge.replace(/_/g, ' ')}
+          </span>
+        )}
+        {offer.discount && (
+          <span class={styles.tileDiscount}>-{offer.discount.percent}%</span>
+        )}
+        {selected && <span class={styles.tileCheck}>✓</span>}
+        <button
+          class={styles.tilePreviewBtn}
+          onClick={(e) => {
+            e.stopPropagation();
+            onPreview();
+          }}
+          title="Preview details"
+        >
+          i
+        </button>
+      </div>
+      <div class={styles.tileBody}>
+        <div class={styles.tileTitleRow}>
+          <div class={styles.tileTitle}>{offer.title}</div>
+          {offer.rating && (
+            <span class={styles.tileRating}>
+              <span class={styles.tileRatingStar}>★</span>
+              {offer.rating.average.toFixed(1)}
+            </span>
+          )}
+        </div>
+        <div class={styles.tileLocation}>
+          {offer.location.city}, {offer.location.country}
+        </div>
+        <div class={styles.tilePriceRow}>
+          {offer.discount && (
+            <span class={styles.tilePriceOriginal}>
+              {symbol(offer.price.currency)}
+              {offer.discount.originalPerNight}
+            </span>
+          )}
+          <span class={styles.tilePrice}>
+            {symbol(offer.price.currency)}
+            {offer.price.perNight}
+          </span>
+          <span class={styles.tilePriceSuffix}>/ night</span>
+        </div>
+      </div>
+    </div>
+  );
+}

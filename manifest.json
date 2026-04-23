@@ -1,8 +1,0 @@
-{
-  "name": "API Edge Case Tester",
-  "id": "12345678",
-  "api": "1.0.0",
-  "main": "code.js",
-  "ui": "ui.html",
-  "editorType": ["figma"]
-}
