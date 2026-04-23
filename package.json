@@ -20,10 +20,7 @@
         "https://images.unsplash.com"
       ],
       "reasoning": "Fetches listing photos from Unsplash for the PoC mock data. v2 will add HomeToGo CDN + API domains."
-    },
-    "menu": [
-      { "name": "Browse properties", "command": "default" }
-    ]
+    }
   },
   "dependencies": {
     "@create-figma-plugin/ui": "^4.0.2",
