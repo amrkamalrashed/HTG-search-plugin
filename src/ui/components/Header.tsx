@@ -18,27 +18,41 @@ export function Header({ mode, onModeChange, onRefresh }: Props) {
   return (
     <div class={styles.header}>
       <div class={styles.logo}>
+        {/*
+          PoC brand mark — squircle home in the primary HomeToGo gradient.
+          When the official wordmark SVG is available, drop it in place of
+          this <svg> block; the `.logo` flex row is sized for ~24px tall
+          art + the "hometogo" text lockup.
+        */}
         <svg
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
+          width="26"
+          height="26"
+          viewBox="0 0 26 26"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
           aria-hidden="true"
         >
           <defs>
-            <linearGradient id="htgLogoGrad" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse">
+            <linearGradient id="htgLogoGrad" x1="2" y1="2" x2="24" y2="24" gradientUnits="userSpaceOnUse">
               <stop offset="0" stop-color="#6B42E8" />
               <stop offset="1" stop-color="#D149C5" />
             </linearGradient>
           </defs>
           <path
-            d="M12 2.5 2.5 10v11a1.5 1.5 0 0 0 1.5 1.5h4.5v-7h7v7H20a1.5 1.5 0 0 0 1.5-1.5V10L12 2.5z"
+            d="M13 1.4 1.9 10.2a3 3 0 0 0-1.1 2.35V21.5A3.5 3.5 0 0 0 4.3 25h17.4a3.5 3.5 0 0 0 3.5-3.5v-8.95a3 3 0 0 0-1.1-2.35L13 1.4z"
             fill="url(#htgLogoGrad)"
+          />
+          <path
+            d="M10 25v-6.2a1.2 1.2 0 0 1 1.2-1.2h3.6a1.2 1.2 0 0 1 1.2 1.2V25"
+            stroke="#ffffff"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            fill="none"
           />
         </svg>
         <span class={styles.logoText}>
-          Home<span class={styles.logoAccent}>to</span>Go
+          home<span class={styles.logoAccent}>to</span>go
         </span>
       </div>
       <div class={styles.headerRight}>

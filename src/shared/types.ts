@@ -193,4 +193,37 @@ export interface Offer {
   cancellationPolicy?: {
     tiers: Array<{ label: string; description?: string; refundPct?: number }>;
   };
+
+  /**
+   * Per-locale overrides for offer-level content. The base fields above
+   * are treated as the English source. When the user picks a different
+   * locale, `localize(offer, locale)` merges the matching `i18n` block on
+   * top so cards/sections render in that language. Missing fields fall
+   * back to the English source.
+   */
+  i18n?: Partial<
+    Record<
+      'de' | 'es' | 'fr',
+      {
+        title?: string;
+        categoryLabel?: string;
+        shortDescription?: string;
+        fullDescription?: string;
+        highlights?: string[];
+        travelDatesLabel?: string;
+        address?: string;
+        reasonsToBook?: Array<{ iconKey: string; title: string; description?: string }>;
+        houseRules?: Array<{ iconKey: string; text: string; allowed?: boolean }>;
+        cancellationPolicy?: {
+          tiers: Array<{ label: string; description?: string; refundPct?: number }>;
+        };
+        rooms?: Array<{
+          kind: 'bedroom' | 'bathroom' | 'kitchen' | 'living';
+          label: string;
+          beds?: Array<{ type: string; count: number }>;
+          features?: string[];
+        }>;
+      }
+    >
+  >;
 }
