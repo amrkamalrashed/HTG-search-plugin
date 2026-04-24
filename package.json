@@ -16,7 +16,7 @@
       "figma"
     ],
     "id": "htg-data-plugin-poc",
-    "name": "HomeToGo Data",
+    "name": "HTG HomeDrop",
     "main": "src/main/index.ts",
     "ui": "src/ui/index.tsx",
     "documentAccess": "dynamic-page",

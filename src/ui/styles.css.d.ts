@@ -45,7 +45,13 @@ declare const styles: {
   readonly "localeGroupLabel": string;
   readonly "logo": string;
   readonly "logoAccent": string;
+  readonly "logoApp": string;
+  readonly "logoDivider": string;
   readonly "logoText": string;
+  readonly "marketSelect": string;
+  readonly "marketSelectChevron": string;
+  readonly "marketSelectFlag": string;
+  readonly "marketSelectWrap": string;
   readonly "modal": string;
   readonly "modalActions": string;
   readonly "modalActionsBtn": string;

@@ -80,6 +80,20 @@
   color: transparent;
 }
 
+.logoDivider {
+  color: var(--htg-text-subtle);
+  font-weight: 600;
+}
+
+.logoApp {
+  background: linear-gradient(90deg, var(--htg-violet) 0%, var(--htg-magenta) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-weight: 800;
+  letter-spacing: -0.2px;
+}
+
 .headerRight {
   display: flex;
   align-items: center;
@@ -192,6 +206,51 @@
 
 .localeCode {
   line-height: 1;
+}
+
+.marketSelectWrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  background: #ffffff;
+  border: 1px solid var(--htg-border);
+  border-radius: var(--radius-pill);
+  padding: 0 26px 0 10px;
+  height: 28px;
+  transition: border-color 0.12s;
+}
+
+.marketSelectWrap:hover {
+  border-color: var(--htg-violet);
+}
+
+.marketSelectFlag {
+  font-size: 14px;
+  line-height: 1;
+  margin-right: 6px;
+  pointer-events: none;
+}
+
+.marketSelect {
+  appearance: none;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--htg-text);
+  cursor: pointer;
+  padding-right: 4px;
+}
+
+.marketSelectChevron {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 10px;
+  color: var(--htg-text-muted);
+  pointer-events: none;
 }
 
 /* ---------- Search ---------- */
