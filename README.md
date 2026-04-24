@@ -26,7 +26,9 @@ In Figma desktop:
 For iterative development:
 
 ```bash
-npm run watch
+npm run watch     # incremental rebuild on save
+npm test          # run the Vitest suite once
+npm run test:watch  # re-run tests on every change
 ```
 
 Then click **Plugins → Development → HomeToGo Data** again; Figma reloads the
@@ -60,8 +62,9 @@ See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for the full tour.
 src/
   main/      Figma sandbox code (all figma.* API calls)
   ui/        Preact iframe UI (browse, search, filter, preview)
-  shared/    Types, message contracts, and the #fieldName spec
-  data/      Mock JSON (10 offers)
+  shared/    Types, message contracts, #fieldName spec, and localize()
+  data/      Mock JSON (10 offers, fully enriched + de/es/fr translated)
+tests/       Vitest unit tests for src/shared/ modules
 docs/
   SCOPE.md            What's in and out of the PoC
   ARCHITECTURE.md     Threads, bundling, message flow

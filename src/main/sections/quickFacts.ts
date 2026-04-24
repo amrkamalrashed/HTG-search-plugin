@@ -69,10 +69,13 @@ export function buildQuickFacts(
   grid.fills = [];
 
   for (const fact of facts.slice(0, 6)) {
+    // hframe is HORIZONTAL → primary axis = horizontal (row width),
+    // counter axis = vertical (row height). Fix width at colWidth and
+    // let the row hug vertically.
     const row = hframe(`fact_${fact.label}`, 10);
-    row.counterAxisSizingMode = 'FIXED';
+    row.primaryAxisSizingMode = 'FIXED';
     row.counterAxisAlignItems = 'CENTER';
-    row.resize(colWidth, 0);
+    row.resize(colWidth, 1);
     row.appendChild(placeIcon(fact.icon, BRAND.textPrimary));
     row.appendChild(
       makeText('factLabel', fact.label, FONT.regular, 14, BRAND.textPrimary),

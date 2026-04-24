@@ -66,7 +66,7 @@ export function buildReasonsToBook(
     row.counterAxisAlignItems = 'MIN';
     row.layoutAlign = 'STRETCH';
     row.primaryAxisSizingMode = 'FIXED';
-    row.resize(metrics(platform).width - metrics(platform).padding * 2, 0);
+    row.resize(metrics(platform).width - metrics(platform).padding * 2, 1);
 
     const iconBg = figma.createFrame();
     iconBg.resize(32, 32);
@@ -79,11 +79,15 @@ export function buildReasonsToBook(
     iconBg.appendChild(iconNode);
     row.appendChild(iconBg);
 
+    // vframe is VERTICAL → primary axis = vertical (column height),
+    // counter axis = horizontal (column width). Let the column hug
+    // vertically so long descriptions aren't clipped; layoutGrow=1
+    // stretches it horizontally to fill the remaining row width.
     const col = vframe('reasonCol', 2);
     col.layoutGrow = 1;
-    col.primaryAxisSizingMode = 'FIXED';
+    col.primaryAxisSizingMode = 'AUTO';
     col.counterAxisSizingMode = 'FIXED';
-    col.resize(200, 0);
+    col.resize(200, 1);
     col.appendChild(
       makeText('reasonTitle', reason.title, FONT.semibold, 14, BRAND.textPrimary),
     );

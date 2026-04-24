@@ -31,104 +31,21 @@ linear-gradient(90deg, #6B42E8 0%, #D149C5 100%)
 In Figma, built as a `GRADIENT_LINEAR` paint with two stops; see
 `VIEW_DEAL_GRADIENT` in `src/main/brand.ts`.
 
-## Typography
+## Plugin logo
 
-The card uses **Inter**:
+The plugin header (`src/ui/components/Header.tsx`) shows a "hometogo"
+wordmark with a squircle home mark filled with the primary gradient.
+This is a **PoC placeholder** — when the official HomeToGo brand SVG
+is available:
 
-- Category label — Medium 13
-- Title — Bold 20
-- Location — Regular 13
-- Rating average — Bold 14
-- Review count — Regular 13
-- Provider line — Regular 12
-- Price per night — Bold 28
-- Price suffix — Regular 11
-- Discount pill — Semi Bold 11
-- CTA button — Bold 14
+1. Replace the inline `<svg>` in `Header.tsx` with the official wordmark.
+2. Keep the containing `.logo` flex row (styles in `ui/styles.css`) so
+   the refresh button + mode toggle alignment doesn't shift.
+3. If the wordmark already includes the "hometogo" text, remove the
+   `<span class={styles.logoText}>` below it.
 
-When HomeToGo provides its production brand font, replace the `FONT` record
-in `src/main/brand.ts` and update `loadBrandFonts()`.
-
-## Card anatomy (matches the reference screenshot)
-
-```
-┌───────────────────────────────────────────────────────────────────────────┐
-│ ┌─────────────────────┐ ┌──────────────────────┐ ┌──────────────────────┐ │
-│ │                     │ │ Hotel                │ │  ⬈  ♡                │ │
-│ │                     │ │ De Bedstee Boutique  │ │                      │ │
-│ │                     │ │ Capsules             │ │                      │ │
-│ │     hero image      │ │ 2.0 km · Oud-Zuid    │ │ ┌──────────────────┐ │ │
-│ │                     │ │ ❄ 📶 🐾 🚭 🅿 🛏 🧹  │ │ │Last-minute: -10%│ │ │
-│ │                     │ │                      │ │ └──────────────────┘ │ │
-│ │                     │ │                      │ │        ‾€98          │ │
-│ │               ⤢    │ │ ★ 4.1 (2,235 reviews)│ │         €89          │ │
-│ │         ● ○ ○       │ │ Promoted by Booking  │ │  for 1 night, fees   │ │
-│ │                     │ │                      │ │ [ View deal  🟪🟥 ]  │ │
-│ └─────────────────────┘ └──────────────────────┘ └──────────────────────┘ │
-└───────────────────────────────────────────────────────────────────────────┘
-```
-
-Sizes (from `CARD` in `src/main/brand.ts`):
-
-- Width **880 px**, height **320 px**, corner radius **16**.
-- Image panel **340 px** wide (full height).
-- Actions column **200 px** wide.
-- Content column fills the remaining space (~340 px) with 20 px padding.
-- Drop shadow: `#0E1824 @ 6%, offset 0 / 2, blur 12`.
-
-## Adaptive behaviour
-
-The card renders only what the offer carries. What you'll see vary:
-
-- **Discount pill** only when `offer.discount` is set.
-- **Strikethrough original price** only when `offer.discount` is set.
-- **Amenity icons** — only amenities that map to a known icon; up to 8 shown.
-- **Rating row** — shows `New listing` if `offer.rating` is absent.
-- **Pagination dots** — shown only when `offer.images.length > 1`.
-- **Location line** — `"{distance} · {city} {neighbourhood}"` or
-  `"{city}, {country}"` if either part is missing.
-- **Category label** — `offer.categoryLabel` wins, falls back to a
-  capitalised `propertyType`.
-
-## iOS / Android SERP card
-
-Matches the HomeToGo native-app search-results card as supplied in
-Figma. Same layout on both iOS and Android; platform-specific tokens
-below.
-
-```
-┌────────────────────────────────────────────┐ 375 px
-│ ┌────┐                              ┌──┐  │
-│ │2-21│                              │♡ │  │ ← date badge · heart button
-│ └────┘                              └──┘  │
-│                                            │ image
-│           (hero image fill)                │ 280 px
-│                                            │
-│ ┌────────────────┐                         │
-│ │Last-minute -10%│  ← discount (adaptive)  │
-│ └────────────────┘                         │
-├────────────────────────────────────────────┤
-│ 800 m² Resort · 1 bedroom · 2 guests       │ meta 13 regular
-│ Buenavista grand hotel                     │ title 20 bold
-│ ★★★★★ 4.8/5 (304)                          │ stars 16 violet + 13
-│ 📍 Jungutbatu, Bali                        │ pin + 13 regular
-│ €5.000.000 total                           │ price 18 bold + suffix
-│ ──────────────────────────────────────     │ divider
-│ Compare                              ☐     │ compare row
-└────────────────────────────────────────────┘
-```
-
-| Token | iOS | Android |
-|-------|-----|---------|
-| Corner radius | 16 | 12 |
-| Stroke | 1px `--htg-border` | none |
-| Shadow alpha / blur / y | 0.06 / 12 / 2 | 0.14 / 18 / 4 |
-| Checkbox radius | 4 | 2 |
-| Date-badge bg | `#FFFFFF` @ 92% | same |
-| Heart button | 40×40 white + tiny shadow | same |
-
-All strings (category label, "guests", "bedroom", "total", "Compare")
-render in the selected locale.
+The inline SVG is deliberately small (~1 KB) and carries no external
+dependencies so the plugin bundle stays lean.
 
 ## Reference screenshots
 

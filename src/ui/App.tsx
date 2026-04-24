@@ -14,6 +14,7 @@ import type {
 } from '@shared/messages';
 import type { Locale } from '@shared/locales';
 import type { Platform } from '@shared/platforms';
+import { localize } from '@shared/localize';
 import { Header } from './components/Header';
 import { SearchBar } from './components/SearchBar';
 import { FilterBar, type Filters } from './components/FilterBar';
@@ -70,9 +71,14 @@ export function App(props: LoadedPayload) {
     return () => clearTimeout(handle);
   }, [mode, search, sort, gridColumns, locale, platform, filters]);
 
+  const localizedOffers = useMemo(
+    () => offers.map((o) => localize(o, locale)),
+    [offers, locale],
+  );
+
   const visible = useMemo(() => {
     const q = search.trim().toLowerCase();
-    const filtered = offers.filter((o) => {
+    const filtered = localizedOffers.filter((o) => {
       if (q) {
         const hay = `${o.title} ${o.location.city} ${o.location.country} ${o.location.neighborhood ?? ''}`.toLowerCase();
         if (!hay.includes(q)) return false;
@@ -84,7 +90,7 @@ export function App(props: LoadedPayload) {
       return true;
     });
     return sortOffers(filtered, sort);
-  }, [offers, search, filters, sort]);
+  }, [localizedOffers, search, filters, sort]);
 
   const toggle = (id: string) => {
     setSelectedIds((prev) => {
@@ -209,8 +215,12 @@ export function App(props: LoadedPayload) {
     return () => window.removeEventListener('keydown', onKey);
   }, [selectedIds, previewId, mode, visible, level, selectedSections, detailOfferId]);
 
-  const previewOffer = previewId ? offers.find((o) => o.id === previewId) : null;
-  const detailOffer = detailOfferId ? offers.find((o) => o.id === detailOfferId) : null;
+  const previewOffer = previewId
+    ? localizedOffers.find((o) => o.id === previewId)
+    : null;
+  const detailOffer = detailOfferId
+    ? localizedOffers.find((o) => o.id === detailOfferId)
+    : null;
   const count = selectedIds.size;
 
   const insertLabel = () => {

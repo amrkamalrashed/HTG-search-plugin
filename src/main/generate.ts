@@ -2,6 +2,7 @@ import type { Amenity, Offer } from '@shared/types';
 import type { Locale } from '@shared/locales';
 import type { Platform } from '@shared/platforms';
 import { t } from '@shared/locales';
+import { localize } from '@shared/localize';
 import { PLATFORM_SPEC, isMobile } from '@shared/platforms';
 import { formatPrice } from '@shared/format';
 import { BRAND, FONT, VIEW_DEAL_GRADIENT } from './brand';
@@ -91,9 +92,11 @@ async function buildImagePanelWeb(offer: Offer, width: number, height: number): 
   fsBg.fills = [{ type: 'SOLID', color: BRAND.white, opacity: 0.92 }];
   fsBg.x = width - 44;
   fsBg.y = height - 44;
+  fsBg.constraints = { horizontal: 'MAX', vertical: 'MAX' };
   const fsIcon = placeIcon('fullscreen', BRAND.textPrimary);
   fsIcon.x = fsBg.x + 8;
   fsIcon.y = fsBg.y + 8;
+  fsIcon.constraints = { horizontal: 'MAX', vertical: 'MAX' };
   panel.appendChild(fsBg);
   panel.appendChild(fsIcon);
 
@@ -115,6 +118,7 @@ async function buildImagePanelWeb(offer: Offer, width: number, height: number): 
     panel.appendChild(dotsWrap);
     dotsWrap.x = width / 2 - dotsWrap.width / 2;
     dotsWrap.y = height - 20;
+    dotsWrap.constraints = { horizontal: 'CENTER', vertical: 'MAX' };
   }
 
   return panel;
@@ -129,8 +133,9 @@ async function buildWebCard(offer: Offer, locale: Locale): Promise<FrameNode> {
   card.name = `HTG Card · ${offer.title}`;
   card.layoutMode = 'HORIZONTAL';
   card.primaryAxisSizingMode = 'FIXED';
-  card.counterAxisSizingMode = 'FIXED';
+  card.counterAxisSizingMode = 'AUTO';
   card.resize(spec.cardWidth, spec.cardHeight);
+  card.minHeight = spec.cardHeight;
   card.cornerRadius = spec.radius;
   card.fills = [{ type: 'SOLID', color: BRAND.white }];
   card.strokes = [{ type: 'SOLID', color: BRAND.border }];
@@ -148,17 +153,18 @@ async function buildWebCard(offer: Offer, locale: Locale): Promise<FrameNode> {
     },
   ];
 
-  // Image panel
-  card.appendChild(await buildImagePanelWeb(offer, imageWidth, spec.cardHeight));
+  // Image panel — stretches vertically to match the card's hugged height.
+  const image = await buildImagePanelWeb(offer, imageWidth, spec.cardHeight);
+  image.layoutAlign = 'STRETCH';
+  card.appendChild(image);
 
-  // Content column
+  // Content column — vertically AUTO so its hugged height drives the card.
+  // Intentionally NOT layoutAlign='STRETCH' so it contributes to the card's hug.
   const content = vframe('content', 6);
-  content.layoutAlign = 'STRETCH';
   content.layoutGrow = 1;
-  content.primaryAxisSizingMode = 'FIXED';
+  content.primaryAxisSizingMode = 'AUTO';
   content.paddingLeft = content.paddingRight = spec.padding;
   content.paddingTop = content.paddingBottom = spec.padding;
-  content.resize(400, spec.cardHeight);
 
   content.appendChild(
     makeText(
@@ -201,14 +207,6 @@ async function buildWebCard(offer: Offer, locale: Locale): Promise<FrameNode> {
     for (const n of iconNames) icons.appendChild(placeIcon(n, BRAND.textSecondary));
     content.appendChild(icons);
   }
-
-  const spacer = figma.createFrame();
-  spacer.name = 'spacer';
-  spacer.fills = [];
-  spacer.layoutAlign = 'STRETCH';
-  spacer.layoutGrow = 1;
-  spacer.resize(1, 1);
-  content.appendChild(spacer);
 
   const ratingRow = hframe('#ratingLine', 6);
   if (offer.rating) {
@@ -333,15 +331,6 @@ async function buildWebCard(offer: Offer, locale: Locale): Promise<FrameNode> {
   return card;
 }
 
-/**
- * Mobile card (iOS / Android) — matches the HomeToGo native-app SERP layout:
- * full-width image with a date badge + heart overlay, a body with
- * meta / bold title / purple 5-star rating / pinned location / total price /
- * Compare-checkbox row.
- *
- * iOS: 16px radii, subtle shadow, thin border.
- * Android: 12px radii, stronger elevation, no border (Material 3 feel).
- */
 async function buildMobileCard(
   offer: Offer,
   locale: Locale,
@@ -375,7 +364,6 @@ async function buildMobileCard(
     },
   ];
 
-  // -------- Image panel --------
   const image = figma.createFrame();
   image.name = '#image';
   image.layoutAlign = 'STRETCH';
@@ -389,7 +377,6 @@ async function buildMobileCard(
     if (hash) applyImageFill(image, hash);
   }
 
-  // Date badge top-left
   if (offer.travelDatesLabel) {
     const dateBadge = figma.createFrame();
     dateBadge.name = '#travelDates';
@@ -401,20 +388,13 @@ async function buildMobileCard(
     dateBadge.cornerRadius = 8;
     dateBadge.fills = [{ type: 'SOLID', color: BRAND.white, opacity: 0.92 }];
     dateBadge.appendChild(
-      makeText(
-        'dateLabel',
-        offer.travelDatesLabel,
-        FONT.semibold,
-        12,
-        BRAND.textPrimary,
-      ),
+      makeText('dateLabel', offer.travelDatesLabel, FONT.semibold, 12, BRAND.textPrimary),
     );
     image.appendChild(dateBadge);
     dateBadge.x = 16;
     dateBadge.y = 16;
   }
 
-  // Heart button top-right — circular white
   const heartBg = figma.createFrame();
   heartBg.name = 'heartBtn';
   heartBg.resize(40, 40);
@@ -439,7 +419,6 @@ async function buildMobileCard(
   image.appendChild(heartBg);
   image.appendChild(heartIcon);
 
-  // Discount pill (if any) — bottom-left of image, coral
   if (offer.discount) {
     const pill = figma.createFrame();
     pill.name = '#discountLabel';
@@ -466,7 +445,6 @@ async function buildMobileCard(
 
   card.appendChild(image);
 
-  // -------- Body --------
   const body = vframe('body', 6);
   body.layoutAlign = 'STRETCH';
   body.primaryAxisSizingMode = 'AUTO';
@@ -475,7 +453,6 @@ async function buildMobileCard(
   body.paddingTop = body.paddingBottom = spec.padding;
   body.paddingLeft = body.paddingRight = spec.padding;
 
-  // Meta: "800 m² Resort · 1 bedroom · 2 guests" (area is optional)
   const metaParts: string[] = [];
   const typeLabel = offer.categoryLabel ?? t(offer.propertyType, locale);
   if (offer.areaSqm !== undefined) {
@@ -491,13 +468,11 @@ async function buildMobileCard(
     makeText('#capacityMeta', metaParts.join(' · '), FONT.regular, 13, BRAND.textSecondary),
   );
 
-  // Title
   const title = makeText('#title', offer.title, FONT.bold, spec.titleSize, BRAND.textPrimary);
   title.layoutAlign = 'STRETCH';
   title.textAutoResize = 'HEIGHT';
   body.appendChild(title);
 
-  // Rating — 5 graphical stars + "avg/5 (count)"
   if (offer.rating) {
     const ratingRow = hframe('#ratingLine', 8);
     ratingRow.paddingTop = 2;
@@ -531,7 +506,6 @@ async function buildMobileCard(
     );
   }
 
-  // Location with pin
   const locRow = hframe('#locationRow', 6);
   locRow.counterAxisAlignItems = 'CENTER';
   locRow.appendChild(placeIcon('pin', BRAND.textSecondary));
@@ -543,7 +517,6 @@ async function buildMobileCard(
   );
   body.appendChild(locRow);
 
-  // Price (total, bold + light "total" suffix)
   const priceRow = hframe('priceRow', 6);
   priceRow.counterAxisAlignItems = 'BASELINE';
   priceRow.paddingTop = 4;
@@ -561,7 +534,6 @@ async function buildMobileCard(
   );
   body.appendChild(priceRow);
 
-  // Divider
   const divider = figma.createFrame();
   divider.name = 'divider';
   divider.layoutAlign = 'STRETCH';
@@ -569,13 +541,12 @@ async function buildMobileCard(
   divider.fills = [{ type: 'SOLID', color: BRAND.border }];
   body.appendChild(divider);
 
-  // Compare row: label + checkbox
   const compareRow = hframe('compareRow', 0);
   compareRow.primaryAxisAlignItems = 'SPACE_BETWEEN';
   compareRow.counterAxisAlignItems = 'CENTER';
   compareRow.layoutAlign = 'STRETCH';
   compareRow.primaryAxisSizingMode = 'FIXED';
-  compareRow.resize(width - spec.padding * 2, 0);
+  compareRow.resize(width - spec.padding * 2, 1);
   compareRow.paddingTop = compareRow.paddingBottom = 4;
 
   compareRow.appendChild(
@@ -597,27 +568,20 @@ async function buildMobileCard(
   return card;
 }
 
-/**
- * Adaptive HomeToGo-styled product card builder, platform- and locale-aware.
- *
- * - Web: horizontal 880×320 card (image · content · actions columns).
- * - iPhone / Android: vertical 360–375px-wide card (image top, content,
- *   price + button row bottom). Android drops the outline and uses
- *   stronger elevation + 8px radii to match Material 3.
- */
 export async function buildCard(
   offer: Offer,
   locale: Locale = 'en',
   platform: Platform = 'web',
 ): Promise<FrameNode> {
   await loadBrandFonts();
+  const view = localize(offer, locale);
   const card = isMobile(platform)
-    ? await buildMobileCard(offer, locale, platform)
-    : await buildWebCard(offer, locale);
+    ? await buildMobileCard(view, locale, platform)
+    : await buildWebCard(view, locale);
 
   card.setPluginData('htgOfferId', offer.id);
   card.setPluginData('htgLocale', locale);
   card.setPluginData('htgPlatform', platform);
   card.setPluginData('htgInsertedAt', new Date().toISOString());
   return card;
-}
+ }

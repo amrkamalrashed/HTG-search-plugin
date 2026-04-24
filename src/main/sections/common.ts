@@ -34,7 +34,7 @@ export const SECTION_METRICS: Record<Platform, SectionMetrics> = {
     shadow: false,
   },
   ios: {
-    width: 375,
+    width: 343,
     padding: 20,
     radius: 0,
     gap: 12,

@@ -49,7 +49,7 @@ export function buildPriceBreakdown(
     row.counterAxisAlignItems = 'CENTER';
     row.layoutAlign = 'STRETCH';
     row.primaryAxisSizingMode = 'FIXED';
-    row.resize(innerWidth, 0);
+    row.resize(innerWidth, 1);
 
     const label = item.quantityLabel ?? item.label ?? resolveKeyLabel(item.key, locale);
     row.appendChild(makeText('lineLabel', label, FONT.regular, 14, BRAND.textPrimary));
@@ -79,7 +79,7 @@ export function buildPriceBreakdown(
   totalRow.counterAxisAlignItems = 'CENTER';
   totalRow.layoutAlign = 'STRETCH';
   totalRow.primaryAxisSizingMode = 'FIXED';
-  totalRow.resize(innerWidth, 0);
+  totalRow.resize(innerWidth, 1);
   totalRow.appendChild(makeText('totalLabel', t('total', locale), FONT.bold, 16, BRAND.textPrimary));
   totalRow.appendChild(
     makeText(
@@ -98,7 +98,7 @@ export function buildPriceBreakdown(
   cta.layoutMode = 'HORIZONTAL';
   cta.primaryAxisSizingMode = 'FIXED';
   cta.counterAxisSizingMode = 'AUTO';
-  cta.resize(innerWidth, 0);
+  cta.resize(innerWidth, 1);
   cta.primaryAxisAlignItems = 'CENTER';
   cta.counterAxisAlignItems = 'CENTER';
   cta.paddingTop = cta.paddingBottom = 14;

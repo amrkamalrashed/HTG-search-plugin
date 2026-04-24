@@ -2,6 +2,7 @@ import type { Offer } from '@shared/types';
 import type { Locale } from '@shared/locales';
 import type { Platform } from '@shared/platforms';
 import type { SectionKind } from '@shared/messages';
+import { localize } from '@shared/localize';
 import { loadBrandFonts } from '../fonts';
 import { buildGallery } from './gallery';
 import { buildAmenities } from './amenities';
@@ -28,43 +29,44 @@ export async function buildSection(
   platform: Platform = 'web',
 ): Promise<FrameNode> {
   await loadBrandFonts();
+  const view = localize(offer, locale);
   let node: FrameNode;
   switch (kind) {
     case 'gallery':
-      node = await buildGallery(offer, locale, platform);
+      node = await buildGallery(view, locale, platform);
       break;
     case 'titleHeader':
-      node = buildTitleHeader(offer, locale, platform);
+      node = buildTitleHeader(view, locale, platform);
       break;
     case 'quickFacts':
-      node = buildQuickFacts(offer, locale, platform);
+      node = buildQuickFacts(view, locale, platform);
       break;
     case 'reasonsToBook':
-      node = buildReasonsToBook(offer, locale, platform);
+      node = buildReasonsToBook(view, locale, platform);
       break;
     case 'reviews':
-      node = buildReviews(offer, locale, platform);
+      node = buildReviews(view, locale, platform);
       break;
     case 'amenities':
-      node = buildAmenities(offer, locale, platform);
+      node = buildAmenities(view, locale, platform);
       break;
     case 'roomInformation':
-      node = buildRoomInformation(offer, locale, platform);
+      node = buildRoomInformation(view, locale, platform);
       break;
     case 'description':
-      node = buildDescription(offer, locale, platform);
+      node = buildDescription(view, locale, platform);
       break;
     case 'houseRules':
-      node = buildHouseRules(offer, locale, platform);
+      node = buildHouseRules(view, locale, platform);
       break;
     case 'location':
-      node = await buildLocation(offer, locale, platform);
+      node = await buildLocation(view, locale, platform);
       break;
     case 'priceBreakdown':
-      node = buildPriceBreakdown(offer, locale, platform);
+      node = buildPriceBreakdown(view, locale, platform);
       break;
     case 'cancellationPolicy':
-      node = buildCancellationPolicy(offer, locale, platform);
+      node = buildCancellationPolicy(view, locale, platform);
       break;
   }
   node.setPluginData('htgOfferId', offer.id);

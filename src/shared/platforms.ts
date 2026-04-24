@@ -37,7 +37,7 @@ export const PLATFORM_SPEC: Record<Platform, PlatformSpec> = {
     priceSize: 28,
   },
   ios: {
-    cardWidth: 375,
+    cardWidth: 343,
     cardHeight: 560,
     imageHeight: 280,
     radius: 16,
