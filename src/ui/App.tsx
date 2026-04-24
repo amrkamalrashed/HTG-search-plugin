@@ -13,6 +13,7 @@ import type {
   UiState,
 } from '@shared/messages';
 import type { Locale } from '@shared/locales';
+import { t } from '@shared/locales';
 import type { Platform } from '@shared/platforms';
 import { localize } from '@shared/localize';
 import { Header } from './components/Header';
@@ -224,10 +225,10 @@ export function App(props: LoadedPayload) {
   const count = selectedIds.size;
 
   const insertLabel = () => {
-    if (count === 0) return 'Select a property';
-    if (mode === 'single') return count === 1 ? 'Insert' : `Insert ${count}`;
-    if (mode === 'list') return count === 1 ? 'Insert as list' : `Insert ${count} as list`;
-    return count === 1 ? 'Insert as grid' : `Insert ${count} as grid`;
+    if (count === 0) return t('uiSelectAProperty', locale);
+    if (mode === 'single') return count === 1 ? t('uiInsert', locale) : t('uiInsertN', locale, { n: count });
+    if (mode === 'list') return count === 1 ? t('uiInsertAsList', locale) : t('uiInsertNAsList', locale, { n: count });
+    return count === 1 ? t('uiInsertAsGrid', locale) : t('uiInsertNAsGrid', locale, { n: count });
   };
 
   const showBulkBar = level === 'search' && mode !== 'single';
@@ -262,8 +263,10 @@ export function App(props: LoadedPayload) {
         <div class={styles.footer}>
           <div class={`${styles.footerInfo} ${selectedSections.size > 0 ? styles.footerInfoActive : ''}`}>
             {selectedSections.size === 0
-              ? 'Pick sections to insert'
-              : `${selectedSections.size} section${selectedSections.size === 1 ? '' : 's'} · ⏎ to insert`}
+              ? t('uiPickSectionsToInsert', locale)
+              : selectedSections.size === 1
+                ? t('uiNSection', locale, { n: 1 })
+                : t('uiNSections', locale, { n: selectedSections.size })}
           </div>
           <button
             class={`${styles.btn} ${styles.btnPrimary}`}
@@ -271,10 +274,10 @@ export function App(props: LoadedPayload) {
             disabled={selectedSections.size === 0}
           >
             {selectedSections.size === 0
-              ? 'Select sections'
+              ? t('uiSelectSections', locale)
               : selectedSections.size === 1
-                ? 'Insert section'
-                : `Insert ${selectedSections.size} sections`}
+                ? t('uiInsertSection', locale)
+                : t('uiInsertNSections', locale, { n: selectedSections.size })}
           </button>
         </div>
       </div>
@@ -312,8 +315,8 @@ export function App(props: LoadedPayload) {
         <div class={styles.bulkBar}>
           <span class={styles.bulkBarText}>
             {count === 0
-              ? `Pick properties to insert as ${mode}`
-              : `${count} selected`}
+              ? t(mode === 'list' ? 'uiPickAsList' : 'uiPickAsGrid', locale)
+              : t('uiNSelected', locale, { n: count })}
           </span>
           <div class={styles.bulkBarActions}>
             <button
@@ -321,14 +324,14 @@ export function App(props: LoadedPayload) {
               onClick={selectAllVisible}
               disabled={count === visible.length}
             >
-              Select all {visible.length}
+              {t('uiSelectAllN', locale, { n: visible.length })}
             </button>
             <button
               class={styles.bulkBarBtnGhost}
               onClick={clearSelection}
               disabled={count === 0}
             >
-              Clear
+              {t('uiClear', locale)}
             </button>
           </div>
         </div>
@@ -338,13 +341,13 @@ export function App(props: LoadedPayload) {
         {visible.length === 0 ? (
           <div class={styles.empty}>
             <div class={styles.emptyIcon}>⌕</div>
-            <div class={styles.emptyTitle}>No properties match</div>
+            <div class={styles.emptyTitle}>{t('uiNoMatchTitle', locale)}</div>
             <div class={styles.emptySubtitle}>
-              Try widening the filters or searching for a different city.
+              {t('uiNoMatchHint', locale)}
             </div>
             {hasActiveFilters && (
               <button class={styles.emptyBtn} onClick={clearAllFilters}>
-                Clear all filters
+                {t('uiClearAllFilters', locale)}
               </button>
             )}
           </div>
@@ -367,8 +370,8 @@ export function App(props: LoadedPayload) {
       <div class={styles.footer}>
         <div class={`${styles.footerInfo} ${count > 0 ? styles.footerInfoActive : ''}`}>
           {count === 0
-            ? hintFor(mode)
-            : `${count} selected · ⏎ to insert`}
+            ? hintFor(mode, locale)
+            : t('uiEnterToInsert', locale, { n: count })}
         </div>
         <button
           class={`${styles.btn} ${styles.btnPrimary}`}
@@ -397,10 +400,10 @@ export function App(props: LoadedPayload) {
   );
 }
 
-function hintFor(mode: InsertMode): string {
-  if (mode === 'single') return 'Click a property to select';
-  if (mode === 'list') return 'Pick multiple to stack as a list';
-  return 'Pick multiple to arrange as a grid';
+function hintFor(mode: InsertMode, locale: Locale): string {
+  if (mode === 'single') return t('uiHintClickSingle', locale);
+  if (mode === 'list') return t('uiHintPickList', locale);
+  return t('uiHintPickGrid', locale);
 }
 
 function sectionHasData(kind: SectionKind, offer: Offer | undefined): boolean {
