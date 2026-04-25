@@ -18,6 +18,13 @@
   --htg-shadow-2: 0 4px 12px rgba(14, 24, 36, 0.08);
   --htg-shadow-3: 0 8px 24px rgba(14, 24, 36, 0.18);
   --htg-green: #22a06e;
+  /* Icon-button glass: sits over tile images in both modes. Light mode
+     uses translucent white over the photo + dark text; dark mode flips
+     to translucent black + white text so the glyph stays legible
+     against any photo. */
+  --htg-icon-btn-bg: rgba(255, 255, 255, 0.92);
+  --htg-icon-btn-bg-strong: rgba(255, 255, 255, 0.95);
+  --htg-icon-btn-color: var(--htg-text);
   --radius-sm: 6px;
   --radius-md: 10px;
   --radius-lg: 16px;
@@ -59,29 +66,32 @@
 :global(html.figma-dark:not([data-theme="light"])),
 :global(html.figma-darker:not([data-theme="light"])),
 :global(html[data-theme="dark"]) {
-  /* Tokens align with Figma's native dark UI (#2c2c2c panels, #3a3a3a
-     surfaces, white-alpha text) so the plugin feels like part of the
-     host rather than a foreign window. The HomeToGo purple stays — only
-     bumped slightly so it has enough contrast against #2c2c2c. */
+  /* Match Figma's native dark UI exactly: #2C2C2C panel background,
+     #383838 elevated foreground (tiles, footer, header). Surface uses
+     a half-step (#404040) so nested pill containers read against the
+     foreground without competing with it. */
   --htg-violet: #9b7ef5;
   --htg-violet-dark: #8b6cf0;
-  --htg-violet-soft: rgba(155, 126, 245, 0.18);
+  --htg-violet-soft: rgba(155, 126, 245, 0.22);
   --htg-magenta: #e26ed5;
   --htg-coral: #ff6f7c;
-  --htg-coral-soft: rgba(255, 111, 124, 0.15);
+  --htg-coral-soft: rgba(255, 111, 124, 0.18);
   --htg-text: #ffffff;
-  --htg-text-muted: rgba(255, 255, 255, 0.7);
+  --htg-text-muted: rgba(255, 255, 255, 0.72);
   --htg-text-subtle: rgba(255, 255, 255, 0.5);
-  --htg-border: rgba(255, 255, 255, 0.12);
-  --htg-border-strong: rgba(255, 255, 255, 0.24);
-  --htg-bg: #2c2c2c;
-  --htg-surface: #383838;
-  --htg-card: #4a4a4a;
+  --htg-border: rgba(255, 255, 255, 0.1);
+  --htg-border-strong: rgba(255, 255, 255, 0.22);
+  --htg-bg: #2C2C2C;
+  --htg-card: #383838;
+  --htg-surface: #404040;
   --htg-overlay: rgba(0, 0, 0, 0.55);
   --htg-shadow-1: 0 1px 2px rgba(0, 0, 0, 0.45);
   --htg-shadow-2: 0 4px 12px rgba(0, 0, 0, 0.45);
   --htg-shadow-3: 0 8px 24px rgba(0, 0, 0, 0.7);
   --htg-green: #4ec48f;
+  --htg-icon-btn-bg: rgba(0, 0, 0, 0.55);
+  --htg-icon-btn-bg-strong: rgba(0, 0, 0, 0.65);
+  --htg-icon-btn-color: #ffffff;
 }
 
 :global(html),
@@ -561,7 +571,7 @@
   width: 22px;
   height: 22px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.92);
+  background: var(--htg-icon-btn-bg);
   border: 1px solid var(--htg-border-strong);
   display: flex;
   align-items: center;
@@ -606,12 +616,12 @@
 .tileHoverBtn {
   width: 22px;
   height: 22px;
-  background: rgba(255, 255, 255, 0.95);
+  background: var(--htg-icon-btn-bg-strong);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--htg-text);
+  color: var(--htg-icon-btn-color);
   font-size: 11px;
   font-weight: 700;
   transition: background 0.12s, color 0.12s;
@@ -1771,13 +1781,13 @@
   right: 8px;
   width: 24px;
   height: 24px;
-  background: rgba(255, 255, 255, 0.92);
+  background: var(--htg-icon-btn-bg);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 14px;
-  color: var(--htg-text-muted);
+  color: var(--htg-icon-btn-color);
   opacity: 0;
   transition: opacity 0.12s, color 0.12s, transform 0.12s;
   z-index: 2;
