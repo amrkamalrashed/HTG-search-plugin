@@ -1,6 +1,7 @@
 import { emit, on, showUI } from '@create-figma-plugin/utilities';
 import type { Offer } from '@shared/types';
 import type {
+  Appearance,
   FindAllHandler,
   HighlightHandler,
   InsertCardsPayload,
@@ -144,12 +145,13 @@ export default async function () {
       if (!offer) continue;
       const locale = (node.getPluginData('htgLocale') as Locale) || 'en';
       const platform = (node.getPluginData('htgPlatform') as Platform) || 'web';
+      const appearance = (node.getPluginData('htgAppearance') as Appearance) || 'light';
       const sectionKind = node.getPluginData('htgSectionKind') as SectionKind | '';
       const parent = node.parent;
       if (!parent || !('children' in parent)) continue;
       const replacement = sectionKind
-        ? await buildSection(sectionKind, offer, locale)
-        : await buildCard(offer, locale, platform);
+        ? await buildSection(sectionKind, offer, locale, platform, appearance)
+        : await buildCard(offer, locale, platform, appearance);
       replacement.x = node.x;
       replacement.y = node.y;
       const idx = parent.children.indexOf(node);
@@ -184,14 +186,22 @@ export default async function () {
   figma.on('drop', (event) => {
     for (const item of event.items) {
       if (item.type === 'application/htg-offer') {
-        const body = safeParse(item.data) as { offerId?: string; locale?: Locale; platform?: Platform } | null;
+        const body = safeParse(item.data) as
+          | { offerId?: string; locale?: Locale; platform?: Platform; appearance?: Appearance }
+          | null;
         if (!body || !body.offerId) continue;
-        void handleNativeDropOffer(body.offerId, body.locale ?? 'en', body.platform ?? 'web', event);
+        void handleNativeDropOffer(
+          body.offerId,
+          body.locale ?? 'en',
+          body.platform ?? 'web',
+          body.appearance ?? 'light',
+          event,
+        );
         return false;
       }
       if (item.type === 'application/htg-offer-multi') {
         const body = safeParse(item.data) as
-          | { offerIds?: string[]; locale?: Locale; platform?: Platform; mode?: InsertMode }
+          | { offerIds?: string[]; locale?: Locale; platform?: Platform; mode?: InsertMode; appearance?: Appearance }
           | null;
         if (!body || !Array.isArray(body.offerIds) || body.offerIds.length === 0) continue;
         void handleNativeDropMulti(
@@ -199,13 +209,14 @@ export default async function () {
           body.locale ?? 'en',
           body.platform ?? 'web',
           body.mode ?? 'list',
+          body.appearance ?? 'light',
           event,
         );
         return false;
       }
       if (item.type === 'application/htg-section') {
         const body = safeParse(item.data) as
-          | { offerId?: string; sectionKind?: SectionKind; locale?: Locale; platform?: Platform }
+          | { offerId?: string; sectionKind?: SectionKind; locale?: Locale; platform?: Platform; appearance?: Appearance }
           | null;
         if (!body || !body.offerId || !body.sectionKind) continue;
         void handleNativeDropSection(
@@ -213,6 +224,7 @@ export default async function () {
           body.sectionKind,
           body.locale ?? 'en',
           body.platform ?? 'web',
+          body.appearance ?? 'light',
           event,
         );
         return false;
@@ -234,6 +246,7 @@ async function handleNativeDropOffer(
   offerId: string,
   locale: Locale,
   platform: Platform,
+  appearance: Appearance,
   event: DropEvent,
 ): Promise<void> {
   const offer = OFFER_BY_ID[offerId];
@@ -277,7 +290,7 @@ async function handleNativeDropOffer(
     }
   }
 
-  const card = await buildCard(offer, locale, platform);
+  const card = await buildCard(offer, locale, platform, appearance);
   await landAtDropEvent(card, event);
   emit<InsertedHandler>('INSERTED', {
     createdNodeIds: [card.id],
@@ -299,11 +312,12 @@ async function handleNativeDropMulti(
   locale: Locale,
   platform: Platform,
   mode: InsertMode,
+  appearance: Appearance,
   event: DropEvent,
 ): Promise<void> {
   const offers = offerIds.map((id) => OFFER_BY_ID[id]).filter((o): o is Offer => !!o);
   if (offers.length === 0) return;
-  const created = await insertCards(offers, mode, 2, locale, platform);
+  const created = await insertCards(offers, mode, 2, locale, platform, appearance);
   if (created.length > 0) {
     const first = created[0];
     first.x = event.absoluteX - first.width / 2;
@@ -321,11 +335,12 @@ async function handleNativeDropSection(
   kind: SectionKind,
   locale: Locale,
   platform: Platform,
+  appearance: Appearance,
   event: DropEvent,
 ): Promise<void> {
   const offer = OFFER_BY_ID[offerId];
   if (!offer) return;
-  const node = await buildSection(kind, offer, locale, platform);
+  const node = await buildSection(kind, offer, locale, platform, appearance);
   await landAtDropEvent(node, event);
   emit<InsertedHandler>('INSERTED', {
     createdNodeIds: [node.id],
@@ -395,7 +410,7 @@ function collectTaggedFrames(selection: readonly SceneNode[]): FrameNode[] {
 }
 
 async function insertLevel1(payload: InsertCardsPayload): Promise<void> {
-  const { offers, mode, gridColumns, locale, platform } = payload;
+  const { offers, mode, gridColumns, locale, platform, appearance } = payload;
   if (offers.length === 0) return;
 
   // Single-card single-offer with a populate-eligible selection routes
@@ -435,7 +450,7 @@ async function insertLevel1(payload: InsertCardsPayload): Promise<void> {
     }
   }
 
-  const created = await insertCards(offers, mode, gridColumns, locale, platform);
+  const created = await insertCards(offers, mode, gridColumns, locale, platform, appearance);
   figma.currentPage.selection = created;
   figma.viewport.scrollAndZoomIntoView(created);
 
@@ -454,6 +469,7 @@ async function insertCards(
   gridColumns: number,
   locale: Locale,
   platform: Platform,
+  appearance: Appearance,
 ): Promise<SceneNode[]> {
   const spec = PLATFORM_SPEC[platform];
 
@@ -462,7 +478,7 @@ async function insertCards(
     let x = figma.viewport.center.x - spec.cardWidth / 2;
     let y = figma.viewport.center.y - spec.cardHeight / 2;
     for (const offer of offers) {
-      const card = await buildCard(offer, locale, platform);
+      const card = await buildCard(offer, locale, platform, appearance);
       card.x = x;
       card.y = y;
       figma.currentPage.appendChild(card);
@@ -501,7 +517,7 @@ async function insertCards(
   container.counterAxisSizingMode = 'AUTO';
 
   for (const offer of offers) {
-    const card = await buildCard(offer, locale, platform);
+    const card = await buildCard(offer, locale, platform, appearance);
     container.appendChild(card);
   }
   container.counterAxisSizingMode = 'AUTO';
@@ -513,7 +529,7 @@ async function insertCards(
 }
 
 async function insertSections(payload: InsertSectionsPayload): Promise<void> {
-  const { offerId, sections, locale, platform } = payload;
+  const { offerId, sections, locale, platform, appearance } = payload;
   const offer = OFFER_BY_ID[offerId];
   if (!offer || sections.length === 0) {
     figma.notify('Pick at least one section to drop');
@@ -522,7 +538,7 @@ async function insertSections(payload: InsertSectionsPayload): Promise<void> {
 
   // Single section → drop it on the canvas directly. No wrapper.
   if (sections.length === 1) {
-    const node = await buildSection(sections[0], offer, locale, platform);
+    const node = await buildSection(sections[0], offer, locale, platform, appearance);
     node.x = figma.viewport.center.x - node.width / 2;
     node.y = figma.viewport.center.y - node.height / 2;
     figma.currentPage.appendChild(node);
@@ -553,7 +569,7 @@ async function insertSections(payload: InsertSectionsPayload): Promise<void> {
   container.cornerRadius = 0;
 
   for (const kind of sections) {
-    const node = await buildSection(kind, offer, locale, platform);
+    const node = await buildSection(kind, offer, locale, platform, appearance);
     container.appendChild(node);
   }
 

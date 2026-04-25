@@ -5,7 +5,8 @@ import { t } from '@shared/locales';
 import { localize } from '@shared/localize';
 import { PLATFORM_SPEC, isMobile } from '@shared/platforms';
 import { formatPrice } from '@shared/format';
-import { BRAND, FONT, VIEW_DEAL_GRADIENT } from './brand';
+import type { Appearance } from './brand';
+import { BRAND, FONT, VIEW_DEAL_GRADIENT, setBrandAppearance } from './brand';
 import { loadBrandFonts } from './fonts';
 import { applyImageFill, loadImageHash } from './images';
 import { placeIcon, type IconName } from './icons';
@@ -602,8 +603,12 @@ export async function buildCard(
   offer: Offer,
   locale: Locale = 'en',
   platform: Platform = 'web',
+  appearance: Appearance = 'light',
 ): Promise<FrameNode> {
   await loadBrandFonts();
+  // Switch the BRAND token proxy for this build. The plugin runs one
+  // drop at a time so the module-level pointer is safe.
+  setBrandAppearance(appearance);
   const view = localize(offer, locale);
   const card = isMobile(platform)
     ? await buildMobileCard(view, locale, platform)
@@ -612,6 +617,7 @@ export async function buildCard(
   card.setPluginData('htgOfferId', offer.id);
   card.setPluginData('htgLocale', locale);
   card.setPluginData('htgPlatform', platform);
+  card.setPluginData('htgAppearance', appearance);
   card.setPluginData('htgInsertedAt', new Date().toISOString());
   return card;
- }
+}

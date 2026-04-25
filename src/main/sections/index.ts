@@ -4,6 +4,8 @@ import type { Platform } from '@shared/platforms';
 import type { SectionKind } from '@shared/messages';
 import { localize } from '@shared/localize';
 import { loadBrandFonts } from '../fonts';
+import type { Appearance } from '../brand';
+import { setBrandAppearance } from '../brand';
 import { buildGallery } from './gallery';
 import { buildAmenities } from './amenities';
 import { buildReviews } from './reviews';
@@ -27,8 +29,10 @@ export async function buildSection(
   offer: Offer,
   locale: Locale,
   platform: Platform = 'web',
+  appearance: Appearance = 'light',
 ): Promise<FrameNode> {
   await loadBrandFonts();
+  setBrandAppearance(appearance);
   const view = localize(offer, locale);
   let node: FrameNode;
   switch (kind) {
@@ -73,5 +77,6 @@ export async function buildSection(
   node.setPluginData('htgSectionKind', kind);
   node.setPluginData('htgLocale', locale);
   node.setPluginData('htgPlatform', platform);
+  node.setPluginData('htgAppearance', appearance);
   return node;
 }
