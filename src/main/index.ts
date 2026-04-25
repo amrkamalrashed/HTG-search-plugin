@@ -229,19 +229,37 @@ export default async function () {
   //   - application/htg-section     → a single detail-page section
   // Returning false tells Figma not to insert a default text node.
   figma.on('drop', (event) => {
+    // Diagnostic: surface what Figma actually delivered. Some browsers
+    // / Figma versions silently drop custom MIME types from the
+    // iframe; if we land here with only `text/plain` we know the
+    // application/htg-* payload didn't survive the iframe boundary.
+    if (event.items.length === 0) {
+      figma.notify('Drop received no items — drag payload was lost', { error: true });
+      return true;
+    }
+    const types = event.items.map((it) => it.type).join(', ');
     for (const item of event.items) {
       if (item.type === 'application/htg-offer') {
         const body = safeParse(item.data) as
           | { offerId?: string; locale?: Locale; platform?: Platform; appearance?: Appearance }
           | null;
-        if (!body || !body.offerId) continue;
-        void handleNativeDropOffer(
+        if (!body || !body.offerId) {
+          figma.notify('Drop body parse failed', { error: true });
+          continue;
+        }
+        if (!OFFER_BY_ID[body.offerId]) {
+          figma.notify(`Drop: offer ${body.offerId} not in cache (have ${Object.keys(OFFER_BY_ID).length})`, { error: true });
+          continue;
+        }
+        handleNativeDropOffer(
           body.offerId,
           body.locale ?? 'en',
           body.platform ?? 'web',
           body.appearance ?? 'light',
           event,
-        );
+        ).catch((err) => {
+          figma.notify(`Drop failed: ${err instanceof Error ? err.message : String(err)}`, { error: true });
+        });
         return false;
       }
       if (item.type === 'application/htg-offer-multi') {
@@ -275,6 +293,10 @@ export default async function () {
         return false;
       }
     }
+    // No HomeDrop MIME matched but items did arrive — surface the
+    // types so we can diagnose if Figma stripped our application/htg-*
+    // and only delivered text/plain.
+    figma.notify(`Drop: no HomeDrop MIME (got ${types})`, { error: true });
     return true;
   });
 }
