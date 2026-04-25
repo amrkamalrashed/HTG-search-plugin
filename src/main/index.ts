@@ -15,8 +15,6 @@ import type {
   SaveStateHandler,
   SaveUiSizeHandler,
   SectionKind,
-  SelectionTargetHandler,
-  SelectionTarget,
   SyncOffersHandler,
   UiSize,
   UiState,
@@ -169,14 +167,11 @@ export default async function () {
   // Wire canvas → UI awareness. We surface two things on every selection
   // change: the offerId of a tagged HomeDrop card (so the matching tile
   // can pulse), and the "drop target" — a frame the user has selected so
-  // the UI can show the "Drop into 'X'" banner with a Replace toggle.
   figma.on('selectionchange', () => {
     pushHighlight();
-    pushSelectionTarget();
   });
   // Initial push so the UI starts in sync.
   pushHighlight();
-  pushSelectionTarget();
 
   // Native Figma drop event. Fires when the user releases a drag from
   // the plugin iframe over the canvas. We dispatch on three MIME types:
@@ -357,27 +352,6 @@ function pushHighlight(): void {
     }
   }
   emit<HighlightHandler>('HIGHLIGHT_OFFER', { offerId });
-}
-
-function pushSelectionTarget(): void {
-  const sel = figma.currentPage.selection;
-  const target = firstTargetInSelection(sel);
-  if (!target) {
-    emit<SelectionTargetHandler>('SELECTION_TARGET', { target: null });
-    return;
-  }
-  // Skip nodes that are themselves an inserted HomeDrop card — they
-  // aren't useful drop targets, only refresh targets.
-  if (target.getPluginData('htgOfferId')) {
-    emit<SelectionTargetHandler>('SELECTION_TARGET', { target: null });
-    return;
-  }
-  const info: SelectionTarget = {
-    id: target.id,
-    name: target.name || 'Frame',
-    hasFieldNames: hasFieldNames(target),
-  };
-  emit<SelectionTargetHandler>('SELECTION_TARGET', { target: info });
 }
 
 function collectTaggedFrames(selection: readonly SceneNode[]): FrameNode[] {

@@ -82,21 +82,6 @@ export interface UiState {
   theme?: Theme;
   favourites?: string[];
   presets?: UiPreset[];
-  /** Persistent state of the Drop banner's Replace toggle. */
-  replaceOnDrop?: boolean;
-}
-
-/**
- * Drop-into-frame instructions attached to an INSERT or DROP payload
- * when the user has a frame selected (or has dragged onto one).
- *
- *   - `targetId` — Figma node id of the frame to land in.
- *   - `replaceContents` — when true, fillIntoTarget removes existing
- *     children of the target before appending the new card.
- */
-export interface DropInto {
-  targetId: string;
-  replaceContents: boolean;
 }
 
 /** Level-1 insert (property cards). */
@@ -107,8 +92,6 @@ export interface InsertCardsPayload {
   gridColumns: number;
   locale: Locale;
   platform: Platform;
-  /** Optional drop-into-frame override; set by DropTargetBanner. */
-  dropInto?: DropInto;
 }
 
 /** Level-2 insert (detail-page sections for a single offer). */
@@ -118,7 +101,6 @@ export interface InsertSectionsPayload {
   sections: SectionKind[];
   locale: Locale;
   platform: Platform;
-  dropInto?: DropInto;
 }
 
 export type InsertPayload = InsertCardsPayload | InsertSectionsPayload;
@@ -145,17 +127,7 @@ export interface ToastMessage {
   /** Short user-facing label, e.g. "Dropped 3 properties as a list". */
   label: string;
   /** Verb hint for analytics + UI styling. */
-  kind: 'inserted' | 'populated' | 'replaced' | 'dropped';
-}
-
-/** Selection target surfaced by main on every selectionchange event. */
-export interface SelectionTarget {
-  /** Figma node id (for analytics/debug only). */
-  id: string;
-  /** Best human-readable label for the banner. */
-  name: string;
-  /** True when the frame contains at least one #fieldName layer. */
-  hasFieldNames: boolean;
+  kind: 'inserted' | 'populated' | 'dropped';
 }
 
 // =============================================================================
@@ -220,12 +192,6 @@ export interface InsertedHandler extends EventHandler {
 export interface HighlightHandler extends EventHandler {
   name: 'HIGHLIGHT_OFFER';
   handler: (payload: { offerId: string | null }) => void;
-}
-
-/** Main → UI: surface the selected drop-target frame (or null). */
-export interface SelectionTargetHandler extends EventHandler {
-  name: 'SELECTION_TARGET';
-  handler: (payload: { target: SelectionTarget | null }) => void;
 }
 
 // =============================================================================

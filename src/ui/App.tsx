@@ -17,8 +17,6 @@ import type {
   SaveStateHandler,
   SaveUiSizeHandler,
   SectionKind,
-  SelectionTargetHandler,
-  SelectionTarget,
   SortKey,
   SyncOffersHandler,
   Theme,
@@ -43,7 +41,6 @@ import { NumberTicker } from './components/NumberTicker';
 import { Toast } from './components/Toast';
 import { CommandPalette, type PaletteCommand } from './components/CommandPalette';
 import { runConfetti } from './confetti';
-import { DropTargetBanner } from './components/DropTargetBanner';
 import { attachDragImage, attachSectionDragImage } from './dragImage';
 import { applyTheme } from './theme';
 import styles from './styles.css';
@@ -113,8 +110,6 @@ export function App(props: LoadedPayload) {
   // v0.7 chunk 3: canvas → UI awareness
   const [pulseId, setPulseId] = useState<string | null>(null);
   const pulseTimerRef = useRef<number | null>(null);
-  const [dropTarget, setDropTarget] = useState<SelectionTarget | null>(null);
-  const [replaceOnDrop, setReplaceOnDrop] = useState<boolean>(saved.replaceOnDrop ?? false);
 
   // v0.8: catalogue lives in the UI iframe via OffersSource. The
   // `offers` state is the result of the most recent source.search()
@@ -223,14 +218,6 @@ export function App(props: LoadedPayload) {
     };
   }, []);
 
-  // Drop target info — drives the "Drop into 'X'" banner.
-  useEffect(() => {
-    const off = on<SelectionTargetHandler>('SELECTION_TARGET', ({ target }) => {
-      setDropTarget(target);
-    });
-    return () => off();
-  }, []);
-
   // Persist UI state, debounced. clientStorage is on the main thread so
   // we drip the saves rather than firing per keystroke.
   useEffect(() => {
@@ -246,7 +233,6 @@ export function App(props: LoadedPayload) {
         theme,
         favourites: Array.from(favourites),
         presets,
-        replaceOnDrop,
       });
     }, 250);
     return () => clearTimeout(handle);
@@ -261,7 +247,6 @@ export function App(props: LoadedPayload) {
     theme,
     favourites,
     presets,
-    replaceOnDrop,
   ]);
 
   // Filtering / sorting / localization moved into OffersSource.search
@@ -747,16 +732,6 @@ export function App(props: LoadedPayload) {
         platform={platform}
         onPlatformChange={setPlatform}
       />
-      {dropTarget && (
-        <DropTargetBanner
-          target={dropTarget}
-          replace={replaceOnDrop}
-          onReplaceChange={setReplaceOnDrop}
-          selectedCount={selectedIds.size}
-          multiLayout={multiLayout}
-          locale={locale}
-        />
-      )}
       <SearchBar value={search} onChange={setSearch} locale={locale} />
       <FilterBar
         filters={filters}

@@ -46,13 +46,6 @@ declare const styles: {
   readonly "dragGhostImg": string;
   readonly "dragGhostMeta": string;
   readonly "dragGhostTitle": string;
-  readonly "dropBanner": string;
-  readonly "dropBannerSub": string;
-  readonly "dropBannerSwitch": string;
-  readonly "dropBannerSwitchOn": string;
-  readonly "dropBannerText": string;
-  readonly "dropBannerTitle": string;
-  readonly "dropBannerToggle": string;
   readonly "dropCtaChevron": string;
   readonly "dropCtaMenu": string;
   readonly "dropCtaMenuCheck": string;

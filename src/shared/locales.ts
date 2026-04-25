@@ -177,9 +177,6 @@ export type StringKey =
   | 'uiLayoutGrid'
   | 'uiCtaPickLayout'
   | 'uiPaletteDrop'
-  | 'uiDropBanner'
-  | 'uiDropBannerWithFields'
-  | 'uiDropBannerReplace'
   | 'uiPresetSaved'
   | 'uiPresetNamePrompt'
   | 'uiFavouriteAdd'
@@ -194,8 +191,6 @@ export type StringKey =
   | 'uiHelpDragBody'
   | 'uiHelpPopulateTitle'
   | 'uiHelpPopulateBody'
-  | 'uiHelpReplaceTitle'
-  | 'uiHelpReplaceBody'
   | 'uiHelpPaletteTitle'
   | 'uiHelpPaletteBody'
   | 'uiHelpMultiTitle'
@@ -213,11 +208,6 @@ export type StringKey =
   | 'uiPresetDelete'
   | 'uiFilterFavourites'
   | 'uiFilterFavouritesEmpty'
-  | 'uiDropBannerSubNone'
-  | 'uiDropBannerSubSingle'
-  | 'uiDropBannerSubList'
-  | 'uiDropBannerSubGrid'
-  | 'uiDropBannerSubPopulate'
   | 'uiLoadErrorTitle'
   | 'uiLoadErrorRetry';
 
@@ -373,9 +363,6 @@ export const STRINGS: Record<Locale, Record<StringKey, string>> = {
     uiLayoutGrid: 'Grid',
     uiCtaPickLayout: 'Pick layout',
     uiPaletteDrop: 'Drop a property card on the canvas',
-    uiDropBanner: 'Drop into "{name}"',
-    uiDropBannerWithFields: 'Drop into "{name}" — {n} #fields detected',
-    uiDropBannerReplace: 'Replace contents on drop',
     uiPresetSaved: 'Preset "{name}" saved.',
     uiPresetNamePrompt: 'Name this preset',
     uiFavouriteAdd: 'Add to favourites',
@@ -390,8 +377,6 @@ export const STRINGS: Record<Locale, Record<StringKey, string>> = {
     uiHelpDragBody: 'Grab any tile and drag it onto the canvas to drop a card at the cursor.',
     uiHelpPopulateTitle: 'Populate #fields',
     uiHelpPopulateBody: 'Select a frame whose layers are named #title, #image, #pricePerNight, etc. and drop — the plugin fills them in place.',
-    uiHelpReplaceTitle: 'Drop into a frame',
-    uiHelpReplaceBody: 'Select a frame and use the banner. Toggle Replace to clear its children before the new card lands.',
     uiHelpPaletteTitle: 'Command palette',
     uiHelpPaletteBody: 'Open with ⌘K (Ctrl+K). Switch mode, platform, locale, theme, presets — or run Drop / Random / Refresh / Find all.',
     uiHelpMultiTitle: 'Multi-select',
@@ -409,11 +394,6 @@ export const STRINGS: Record<Locale, Record<StringKey, string>> = {
     uiPresetDelete: 'Delete preset',
     uiFilterFavourites: 'Favourites ({n})',
     uiFilterFavouritesEmpty: 'Star a tile to add it to favourites',
-    uiDropBannerSubNone: 'Pick a property below',
-    uiDropBannerSubSingle: 'The selected property will land here',
-    uiDropBannerSubList: '{n} properties will land here as a list',
-    uiDropBannerSubGrid: '{n} properties will land here as a grid',
-    uiDropBannerSubPopulate: 'Populate matching #fields with the selected property',
     uiLoadErrorTitle: "Couldn't load properties",
     uiLoadErrorRetry: 'Retry',
   },
@@ -568,9 +548,6 @@ export const STRINGS: Record<Locale, Record<StringKey, string>> = {
     uiLayoutGrid: 'Raster',
     uiCtaPickLayout: 'Layout wählen',
     uiPaletteDrop: 'Karte auf dem Canvas ablegen',
-    uiDropBanner: 'In "{name}" ablegen',
-    uiDropBannerWithFields: 'In "{name}" ablegen — {n} #-Felder erkannt',
-    uiDropBannerReplace: 'Inhalte beim Ablegen ersetzen',
     uiPresetSaved: 'Preset "{name}" gespeichert.',
     uiPresetNamePrompt: 'Preset benennen',
     uiFavouriteAdd: 'Zu Favoriten hinzufügen',
@@ -585,8 +562,6 @@ export const STRINGS: Record<Locale, Record<StringKey, string>> = {
     uiHelpDragBody: 'Beliebiges Feld greifen und auf das Canvas ziehen, um eine Karte am Cursor abzulegen.',
     uiHelpPopulateTitle: '#fields füllen',
     uiHelpPopulateBody: 'Frame mit Ebenen wie #title, #image, #pricePerNight wählen und ablegen — der Plugin füllt sie an Ort und Stelle.',
-    uiHelpReplaceTitle: 'In einen Frame ablegen',
-    uiHelpReplaceBody: 'Frame markieren und das Banner nutzen. Mit Replace werden vorhandene Inhalte vorher gelöscht.',
     uiHelpPaletteTitle: 'Befehlspalette',
     uiHelpPaletteBody: 'Mit ⌘K (Strg+K) öffnen. Modus, Plattform, Sprache, Theme, Presets wechseln — oder Drop / Zufall / Aktualisieren / Alle finden.',
     uiHelpMultiTitle: 'Mehrfachauswahl',
@@ -604,11 +579,6 @@ export const STRINGS: Record<Locale, Record<StringKey, string>> = {
     uiPresetDelete: 'Voreinstellung löschen',
     uiFilterFavourites: 'Favoriten ({n})',
     uiFilterFavouritesEmpty: 'Markiere Karten als Favoriten',
-    uiDropBannerSubNone: 'Wähle unten eine Unterkunft',
-    uiDropBannerSubSingle: 'Die ausgewählte Unterkunft landet hier',
-    uiDropBannerSubList: '{n} Unterkünfte landen hier als Liste',
-    uiDropBannerSubGrid: '{n} Unterkünfte landen hier als Raster',
-    uiDropBannerSubPopulate: 'Passende #-Felder mit der Auswahl füllen',
     uiLoadErrorTitle: 'Unterkünfte konnten nicht geladen werden',
     uiLoadErrorRetry: 'Erneut versuchen',
   },
@@ -763,9 +733,6 @@ export const STRINGS: Record<Locale, Record<StringKey, string>> = {
     uiLayoutGrid: 'Cuadrícula',
     uiCtaPickLayout: 'Elegir diseño',
     uiPaletteDrop: 'Soltar una tarjeta en el lienzo',
-    uiDropBanner: 'Soltar en "{name}"',
-    uiDropBannerWithFields: 'Soltar en "{name}" — {n} #campos detectados',
-    uiDropBannerReplace: 'Reemplazar contenido al soltar',
     uiPresetSaved: 'Preset "{name}" guardado.',
     uiPresetNamePrompt: 'Nombre del preset',
     uiFavouriteAdd: 'Añadir a favoritos',
@@ -780,8 +747,6 @@ export const STRINGS: Record<Locale, Record<StringKey, string>> = {
     uiHelpDragBody: 'Arrastra cualquier tarjeta al lienzo para soltarla bajo el cursor.',
     uiHelpPopulateTitle: 'Rellenar #fields',
     uiHelpPopulateBody: 'Selecciona un frame con capas #title, #image, #pricePerNight y suelta — el plugin las rellena.',
-    uiHelpReplaceTitle: 'Soltar en un frame',
-    uiHelpReplaceBody: 'Selecciona un frame y usa el banner. Con Replace se borran los hijos antes de soltar.',
     uiHelpPaletteTitle: 'Paleta de comandos',
     uiHelpPaletteBody: 'Abre con ⌘K (Ctrl+K). Cambia modo, plataforma, idioma, tema, presets — o ejecuta Soltar / Aleatorio / Actualizar / Buscar todo.',
     uiHelpMultiTitle: 'Selección múltiple',
@@ -799,11 +764,6 @@ export const STRINGS: Record<Locale, Record<StringKey, string>> = {
     uiPresetDelete: 'Eliminar preset',
     uiFilterFavourites: 'Favoritos ({n})',
     uiFilterFavouritesEmpty: 'Marca tarjetas como favoritas',
-    uiDropBannerSubNone: 'Elige un alojamiento abajo',
-    uiDropBannerSubSingle: 'El alojamiento seleccionado caerá aquí',
-    uiDropBannerSubList: '{n} alojamientos caerán aquí como lista',
-    uiDropBannerSubGrid: '{n} alojamientos caerán aquí como cuadrícula',
-    uiDropBannerSubPopulate: 'Rellenar los #campos con la selección',
     uiLoadErrorTitle: 'No se pudieron cargar los alojamientos',
     uiLoadErrorRetry: 'Reintentar',
   },
@@ -958,9 +918,6 @@ export const STRINGS: Record<Locale, Record<StringKey, string>> = {
     uiLayoutGrid: 'Grille',
     uiCtaPickLayout: 'Choisir la mise en page',
     uiPaletteDrop: 'Déposer une fiche sur le canevas',
-    uiDropBanner: 'Déposer dans « {name} »',
-    uiDropBannerWithFields: 'Déposer dans « {name} » — {n} champs # détectés',
-    uiDropBannerReplace: 'Remplacer le contenu au dépôt',
     uiPresetSaved: 'Préréglage « {name} » enregistré.',
     uiPresetNamePrompt: 'Nommez ce préréglage',
     uiFavouriteAdd: 'Ajouter aux favoris',
@@ -975,8 +932,6 @@ export const STRINGS: Record<Locale, Record<StringKey, string>> = {
     uiHelpDragBody: 'Saisissez une carte et glissez-la sur le canevas pour déposer une fiche au curseur.',
     uiHelpPopulateTitle: 'Remplir les #fields',
     uiHelpPopulateBody: 'Sélectionnez un frame avec des calques #title, #image, #pricePerNight et déposez — le plugin les remplit sur place.',
-    uiHelpReplaceTitle: 'Déposer dans un frame',
-    uiHelpReplaceBody: 'Sélectionnez un frame et utilisez la bannière. Replace efface les enfants avant de déposer.',
     uiHelpPaletteTitle: 'Palette de commandes',
     uiHelpPaletteBody: 'Ouvrez avec ⌘K (Ctrl+K). Changez de mode, plateforme, langue, thème, preset — ou lancez Déposer / Aléatoire / Actualiser / Tout trouver.',
     uiHelpMultiTitle: 'Sélection multiple',
@@ -994,11 +949,6 @@ export const STRINGS: Record<Locale, Record<StringKey, string>> = {
     uiPresetDelete: 'Supprimer le préréglage',
     uiFilterFavourites: 'Favoris ({n})',
     uiFilterFavouritesEmpty: 'Mettez une fiche en favori',
-    uiDropBannerSubNone: 'Choisissez un logement ci-dessous',
-    uiDropBannerSubSingle: 'Le logement sélectionné atterrira ici',
-    uiDropBannerSubList: '{n} logements atterriront ici en liste',
-    uiDropBannerSubGrid: '{n} logements atterriront ici en grille',
-    uiDropBannerSubPopulate: 'Remplir les champs # avec la sélection',
     uiLoadErrorTitle: 'Impossible de charger les logements',
     uiLoadErrorRetry: 'Réessayer',
   },
