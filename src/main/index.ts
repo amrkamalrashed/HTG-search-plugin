@@ -124,12 +124,12 @@ export default async function () {
     };
     visit(figma.currentPage);
     if (tagged.length === 0) {
-      figma.notify('No HTG cards on this page.');
+      figma.notify('No HomeDrop cards on this page.');
       return;
     }
     figma.currentPage.selection = tagged;
     figma.viewport.scrollAndZoomIntoView(tagged);
-    figma.notify(`Selected ${tagged.length} HTG node${tagged.length === 1 ? '' : 's'}.`);
+    figma.notify(`Selected ${tagged.length} HomeDrop node${tagged.length === 1 ? '' : 's'}.`);
   });
 
   on<RefreshHandler>('REFRESH', async () => {
@@ -169,7 +169,7 @@ export default async function () {
     figma.notify(
       refreshed === 0
         ? 'Nothing refreshed — offer data not found.'
-        : `Refreshed ${refreshed} HomeToGo ${refreshed === 1 ? 'card' : 'cards'}`,
+        : `Refreshed ${refreshed} HomeDrop ${refreshed === 1 ? 'card' : 'cards'}`,
     );
   });
 
@@ -444,8 +444,8 @@ async function insertCards(
   const container = figma.createFrame();
   container.name =
     mode === 'grid'
-      ? `HTG Card Grid · ${platform} · ${offers.length}`
-      : `HTG Card List · ${platform} · ${offers.length}`;
+      ? `HomeDrop Card Grid · ${platform} · ${offers.length}`
+      : `HomeDrop Card List · ${platform} · ${offers.length}`;
   container.layoutMode = mode === 'grid' ? 'HORIZONTAL' : 'VERTICAL';
   container.itemSpacing = LAYOUT_GAP;
   container.fills = [];
@@ -507,7 +507,7 @@ async function insertSections(payload: InsertSectionsPayload): Promise<void> {
   // no radius) so designers can drop it straight into their own screen
   // chrome without having to unstyle a wrapper.
   const container = figma.createFrame();
-  container.name = `HTG Sections · ${platform} · ${offer.title}`;
+  container.name = `HomeDrop Sections · ${platform} · ${offer.title}`;
   container.layoutMode = 'VERTICAL';
   container.primaryAxisSizingMode = 'AUTO';
   container.counterAxisSizingMode = 'AUTO';

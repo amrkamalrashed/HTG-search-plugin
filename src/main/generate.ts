@@ -140,7 +140,7 @@ async function buildWebCard(offer: Offer, locale: Locale): Promise<FrameNode> {
   // shorter title. Instead the card hugs and the image + actions
   // columns stretch to match.
   const card = figma.createFrame();
-  card.name = `HTG Card · ${offer.title}`;
+  card.name = `HomeDrop Card · ${offer.title}`;
   card.layoutMode = 'HORIZONTAL';
   card.primaryAxisSizingMode = 'FIXED';
   card.counterAxisSizingMode = 'AUTO';
@@ -362,7 +362,7 @@ async function buildMobileCard(
   const imageHeight = spec.imageHeight;
 
   const card = figma.createFrame();
-  card.name = `HTG Card · ${offer.title} (${platform})`;
+  card.name = `HomeDrop Card · ${offer.title} (${platform})`;
   card.layoutMode = 'VERTICAL';
   card.counterAxisSizingMode = 'FIXED';
   card.primaryAxisSizingMode = 'AUTO';

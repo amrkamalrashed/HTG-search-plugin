@@ -59,7 +59,7 @@ export function buildAmenities(
   platform: Platform = 'web',
 ): FrameNode {
   const m = metrics(platform);
-  const section = sectionFrame(`HTG Section · Amenities · ${offer.title}`, platform);
+  const section = sectionFrame(`HomeDrop Section · Amenities · ${offer.title}`, platform);
 
   section.appendChild(sectionHeading(t('amenities', locale), platform));
 

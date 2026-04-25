@@ -31,7 +31,7 @@ export function buildRoomInformation(
   platform: Platform,
 ): FrameNode {
   const m = metrics(platform);
-  const section = sectionFrame(`HTG Section · Rooms · ${offer.title}`, platform);
+  const section = sectionFrame(`HomeDrop Section · Rooms · ${offer.title}`, platform);
   section.appendChild(sectionHeading(t('roomInformation', locale), platform));
 
   const rooms =

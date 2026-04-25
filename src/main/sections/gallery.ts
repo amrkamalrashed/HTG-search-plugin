@@ -16,7 +16,7 @@ export async function buildGallery(
   platform: Platform = 'web',
 ): Promise<FrameNode> {
   const m = metrics(platform);
-  const section = sectionFrame(`HTG Section · Gallery · ${offer.title}`, platform);
+  const section = sectionFrame(`HomeDrop Section · Gallery · ${offer.title}`, platform);
   section.paddingTop = section.paddingBottom = 0;
   section.paddingLeft = section.paddingRight = 0;
   section.itemSpacing = 8;

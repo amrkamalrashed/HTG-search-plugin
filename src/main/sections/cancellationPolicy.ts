@@ -35,7 +35,7 @@ export function buildCancellationPolicy(
   platform: Platform,
 ): FrameNode {
   const m = metrics(platform);
-  const section = sectionFrame(`HTG Section · Cancellation · ${offer.title}`, platform);
+  const section = sectionFrame(`HomeDrop Section · Cancellation · ${offer.title}`, platform);
   section.appendChild(sectionHeading(t('cancellationPolicy', locale), platform));
 
   const tiers = offer.cancellationPolicy?.tiers ?? DEFAULT_TIERS;

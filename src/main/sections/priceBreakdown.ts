@@ -25,7 +25,7 @@ export function buildPriceBreakdown(
   platform: Platform = 'web',
 ): FrameNode {
   const m = metrics(platform);
-  const section = sectionFrame(`HTG Section · Price · ${offer.title}`, platform);
+  const section = sectionFrame(`HomeDrop Section · Price · ${offer.title}`, platform);
   section.appendChild(sectionHeading(t('priceBreakdown', locale), platform));
 
   const breakdown = offer.priceBreakdown ?? {

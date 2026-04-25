@@ -53,7 +53,7 @@ export function buildReasonsToBook(
   locale: Locale,
   platform: Platform,
 ): FrameNode {
-  const section = sectionFrame(`HTG Section · Reasons · ${offer.title}`, platform);
+  const section = sectionFrame(`HomeDrop Section · Reasons · ${offer.title}`, platform);
   section.appendChild(sectionHeading(t('reasonsToBook', locale), platform));
 
   const items =

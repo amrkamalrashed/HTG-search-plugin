@@ -25,7 +25,7 @@ export async function buildLocation(
   platform: Platform,
 ): Promise<FrameNode> {
   const m = metrics(platform);
-  const section = sectionFrame(`HTG Section · Location · ${offer.title}`, platform);
+  const section = sectionFrame(`HomeDrop Section · Location · ${offer.title}`, platform);
   section.appendChild(sectionHeading(t('location', locale), platform));
 
   const innerWidth = m.width - m.padding * 2;

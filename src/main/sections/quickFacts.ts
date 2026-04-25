@@ -29,7 +29,7 @@ export function buildQuickFacts(
   platform: Platform,
 ): FrameNode {
   const m = metrics(platform);
-  const section = sectionFrame(`HTG Section · Quick facts · ${offer.title}`, platform);
+  const section = sectionFrame(`HomeDrop Section · Quick facts · ${offer.title}`, platform);
   section.appendChild(sectionHeading(t('quickFacts', locale), platform));
 
   const facts: Fact[] = [];

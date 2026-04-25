@@ -37,7 +37,7 @@ export function buildHouseRules(
   locale: Locale,
   platform: Platform,
 ): FrameNode {
-  const section = sectionFrame(`HTG Section · Rules · ${offer.title}`, platform);
+  const section = sectionFrame(`HomeDrop Section · Rules · ${offer.title}`, platform);
   section.appendChild(sectionHeading(t('houseRules', locale), platform));
 
   const rules = offer.houseRules && offer.houseRules.length > 0

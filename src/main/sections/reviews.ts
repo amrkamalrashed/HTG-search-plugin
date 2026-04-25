@@ -60,7 +60,7 @@ export function buildReviews(
   platform: Platform = 'web',
 ): FrameNode {
   const m = metrics(platform);
-  const section = sectionFrame(`HTG Section · Reviews · ${offer.title}`, platform);
+  const section = sectionFrame(`HomeDrop Section · Reviews · ${offer.title}`, platform);
   section.appendChild(sectionHeading(t('reviewsHeader', locale), platform));
 
   const details = offer.reviewDetails;
