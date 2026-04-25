@@ -248,6 +248,22 @@ async function handleNativeDropOffer(
 ): Promise<void> {
   const offer = OFFER_BY_ID[offerId];
   if (!offer) return;
+
+  const dropTarget = nativeDropTargetFrame(event);
+  if (dropTarget && hasFieldNames(dropTarget)) {
+    const filled = await populateSelection(dropTarget, offer, locale);
+    if (filled > 0) {
+      const label = `Populated ${filled} layer${filled === 1 ? '' : 's'} in "${dropTarget.name}".`;
+      figma.notify(label);
+      emit<InsertedHandler>('INSERTED', {
+        createdNodeIds: [],
+        label,
+        kind: 'populated',
+      });
+      return;
+    }
+  }
+
   const card = await buildCard(offer, locale, platform);
   await landAtDropEvent(card, event);
   emit<InsertedHandler>('INSERTED', {
@@ -255,6 +271,14 @@ async function handleNativeDropOffer(
     label: `Dropped "${offer.title}" on the canvas.`,
     kind: 'dropped',
   });
+}
+
+function nativeDropTargetFrame(event: DropEvent): FrameNode | null {
+  const n = event.node;
+  if (n.type === 'FRAME' || n.type === 'COMPONENT' || n.type === 'INSTANCE') {
+    return n as FrameNode;
+  }
+  return null;
 }
 
 async function handleNativeDropMulti(

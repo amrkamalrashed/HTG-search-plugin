@@ -3,8 +3,6 @@ import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { emit, on } from '@create-figma-plugin/utilities';
 import type { Offer } from '@shared/types';
 import type {
-  DropHandler,
-  DropPayload,
   FindAllHandler,
   HighlightHandler,
   InsertHandler,
@@ -458,24 +456,13 @@ export function App(props: LoadedPayload) {
     e.dataTransfer.effectAllowed = 'copy';
   };
 
-  const onTileDragEnd = (offer: Offer, e: DragEvent) => {
-    // Figma exposes drop coords on the dragend event when the drop
-    // landed on the canvas (vs another iframe). Falling back to the
-    // pointer coords keeps things working in browser previews.
-    const data = e as unknown as {
-      dataTransfer: DataTransfer | null;
-      clientX: number;
-      clientY: number;
-    };
-    const payload: DropPayload = {
-      offerId: offer.id,
-      clientX: data.clientX,
-      clientY: data.clientY,
-      locale,
-      platform,
-      replaceOnDrop,
-    };
-    emit<DropHandler>('DROP', payload);
+  const onTileDragEnd = (_offer: Offer, _e: DragEvent) => {
+    // Canvas drops are now handled exclusively by the main thread's
+    // figma.on('drop') registration, which gets accurate canvas coords
+    // and the node under the cursor. We deliberately do not emit DROP
+    // from here — doing so would create a duplicate card alongside the
+    // one figma.on('drop') already placed.
+    onTileHoverLeave();
   };
 
   // Resize: live-resize while dragging the corner handle, persist on commit.
