@@ -261,16 +261,15 @@ export function App(props: LoadedPayload) {
   }, [offers]);
 
   /**
-   * Tile-click handler. Selection is always multi-capable; the engine
-   * picks a single-card vs list-vs-grid layout from selection count
-   * + multiLayout preference, so there is no longer a "single mode".
+   * Tile-click handler. Mirrors the section-grid behaviour in
+   * DetailView: plain click toggles the tile in/out of the selection
+   * (no replace-on-click), so clicking three tiles in a row gives a
+   * three-tile selection. Selection count drives the engine mode
+   * (single vs list vs grid) — there is no separate "single mode".
    *
-   * - plain click: replaces the selection with this id (one-of-N feel
-   *   when the user just wants one) and moves the anchor.
-   * - shift + click: extends the existing selection to a range from
-   *   the anchor to id.
-   * - cmd/ctrl + click: additively toggles id without moving the
-   *   anchor — useful for picking out a few specific tiles.
+   * - plain click / cmd / ctrl click: toggle this id in/out. Plain
+   *   click also moves the anchor; cmd / ctrl deliberately doesn't.
+   * - shift + click: add the [anchor, id] range to the selection.
    */
   const toggle = (id: string, e?: MouseEvent) => {
     const shift = !!e && e.shiftKey;
@@ -292,20 +291,13 @@ export function App(props: LoadedPayload) {
       }
     }
 
-    if (meta) {
-      // Additive toggle, anchor stays put.
-      setSelectedIds((prev) => {
-        const next = new Set(prev);
-        if (next.has(id)) next.delete(id);
-        else next.add(id);
-        return next;
-      });
-      return;
-    }
-
-    // Plain click: replace the selection with just this id.
-    setSelectedIds((prev) => (prev.size === 1 && prev.has(id) ? new Set() : new Set([id])));
-    setAnchorId(id);
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+    if (!meta) setAnchorId(id);
   };
 
   const toggleFavourite = (id: string) => {
@@ -760,7 +752,6 @@ export function App(props: LoadedPayload) {
         multiLayout={multiLayout}
         gridColumns={gridColumns}
         onGridColumnsChange={setGridColumns}
-        onRandomize={randomize}
         locale={locale}
       />
 
@@ -878,6 +869,21 @@ export function App(props: LoadedPayload) {
             ↺ {t('uiToastUndo', locale)}
           </button>
         )}
+        <button
+          class={styles.footerRandomBtn}
+          onClick={randomize}
+          title={t('uiRandomizeTooltip', locale)}
+          aria-label={t('uiRandomize', locale)}
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="3" />
+            <circle cx="8" cy="8" r="1" fill="currentColor" />
+            <circle cx="16" cy="8" r="1" fill="currentColor" />
+            <circle cx="8" cy="16" r="1" fill="currentColor" />
+            <circle cx="16" cy="16" r="1" fill="currentColor" />
+            <circle cx="12" cy="12" r="1" fill="currentColor" />
+          </svg>
+        </button>
         <DropCta
           count={count}
           multiLayout={multiLayout}

@@ -65,6 +65,7 @@ declare const styles: {
   readonly "footer": string;
   readonly "footerInfo": string;
   readonly "footerInfoActive": string;
+  readonly "footerRandomBtn": string;
   readonly "footerUndoBtn": string;
   readonly "grid": string;
   readonly "header": string;
@@ -152,7 +153,6 @@ declare const styles: {
   readonly "sortBar": string;
   readonly "sortBarRight": string;
   readonly "sortCount": string;
-  readonly "sortRandomizeBtn": string;
   readonly "sortSelect": string;
   readonly "sortSelectChevron": string;
   readonly "sortSelectWrap": string;
