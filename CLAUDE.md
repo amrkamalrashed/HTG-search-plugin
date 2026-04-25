@@ -95,14 +95,13 @@ Main and UI threads communicate via `emit` / `on` from
 ## Message channels
 
 All handler interfaces live in `src/shared/messages.ts`. Wire names
-(in quotes) are stable; TS handler names tracked the v0.7 rename.
+(in quotes) are stable across renames.
 
 | Channel              | Direction | Payload                                | Purpose                                   |
 |----------------------|-----------|----------------------------------------|-------------------------------------------|
-| `'INSERT'`           | UI → main | `InsertCardsPayload \| InsertSectionsPayload` (may include `dropInto: DropInto`) | The main CTA — drop a card / list / grid / section |
-| `'DROP'`             | UI → main | `DropPayload`                          | Tile dragend (legacy emit-based path)     |
+| `'INSERT'`           | UI → main | `InsertCardsPayload \| InsertSectionsPayload` | The main CTA — drop a card / list / grid / section |
 | `'SYNC_OFFERS'`      | UI → main | `{ offers: Offer[]; locale: Locale }`  | Push the freshly-fetched catalogue so main can resolve refresh-by-id |
-| `'UNDO'`             | UI → main | `{ nodeIds: string[] }`                | Toast Undo button                         |
+| `'UNDO'`             | UI → main | `{ nodeIds: string[] }`                | Toast Undo button + persistent footer Undo + ⌘Z |
 | `'FIND_ALL'`         | UI → main | —                                      | Select every HomeDrop-tagged node on page |
 | `'REFRESH'`          | UI → main | —                                      | Re-render selected HomeDrop nodes         |
 | `'RESIZE'`           | UI → main | `UiSize`                               | Live resize while dragging the corner     |
@@ -110,32 +109,62 @@ All handler interfaces live in `src/shared/messages.ts`. Wire names
 | `'SAVE_UI_SIZE'`     | UI → main | `UiSize`                               | Persist final size on resize commit       |
 | `'INSERTED'`         | main → UI | `ToastMessage`                         | Toast body + Undo node ids                |
 | `'HIGHLIGHT_OFFER'`  | main → UI | `{ offerId: string \| null }`          | Pulse the matching tile on canvas select  |
-| `'SELECTION_TARGET'` | main → UI | `{ target: SelectionTarget \| null }`  | Drive the Drop banner                     |
 
-Two `figma.on(...)` events on the main thread:
+The legacy `'DROP'` channel and the `'SELECTION_TARGET'` channel were
+removed in 0.9 along with the Replace-banner feature; canvas drops
+go through `figma.on('drop')` exclusively.
 
-- `selectionchange` — fires `pushHighlight()` and `pushSelectionTarget()`.
+One `figma.on(...)` event on the main thread:
+
+- `selectionchange` — fires `pushHighlight()`.
 - `drop` — three MIME types: `application/htg-offer`,
   `application/htg-offer-multi`, `application/htg-section`. Returning
-  `false` suppresses Figma's default text-node insertion.
+  `false` suppresses Figma's default text-node insertion. The handler
+  inspects `event.node`: a `#field` text/shape gets filled directly,
+  a frame with `#field` descendants gets populated via
+  `populateSelection`, anything else falls through to
+  `landAtDropEvent` (append-as-child or land-at-coords).
 
-## Interaction model — four ways to drop
+## Interaction model — four ways to drop a card
 
-1. **Click the Drop CTA** (single mode, no selection) → card lands at
-   viewport centre.
-2. **Click the Drop CTA with a #fieldName frame selected** → the
-   plugin populates `#title`, `#image`, etc. instead of creating a
-   new card.
-3. **Drag a tile onto a frame on the canvas** → routed through
-   `figma.on('drop')` → main lands the card inside the dropped-on
-   frame at the cursor's local coordinates.
-4. **Drag a tile onto empty canvas** → same channel, lands on the
-   page at `event.absoluteX / absoluteY`.
+The same selection-aware routing applies whether the user clicks the
+Drop CTA or drags a tile.
 
-The "Drop into 'X' with Replace" banner adds a fifth path on top of
-(2): when the user clicks Drop with a non-`#field` frame selected and
-Replace ON, the target frame's children are cleared first and the
-fresh card becomes its only child.
+1. **No selection** → card lands at viewport centre (CTA) / cursor
+   coords (drag).
+2. **Single `#field` text/shape selected** → fill that one node with
+   the matching offer field (`#title` → property title, `#image` →
+   hero image fill, etc.).
+3. **Frame with `#field` descendants selected** → fill every matching
+   descendant via `populateSelection`. Untouched layers are left
+   alone.
+4. **Plain frame selected (no `#field` descendants)** → drag drops
+   the card as a child; click drops at viewport centre.
+
+The detail-page hero (Level 2) and each section tile in the detail
+grid are also draggable, sharing the same MIME types.
+
+## Selection model — multi-select + split CTA
+
+Tiles are always multi-selectable. The footer CTA infers the layout
+from selection count + a persisted `multiLayout` preference
+(`list` / `grid`):
+
+- count = 0 → disabled "Pick a property"
+- count = 1 → `Drop` (single card at viewport centre)
+- count ≥ 2 → split-button `Drop {n} as {layout} ▾` (chevron opens
+  a List / Grid menu).
+
+`InsertMode = 'single' | 'list' | 'grid'` survives in the lower
+layers (insertCards / generate.ts) but is derived in `App.tsx` from
+`count <= 1 ? 'single' : multiLayout`. There is no longer a
+`single`/`list`/`grid` mode toggle in the header.
+
+Multi-select gestures:
+- Plain click replaces the selection with that tile + moves anchor.
+- Shift-click extends a range from the anchor.
+- ⌘ / Ctrl-click toggles a tile additively without moving the
+  anchor.
 
 ## Locale + Platform
 
@@ -154,23 +183,31 @@ without losing presentation.
 
 ## Two-level navigation
 
-- Level 1 (Search): browse / filter / sort / insert cards.
-- Level 2 (Detail): drill into one property via the `→` button on
-  each tile, pick any subset of Gallery / Amenities / Reviews /
-  Price breakdown sections, insert them as an auto-layout container
-  that rebuilds the full rental page.
+- **Level 1 (Search).** Browse / search / filter / sort / multi-
+  select / drop. The default surface.
+- **Level 2 (Detail).** Click `→` on a tile to drill into the
+  property. The page carries a sticky breadcrumb (`← Properties /
+  <title>`), the property hero (draggable — drops the card), a
+  property-facts panel (4-stat row: guests/bedrooms/baths/rating;
+  short description; amenity chips; price + provider), and a 12-tile
+  section grid. Pick any subset of sections (Gallery, Title header,
+  Quick facts, Reasons to book, Reviews, Amenities, Room information,
+  Description, House rules, Location, Price breakdown, Cancellation
+  policy); the CTA drops them as one vertical auto-layout container
+  with a 16 px gap between sections (web + iOS + Android).
 
-## Three insert modes (all adaptive to the offer)
+## Drop output shapes (all adaptive to the offer)
 
-- **Single** — one card at viewport centre. If the user has a frame selected
-  containing `#fieldName` layers, we populate it instead of creating a new one.
-- **List** — N cards stacked in a vertical auto-layout container.
-- **Grid** — N cards in a 2-column wrapping auto-layout container.
+- count = 1 → single card at viewport centre.
+- count ≥ 2 + multiLayout = 'list' → vertical auto-layout stack.
+- count ≥ 2 + multiLayout = 'grid' → wrapping auto-layout, 2/3/4
+  cols (user-controlled via the column stepper in SortBar).
 
-The **card generator is adaptive**: it skips missing fields rather than
-inserting placeholders. Offers without a discount get no discount pill;
-unrated offers show "New listing"; amenities the plugin doesn't have icons for
-are silently dropped; fewer than 2 images skips the pagination dots.
+The **card generator is adaptive**: it skips missing fields rather
+than inserting placeholders. Offers without a discount get no discount
+pill; unrated offers show "New listing"; amenities the plugin doesn't
+have icons for are silently dropped; fewer than 2 images skips the
+pagination dots.
 
 ## Design anchor
 
