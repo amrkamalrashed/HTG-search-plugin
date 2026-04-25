@@ -50,10 +50,14 @@ src/
 │       ├── amenities.ts
 │       ├── reviews.ts
 │       └── priceBreakdown.ts
-├── ui/                    # iframe
+├── ui/                    # iframe (real browser, owns fetch)
 │   ├── index.tsx          # render(App)
 │   ├── App.tsx            # state machine (Level 1 + Level 2), emits INSERT
-│   ├── styles.css         # CSS Modules, HTG tokens as custom properties
+│   ├── offers-source.ts   # OffersSource + JsonOffersSource + parseApiOffer (v2)
+│   ├── confetti.ts        # imperative runConfetti() (no React tree)
+│   ├── theme.ts           # applyTheme() + isDark()
+│   ├── dragImage.ts       # custom setDragImage() ghost factory
+│   ├── styles.css         # CSS Modules, HomeDrop tokens as custom properties
 │   └── components/
 │       ├── Header.tsx     # logo + Single/List/Grid toggle + refresh btn
 │       ├── LocaleBar.tsx  # locale + platform pills
@@ -108,8 +112,38 @@ from it.
      re-sync.
    - figma.viewport.scrollAndZoomIntoView + figma.notify
 
-4. No response message back; toast + scroll are enough feedback for PoC.
+4. Main emits `INSERT_RESULT` back to the UI with the top-level node ids
+   so the UI can show a Toast with an Undo button.
 ```
+
+### Figma events (main thread)
+
+Two `figma.on(...)` listeners drive the plugin's reaction to canvas
+state, alongside the explicit `emit/on` channels:
+
+| Event             | Fired by Figma when…                              | Side-effects                                                                                                         |
+|-------------------|---------------------------------------------------|----------------------------------------------------------------------------------------------------------------------|
+| `selectionchange` | Any selection mutation on the current page        | Calls `pushHighlight()` (emits `HIGHLIGHT_OFFER`) and `pushSelectionTarget()` (emits `SELECTION_TARGET`).             |
+| `drop`            | The user releases a drag from the plugin iframe   | Reads `event.items` for the three MIME types (`application/htg-offer`, `-multi`, `-section`) and dispatches the build. Returns `false` so Figma doesn't insert its own text node. |
+
+### v0.6 / v0.7 message channels
+
+The plugin now has a richer two-way message bus. Every channel is
+typed in `src/shared/messages.ts` and consumed via `emit/on`:
+
+| Channel | Direction | Payload | Purpose |
+|---------|-----------|---------|---------|
+| `INSERT` | UI → main | `InsertCardsPayload \| InsertSectionsPayload` | Existing card/section insert |
+| `DROP` | UI → main | `DropPayload` (offerId, coords, replaceOnDrop) | Tile dropped on canvas |
+| `UNDO` | UI → main | `{ nodeIds: string[] }` | Toast Undo button |
+| `FIND_ALL` | UI → main | — | Select every HomeDrop-tagged node on the page |
+| `REFRESH` | UI → main | — | Re-render selected HomeDrop cards |
+| `RESIZE` | UI → main | `UiSize` | Live resize while dragging the handle |
+| `SAVE_STATE` | UI → main | `UiState` | Persist UI state to clientStorage |
+| `SAVE_UI_SIZE` | UI → main | `UiSize` | Persist final size on resize commit |
+| `INSERT_RESULT` | main → UI | `InsertResultPayload` | Toast message + Undo node ids |
+| `HIGHLIGHT_OFFER` | main → UI | `{ offerId: string \| null }` | Pulse a tile when its card is selected |
+| `SELECTION_TARGET` | main → UI | `SelectionTargetInfo \| null` | Drive the Drop banner |
 
 ## Adaptive card
 
@@ -160,6 +194,105 @@ them against the current data without losing presentation.
 | Single | Loose card(s) on page | none (card is itself vertical auto-layout) |
 | List | Wrapper frame, padding 20, gap 16 | `layoutMode: VERTICAL, primaryAxis: AUTO` |
 | Grid | Wrapper frame, 2 cols, gaps 16 | `layoutMode: HORIZONTAL, layoutWrap: WRAP, primaryAxis: FIXED` (width = 2×card + gap + padding) |
+
+## Data layer (v0.8)
+
+The catalogue lives behind the `OffersSource` interface in
+`src/ui/offers-source.ts`:
+
+```ts
+interface OffersSource {
+  search(query: SearchQuery): Promise<Offer[]>;
+  getById(id: string, locale: Locale): Promise<Offer | null>;
+}
+
+interface SearchQuery {
+  locale: Locale;
+  text?: string;
+  filters?: { propertyType?, minRating?, priceMax?, minGuests? };
+  sort?: SortKey;
+  limit?: number;
+  cursor?: string;     // server-driven pagination, v2 only
+}
+```
+
+The seam lives on the **UI thread**, not main, because the QuickJS
+sandbox can't do real fetches — the iframe is where `fetch()` works.
+`App.tsx` instantiates the source once and runs a `useEffect` that
+calls `source.search(query)` whenever `locale | search | filters |
+sort` changes. The result becomes `offers` state.
+
+### Boot + sync flow
+
+```
+1. Plugin opens
+   main: showUI({ width, height }, { savedState, uiSize })
+   → UI receives savedState only — NOT the catalogue.
+
+2. UI mounts. useEffect fires source.search({ locale, ... }).
+   → Today: JsonOffersSource resolves immediately.
+   → v2:   ApiOffersSource calls fetch(); skeleton tiles cover the wait.
+
+3. UI receives offers. Two things happen:
+   a. setOffers(...)   — the grid renders.
+   b. emit<SyncOffersHandler>('SYNC_OFFERS', { offers, locale })
+      → main caches them in OFFER_BY_ID for Refresh/DROP lookups.
+
+4. User changes locale → step 2 re-runs with new query.locale.
+   Server returns localized data; SYNC_OFFERS re-syncs the cache.
+
+5. User clicks Refresh on selected canvas cards.
+   main looks up offerId in its cache → rebuilds via buildCard.
+   No round-trip back to the UI required.
+```
+
+### Loading + error UX
+
+While `source.search()` is pending, the grid shows **6 skeleton
+tiles** with an animated shimmer (dark-mode-aware). On rejection,
+the empty-state shows the error message and a Retry button that
+bumps a tick and re-runs the effect. Locale switches show the
+loading state for as long as the new fetch takes.
+
+### Why v2 is a one-line swap
+
+Today's `App.tsx` is:
+
+```ts
+const [source] = useState<OffersSource>(() => defaultOffersSource);
+```
+
+v2 becomes:
+
+```ts
+const [source] = useState<OffersSource>(() => new ApiOffersSource(API_URL));
+```
+
+Plus deleting `localize()` and the `i18n` block on `Offer` (the API
+returns localized data directly via `Accept-Language` / `?locale=de`).
+The card renderer, populate path, locale selector, drop banner — all
+unchanged.
+
+## Drop routing (v0.7)
+
+`handleDrop` in `src/main/index.ts` dispatches via `resolveDropTarget`:
+
+```
+selection has #fields  → populate (Replace toggle ignored)
+selection w/o #fields  → fill    (Replace=on clears children first)
+no selection           → viewport (drop at canvas coords)
+```
+
+`fillIntoTarget(target, child, replace)` in `src/main/populate.ts`
+clears the target's existing children when `replace` is true and
+appends the new card; otherwise it just appends. `hasFieldNames(target)`
+short-circuits via `findOne` so it returns as soon as one matching
+layer is found.
+
+The UI surfaces the active drop target via the
+[`DropTargetBanner`](../src/ui/components/DropTargetBanner.tsx)
+component, which receives a `SelectionTargetInfo` from main on every
+canvas selection change.
 
 ## Keeping v2 cheap
 

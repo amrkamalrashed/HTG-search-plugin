@@ -16,7 +16,7 @@ export async function buildGallery(
   platform: Platform = 'web',
 ): Promise<FrameNode> {
   const m = metrics(platform);
-  const section = sectionFrame(`HTG Section · Gallery · ${offer.title}`, platform);
+  const section = sectionFrame(`HomeDrop Section · Gallery · ${offer.title}`, platform);
   section.paddingTop = section.paddingBottom = 0;
   section.paddingLeft = section.paddingRight = 0;
   section.itemSpacing = 8;
@@ -36,7 +36,7 @@ export async function buildGallery(
     row.layoutMode = 'HORIZONTAL';
     row.primaryAxisSizingMode = 'FIXED';
     row.counterAxisSizingMode = 'AUTO';
-    row.resize(width, 1);
+    row.resizeWithoutConstraints(width, 1);
     row.itemSpacing = 8;
     row.fills = [];
     row.clipsContent = true;
@@ -119,7 +119,7 @@ async function makeThumbs(
   col.layoutMode = 'VERTICAL';
   col.primaryAxisSizingMode = 'AUTO';
   col.counterAxisSizingMode = 'FIXED';
-  col.resize(width, 1);
+  col.resizeWithoutConstraints(width, 1);
   col.itemSpacing = 8;
   col.fills = [];
 

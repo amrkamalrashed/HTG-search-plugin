@@ -2,7 +2,7 @@ export type Platform = 'web' | 'ios' | 'android';
 
 export const PLATFORMS: Array<{ id: Platform; label: string; icon: string }> = [
   { id: 'web', label: 'Web', icon: '⎕' },
-  { id: 'ios', label: 'iPhone', icon: '' },
+  { id: 'ios', label: 'iOS', icon: '' },
   { id: 'android', label: 'Android', icon: '◆' },
 ];
 

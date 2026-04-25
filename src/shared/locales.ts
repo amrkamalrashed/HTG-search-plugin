@@ -1,10 +1,14 @@
 export type Locale = 'en' | 'de' | 'es' | 'fr';
 
+// Plain text codes instead of regional-indicator flag emojis. Some
+// platforms (Windows, certain emoji fonts) render `🇬🇧 🇩🇪 🇪🇸 🇫🇷`
+// as doubled letter blocks (the "doubled-flag" bug); the text codes
+// look correct everywhere and stay short enough for the locale pill.
 export const LOCALES: Array<{ id: Locale; label: string; flag: string }> = [
-  { id: 'en', label: 'English', flag: '🇬🇧' },
-  { id: 'de', label: 'Deutsch', flag: '🇩🇪' },
-  { id: 'es', label: 'Español', flag: '🇪🇸' },
-  { id: 'fr', label: 'Français', flag: '🇫🇷' },
+  { id: 'en', label: 'English', flag: 'EN' },
+  { id: 'de', label: 'Deutsch', flag: 'DE' },
+  { id: 'es', label: 'Español', flag: 'ES' },
+  { id: 'fr', label: 'Français', flag: 'FR' },
 ];
 
 export const LOCALE_TO_INTL: Record<Locale, string> = {
@@ -164,7 +168,56 @@ export type StringKey =
   | 'uiPerNightSlash'
   | 'uiOpenDetails'
   | 'uiInsertCard'
-  | 'uiPreviewTooltip';
+  | 'uiPreviewTooltip'
+  // v0.6 / v0.7 chrome
+  | 'uiRandomize'
+  | 'uiRandomizeTooltip'
+  | 'uiThemeAuto'
+  | 'uiThemeLight'
+  | 'uiThemeDark'
+  | 'uiThemeTooltip'
+  | 'uiToastUndo'
+  | 'uiPaletteHint'
+  | 'uiPalettePlaceholder'
+  | 'uiPaletteRandom'
+  | 'uiPaletteRefresh'
+  | 'uiPaletteFindAll'
+  | 'uiPaletteSetMode'
+  | 'uiPaletteSetPlatform'
+  | 'uiPaletteSetLocale'
+  | 'uiPaletteSetTheme'
+  | 'uiPaletteSavePreset'
+  | 'uiPaletteApplyPreset'
+  | 'uiPaletteDrop'
+  | 'uiDropBanner'
+  | 'uiDropBannerWithFields'
+  | 'uiDropBannerReplace'
+  | 'uiPresetSaved'
+  | 'uiPresetNamePrompt'
+  | 'uiFavouriteAdd'
+  | 'uiFavouriteRemove'
+  | 'uiHoverPeekTitle'
+  | 'uiFindAll'
+  | 'uiFindAllTooltip'
+  | 'uiDrop'
+  | 'uiDropN'
+  | 'uiDropAsList'
+  | 'uiDropNAsList'
+  | 'uiDropAsGrid'
+  | 'uiDropNAsGrid'
+  | 'uiPresetsTooltip'
+  | 'uiPresetsEmpty'
+  | 'uiPresetsSaveCurrent'
+  | 'uiPresetDelete'
+  | 'uiFilterFavourites'
+  | 'uiFilterFavouritesEmpty'
+  | 'uiDropBannerSubNone'
+  | 'uiDropBannerSubSingle'
+  | 'uiDropBannerSubList'
+  | 'uiDropBannerSubGrid'
+  | 'uiDropBannerSubPopulate'
+  | 'uiLoadErrorTitle'
+  | 'uiLoadErrorRetry';
 
 export const STRINGS: Record<Locale, Record<StringKey, string>> = {
   en: {
@@ -311,6 +364,54 @@ export const STRINGS: Record<Locale, Record<StringKey, string>> = {
     uiOpenDetails: 'Open details →',
     uiInsertCard: 'Insert card',
     uiPreviewTooltip: 'Preview details',
+    uiRandomize: 'Randomize',
+    uiRandomizeTooltip: 'Pick a random property (R)',
+    uiThemeAuto: 'Auto',
+    uiThemeLight: 'Light',
+    uiThemeDark: 'Dark',
+    uiThemeTooltip: 'Theme',
+    uiToastUndo: 'Undo',
+    uiPaletteHint: '⌘K',
+    uiPalettePlaceholder: 'Type a command…',
+    uiPaletteRandom: 'Random property',
+    uiPaletteRefresh: 'Refresh selected cards',
+    uiPaletteFindAll: 'Find all HomeDrop cards on this page',
+    uiPaletteSetMode: 'Mode: {value}',
+    uiPaletteSetPlatform: 'Surface: {value}',
+    uiPaletteSetLocale: 'Market: {value}',
+    uiPaletteSetTheme: 'Theme: {value}',
+    uiPaletteSavePreset: 'Save current settings as preset…',
+    uiPaletteApplyPreset: 'Apply preset · {value}',
+    uiPaletteDrop: 'Drop a property card on the canvas',
+    uiDropBanner: 'Drop into "{name}"',
+    uiDropBannerWithFields: 'Drop into "{name}" — {n} #fields detected',
+    uiDropBannerReplace: 'Replace contents on drop',
+    uiPresetSaved: 'Preset "{name}" saved.',
+    uiPresetNamePrompt: 'Name this preset',
+    uiFavouriteAdd: 'Add to favourites',
+    uiFavouriteRemove: 'Remove from favourites',
+    uiHoverPeekTitle: 'Quick look',
+    uiFindAll: 'Find all',
+    uiFindAllTooltip: 'Find all HomeDrop cards on this page',
+    uiDrop: 'Drop',
+    uiDropN: 'Drop {n}',
+    uiDropAsList: 'Drop as list',
+    uiDropNAsList: 'Drop {n} as list',
+    uiDropAsGrid: 'Drop as grid',
+    uiDropNAsGrid: 'Drop {n} as grid',
+    uiPresetsTooltip: 'Presets',
+    uiPresetsEmpty: 'No presets yet.',
+    uiPresetsSaveCurrent: 'Save current settings…',
+    uiPresetDelete: 'Delete preset',
+    uiFilterFavourites: 'Favourites ({n})',
+    uiFilterFavouritesEmpty: 'Star a tile to add it to favourites',
+    uiDropBannerSubNone: 'Pick a property below',
+    uiDropBannerSubSingle: 'The selected property will land here',
+    uiDropBannerSubList: '{n} properties will land here as a list',
+    uiDropBannerSubGrid: '{n} properties will land here as a grid',
+    uiDropBannerSubPopulate: 'Populate matching #fields with the selected property',
+    uiLoadErrorTitle: "Couldn't load properties",
+    uiLoadErrorRetry: 'Retry',
   },
   de: {
     ratingOutstanding: 'Hervorragend',
@@ -456,6 +557,54 @@ export const STRINGS: Record<Locale, Record<StringKey, string>> = {
     uiOpenDetails: 'Details öffnen →',
     uiInsertCard: 'Karte einfügen',
     uiPreviewTooltip: 'Details ansehen',
+    uiRandomize: 'Zufall',
+    uiRandomizeTooltip: 'Zufällige Unterkunft wählen (R)',
+    uiThemeAuto: 'Auto',
+    uiThemeLight: 'Hell',
+    uiThemeDark: 'Dunkel',
+    uiThemeTooltip: 'Design',
+    uiToastUndo: 'Rückgängig',
+    uiPaletteHint: '⌘K',
+    uiPalettePlaceholder: 'Befehl eingeben…',
+    uiPaletteRandom: 'Zufällige Unterkunft',
+    uiPaletteRefresh: 'Ausgewählte Karten aktualisieren',
+    uiPaletteFindAll: 'Alle HomeDrop-Karten auf dieser Seite finden',
+    uiPaletteSetMode: 'Modus: {value}',
+    uiPaletteSetPlatform: 'Oberfläche: {value}',
+    uiPaletteSetLocale: 'Markt: {value}',
+    uiPaletteSetTheme: 'Design: {value}',
+    uiPaletteSavePreset: 'Aktuelle Einstellungen als Preset speichern…',
+    uiPaletteApplyPreset: 'Preset anwenden · {value}',
+    uiPaletteDrop: 'Karte auf dem Canvas ablegen',
+    uiDropBanner: 'In "{name}" ablegen',
+    uiDropBannerWithFields: 'In "{name}" ablegen — {n} #-Felder erkannt',
+    uiDropBannerReplace: 'Inhalte beim Ablegen ersetzen',
+    uiPresetSaved: 'Preset "{name}" gespeichert.',
+    uiPresetNamePrompt: 'Preset benennen',
+    uiFavouriteAdd: 'Zu Favoriten hinzufügen',
+    uiFavouriteRemove: 'Aus Favoriten entfernen',
+    uiHoverPeekTitle: 'Kurzansicht',
+    uiFindAll: 'Alle finden',
+    uiFindAllTooltip: 'Alle HomeDrop-Karten auf dieser Seite finden',
+    uiDrop: 'Ablegen',
+    uiDropN: '{n} ablegen',
+    uiDropAsList: 'Als Liste ablegen',
+    uiDropNAsList: '{n} als Liste ablegen',
+    uiDropAsGrid: 'Als Raster ablegen',
+    uiDropNAsGrid: '{n} als Raster ablegen',
+    uiPresetsTooltip: 'Voreinstellungen',
+    uiPresetsEmpty: 'Noch keine Voreinstellungen.',
+    uiPresetsSaveCurrent: 'Aktuelle Einstellungen speichern…',
+    uiPresetDelete: 'Voreinstellung löschen',
+    uiFilterFavourites: 'Favoriten ({n})',
+    uiFilterFavouritesEmpty: 'Markiere Karten als Favoriten',
+    uiDropBannerSubNone: 'Wähle unten eine Unterkunft',
+    uiDropBannerSubSingle: 'Die ausgewählte Unterkunft landet hier',
+    uiDropBannerSubList: '{n} Unterkünfte landen hier als Liste',
+    uiDropBannerSubGrid: '{n} Unterkünfte landen hier als Raster',
+    uiDropBannerSubPopulate: 'Passende #-Felder mit der Auswahl füllen',
+    uiLoadErrorTitle: 'Unterkünfte konnten nicht geladen werden',
+    uiLoadErrorRetry: 'Erneut versuchen',
   },
   es: {
     ratingOutstanding: 'Excepcional',
@@ -601,6 +750,54 @@ export const STRINGS: Record<Locale, Record<StringKey, string>> = {
     uiOpenDetails: 'Abrir detalles →',
     uiInsertCard: 'Insertar tarjeta',
     uiPreviewTooltip: 'Vista previa',
+    uiRandomize: 'Aleatorio',
+    uiRandomizeTooltip: 'Elegir alojamiento al azar (R)',
+    uiThemeAuto: 'Auto',
+    uiThemeLight: 'Claro',
+    uiThemeDark: 'Oscuro',
+    uiThemeTooltip: 'Tema',
+    uiToastUndo: 'Deshacer',
+    uiPaletteHint: '⌘K',
+    uiPalettePlaceholder: 'Escribe un comando…',
+    uiPaletteRandom: 'Alojamiento aleatorio',
+    uiPaletteRefresh: 'Actualizar tarjetas seleccionadas',
+    uiPaletteFindAll: 'Buscar todas las tarjetas HomeDrop en esta página',
+    uiPaletteSetMode: 'Modo: {value}',
+    uiPaletteSetPlatform: 'Superficie: {value}',
+    uiPaletteSetLocale: 'Mercado: {value}',
+    uiPaletteSetTheme: 'Tema: {value}',
+    uiPaletteSavePreset: 'Guardar ajustes actuales como preset…',
+    uiPaletteApplyPreset: 'Aplicar preset · {value}',
+    uiPaletteDrop: 'Soltar una tarjeta en el lienzo',
+    uiDropBanner: 'Soltar en "{name}"',
+    uiDropBannerWithFields: 'Soltar en "{name}" — {n} #campos detectados',
+    uiDropBannerReplace: 'Reemplazar contenido al soltar',
+    uiPresetSaved: 'Preset "{name}" guardado.',
+    uiPresetNamePrompt: 'Nombre del preset',
+    uiFavouriteAdd: 'Añadir a favoritos',
+    uiFavouriteRemove: 'Quitar de favoritos',
+    uiHoverPeekTitle: 'Vista rápida',
+    uiFindAll: 'Buscar todas',
+    uiFindAllTooltip: 'Buscar todas las tarjetas HomeDrop en esta página',
+    uiDrop: 'Soltar',
+    uiDropN: 'Soltar {n}',
+    uiDropAsList: 'Soltar como lista',
+    uiDropNAsList: 'Soltar {n} como lista',
+    uiDropAsGrid: 'Soltar como cuadrícula',
+    uiDropNAsGrid: 'Soltar {n} como cuadrícula',
+    uiPresetsTooltip: 'Presets',
+    uiPresetsEmpty: 'Aún no hay presets.',
+    uiPresetsSaveCurrent: 'Guardar ajustes actuales…',
+    uiPresetDelete: 'Eliminar preset',
+    uiFilterFavourites: 'Favoritos ({n})',
+    uiFilterFavouritesEmpty: 'Marca tarjetas como favoritas',
+    uiDropBannerSubNone: 'Elige un alojamiento abajo',
+    uiDropBannerSubSingle: 'El alojamiento seleccionado caerá aquí',
+    uiDropBannerSubList: '{n} alojamientos caerán aquí como lista',
+    uiDropBannerSubGrid: '{n} alojamientos caerán aquí como cuadrícula',
+    uiDropBannerSubPopulate: 'Rellenar los #campos con la selección',
+    uiLoadErrorTitle: 'No se pudieron cargar los alojamientos',
+    uiLoadErrorRetry: 'Reintentar',
   },
   fr: {
     ratingOutstanding: 'Exceptionnel',
@@ -746,6 +943,54 @@ export const STRINGS: Record<Locale, Record<StringKey, string>> = {
     uiOpenDetails: 'Voir les détails →',
     uiInsertCard: 'Insérer la fiche',
     uiPreviewTooltip: 'Aperçu',
+    uiRandomize: 'Aléatoire',
+    uiRandomizeTooltip: 'Choisir un logement au hasard (R)',
+    uiThemeAuto: 'Auto',
+    uiThemeLight: 'Clair',
+    uiThemeDark: 'Sombre',
+    uiThemeTooltip: 'Thème',
+    uiToastUndo: 'Annuler',
+    uiPaletteHint: '⌘K',
+    uiPalettePlaceholder: 'Tapez une commande…',
+    uiPaletteRandom: 'Logement aléatoire',
+    uiPaletteRefresh: 'Actualiser les fiches sélectionnées',
+    uiPaletteFindAll: 'Trouver toutes les fiches HomeDrop sur cette page',
+    uiPaletteSetMode: 'Mode : {value}',
+    uiPaletteSetPlatform: 'Surface : {value}',
+    uiPaletteSetLocale: 'Marché : {value}',
+    uiPaletteSetTheme: 'Thème : {value}',
+    uiPaletteSavePreset: 'Enregistrer les réglages actuels comme préréglage…',
+    uiPaletteApplyPreset: 'Appliquer le préréglage · {value}',
+    uiPaletteDrop: 'Déposer une fiche sur le canevas',
+    uiDropBanner: 'Déposer dans « {name} »',
+    uiDropBannerWithFields: 'Déposer dans « {name} » — {n} champs # détectés',
+    uiDropBannerReplace: 'Remplacer le contenu au dépôt',
+    uiPresetSaved: 'Préréglage « {name} » enregistré.',
+    uiPresetNamePrompt: 'Nommez ce préréglage',
+    uiFavouriteAdd: 'Ajouter aux favoris',
+    uiFavouriteRemove: 'Retirer des favoris',
+    uiHoverPeekTitle: 'Aperçu rapide',
+    uiFindAll: 'Tout trouver',
+    uiFindAllTooltip: 'Trouver toutes les fiches HomeDrop sur cette page',
+    uiDrop: 'Déposer',
+    uiDropN: 'Déposer {n}',
+    uiDropAsList: 'Déposer en liste',
+    uiDropNAsList: 'Déposer {n} en liste',
+    uiDropAsGrid: 'Déposer en grille',
+    uiDropNAsGrid: 'Déposer {n} en grille',
+    uiPresetsTooltip: 'Préréglages',
+    uiPresetsEmpty: 'Aucun préréglage pour le moment.',
+    uiPresetsSaveCurrent: 'Enregistrer les réglages actuels…',
+    uiPresetDelete: 'Supprimer le préréglage',
+    uiFilterFavourites: 'Favoris ({n})',
+    uiFilterFavouritesEmpty: 'Mettez une fiche en favori',
+    uiDropBannerSubNone: 'Choisissez un logement ci-dessous',
+    uiDropBannerSubSingle: 'Le logement sélectionné atterrira ici',
+    uiDropBannerSubList: '{n} logements atterriront ici en liste',
+    uiDropBannerSubGrid: '{n} logements atterriront ici en grille',
+    uiDropBannerSubPopulate: 'Remplir les champs # avec la sélection',
+    uiLoadErrorTitle: 'Impossible de charger les logements',
+    uiLoadErrorRetry: 'Réessayer',
   },
 };
 

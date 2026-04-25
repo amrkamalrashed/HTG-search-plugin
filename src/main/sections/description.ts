@@ -15,7 +15,7 @@ export function buildDescription(
   platform: Platform,
 ): FrameNode {
   const m = metrics(platform);
-  const section = sectionFrame(`HTG Section · Description · ${offer.title}`, platform);
+  const section = sectionFrame(`HomeDrop Section · Description · ${offer.title}`, platform);
   section.appendChild(sectionHeading(t('description', locale), platform));
 
   const text = offer.fullDescription ?? offer.shortDescription ?? '';

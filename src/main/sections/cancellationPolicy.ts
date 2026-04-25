@@ -35,7 +35,7 @@ export function buildCancellationPolicy(
   platform: Platform,
 ): FrameNode {
   const m = metrics(platform);
-  const section = sectionFrame(`HTG Section · Cancellation · ${offer.title}`, platform);
+  const section = sectionFrame(`HomeDrop Section · Cancellation · ${offer.title}`, platform);
   section.appendChild(sectionHeading(t('cancellationPolicy', locale), platform));
 
   const tiers = offer.cancellationPolicy?.tiers ?? DEFAULT_TIERS;
@@ -47,13 +47,13 @@ export function buildCancellationPolicy(
     card.layoutMode = 'HORIZONTAL';
     card.primaryAxisSizingMode = 'FIXED';
     card.counterAxisSizingMode = 'AUTO';
-    card.resize(innerWidth, 1);
+    card.resizeWithoutConstraints(innerWidth, 1);
     card.cornerRadius = 12;
     card.fills = [{ type: 'SOLID', color: BRAND.surface }];
     card.clipsContent = true;
 
     const rail = figma.createFrame();
-    rail.resize(4, 1);
+    rail.resizeWithoutConstraints(4, 1);
     rail.layoutAlign = 'STRETCH';
     rail.fills = [{ type: 'SOLID', color: refundColor(tier.refundPct) }];
     card.appendChild(rail);

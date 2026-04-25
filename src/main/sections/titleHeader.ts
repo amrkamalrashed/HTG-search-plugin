@@ -23,7 +23,7 @@ export function buildTitleHeader(
   platform: Platform,
 ): FrameNode {
   const m = metrics(platform);
-  const section = sectionFrame(`HTG Section · Title · ${offer.title}`, platform);
+  const section = sectionFrame(`HomeDrop Section · Title · ${offer.title}`, platform);
   section.itemSpacing = 6;
 
   // Badges row (best-effort from offer.badges)

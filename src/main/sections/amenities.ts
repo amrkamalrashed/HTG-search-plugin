@@ -59,7 +59,7 @@ export function buildAmenities(
   platform: Platform = 'web',
 ): FrameNode {
   const m = metrics(platform);
-  const section = sectionFrame(`HTG Section · Amenities · ${offer.title}`, platform);
+  const section = sectionFrame(`HomeDrop Section · Amenities · ${offer.title}`, platform);
 
   section.appendChild(sectionHeading(t('amenities', locale), platform));
 
@@ -72,7 +72,7 @@ export function buildAmenities(
   grid.layoutWrap = 'WRAP';
   grid.primaryAxisSizingMode = 'FIXED';
   grid.counterAxisSizingMode = 'AUTO';
-  grid.resize(innerWidth, 1);
+  grid.resizeWithoutConstraints(innerWidth, 1);
   grid.itemSpacing = 16;
   grid.counterAxisSpacing = 20;
   grid.fills = [];
@@ -92,7 +92,7 @@ export function buildAmenities(
       if (!items || items.length === 0) continue;
       const col = vframe(`cat_${cat}`, 8);
       col.counterAxisSizingMode = 'FIXED';
-      col.resize(colWidth, 1);
+      col.resizeWithoutConstraints(colWidth, 1);
       col.appendChild(
         makeText(
           'catLabel',

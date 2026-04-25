@@ -9,22 +9,25 @@ export interface Filters {
   minRating?: number;
   priceMax?: number;
   minGuests?: number;
+  favouritesOnly?: boolean;
 }
 
 interface Props {
   filters: Filters;
   onChange: (f: Filters) => void;
+  /** Number of favourited offers; drives the chip's count badge. */
+  favouritesCount: number;
   locale: Locale;
 }
 
 const PROPERTY_TYPES: PropertyType[] = ['apartment', 'villa', 'house', 'chalet', 'cabin', 'cottage', 'studio', 'penthouse'];
 
-export function FilterBar({ filters, onChange, locale }: Props) {
+export function FilterBar({ filters, onChange, favouritesCount, locale }: Props) {
   const toggle = <K extends keyof Filters>(key: K, value: Filters[K]) =>
     onChange({ ...filters, [key]: filters[key] === value ? undefined : value });
 
   const clearAll = () => onChange({});
-  const hasAny = Object.values(filters).some((v) => v !== undefined);
+  const hasAny = Object.values(filters).some((v) => v !== undefined && v !== false);
 
   return (
     <div class={styles.filterBar}>
@@ -33,6 +36,18 @@ export function FilterBar({ filters, onChange, locale }: Props) {
         onClick={clearAll}
       >
         {t('uiFilterAll', locale)}
+      </button>
+      <button
+        class={`${styles.chip} ${filters.favouritesOnly ? styles.chipActive : ''}`}
+        onClick={() => toggle('favouritesOnly', filters.favouritesOnly ? undefined : true)}
+        disabled={favouritesCount === 0}
+        title={
+          favouritesCount === 0
+            ? t('uiFilterFavouritesEmpty', locale)
+            : t('uiFilterFavourites', locale, { n: favouritesCount })
+        }
+      >
+        ★ {t('uiFilterFavourites', locale, { n: favouritesCount })}
       </button>
       <button
         class={`${styles.chip} ${filters.priceMax === 150 ? styles.chipActive : ''}`}

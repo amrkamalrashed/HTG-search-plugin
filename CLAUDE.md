@@ -1,6 +1,7 @@
-# CLAUDE.md — HomeToGo Data Figma Plugin
+# CLAUDE.md — HomeDrop Figma Plugin
 
-Context for future Claude sessions working on this repository.
+Context for future Claude sessions working on this repository. The plugin is
+called **HomeDrop**; HomeToGo is the brand whose product data it places.
 
 ## Design principle: sections and cards, never screens
 
@@ -19,14 +20,14 @@ Designers compose the card/section outputs into their own screens.
 
 ## What this is
 
-A **Proof-of-Concept Figma plugin** that lets HomeToGo designers insert real
-vacation-rental product data into their designs with one click. PoC v1 reads a
-local JSON file of 10 mock offers; a future v2 will call the internal HTG
-search/product API once it becomes available.
+**HomeDrop** is a Proof-of-Concept Figma plugin that lets HomeToGo designers
+insert real vacation-rental product data into their designs with one click
+(or one drag). PoC v1 reads a local JSON file of 10 mock offers; a future v2
+will call the internal HTG search/product API once it becomes available.
 
 The core UX: open plugin → browse/search/filter properties → optionally preview
-→ pick one or many → click **Insert** → plugin places a fully-populated HTG
-product card (or a list / grid of cards) on the canvas.
+→ pick one or many → click **Drop** (or drag a tile onto the canvas) → plugin
+places a fully-populated HomeToGo product card (or a list / grid of cards).
 
 ## Who asked for this
 
@@ -40,6 +41,10 @@ integration later.
 - Mock data source only (no API access yet).
 - Card design targets the real HomeToGo search-results card (screenshot in
   `docs/BRAND.md`). Designers will supply the official component later.
+- v0.6 / v0.7 — UX polish wave: dark mode, resizable window, drag-onto-canvas,
+  ⌘K command palette, multi-select, favourites, toast + undo, drop-into-frame
+  with Replace toggle, canvas ↔ plugin awareness, presets, confetti. See
+  `CHANGELOG.md` for the per-chunk breakdown.
 
 ## Architecture at a glance
 
@@ -61,9 +66,15 @@ src/
   ui/           # Preact iframe. Search + detail + pickers.
     index.tsx
     App.tsx         # Level-1 search + Level-2 detail state machine
+    offers-source.ts # OffersSource interface + JsonOffersSource + v2 stub
+    confetti.ts     # Imperative runConfetti() (no React tree)
+    theme.ts        # Auto/Light/Dark theme application (data-theme attr)
+    dragImage.ts    # Custom drag-image factory (setDragImage)
     styles.css
     components/     # Header, LocaleBar, SearchBar, FilterBar, SortBar,
-                    # ProductTile, PreviewModal, DetailView
+                    # ProductTile, PreviewModal, DetailView,
+                    # ResizeHandle, HoverPeek, NumberTicker, Toast,
+                    # CommandPalette, DropTargetBanner, PresetsMenu
   shared/       # Consumed by both threads (no DOM / no figma.* API).
     types.ts        # Offer + ReviewDetails + PriceBreakdown + enums
     messages.ts     # Insert*Payload + SectionKind + UiState
@@ -80,6 +91,51 @@ src/
 
 Main and UI threads communicate via `emit` / `on` from
 `@create-figma-plugin/utilities` (typed wrappers over `postMessage`).
+
+## Message channels
+
+All handler interfaces live in `src/shared/messages.ts`. Wire names
+(in quotes) are stable; TS handler names tracked the v0.7 rename.
+
+| Channel              | Direction | Payload                                | Purpose                                   |
+|----------------------|-----------|----------------------------------------|-------------------------------------------|
+| `'INSERT'`           | UI → main | `InsertCardsPayload \| InsertSectionsPayload` (may include `dropInto: DropInto`) | The main CTA — drop a card / list / grid / section |
+| `'DROP'`             | UI → main | `DropPayload`                          | Tile dragend (legacy emit-based path)     |
+| `'SYNC_OFFERS'`      | UI → main | `{ offers: Offer[]; locale: Locale }`  | Push the freshly-fetched catalogue so main can resolve refresh-by-id |
+| `'UNDO'`             | UI → main | `{ nodeIds: string[] }`                | Toast Undo button                         |
+| `'FIND_ALL'`         | UI → main | —                                      | Select every HomeDrop-tagged node on page |
+| `'REFRESH'`          | UI → main | —                                      | Re-render selected HomeDrop nodes         |
+| `'RESIZE'`           | UI → main | `UiSize`                               | Live resize while dragging the corner     |
+| `'SAVE_STATE'`       | UI → main | `UiState`                              | Persist UI state (debounced)              |
+| `'SAVE_UI_SIZE'`     | UI → main | `UiSize`                               | Persist final size on resize commit       |
+| `'INSERTED'`         | main → UI | `ToastMessage`                         | Toast body + Undo node ids                |
+| `'HIGHLIGHT_OFFER'`  | main → UI | `{ offerId: string \| null }`          | Pulse the matching tile on canvas select  |
+| `'SELECTION_TARGET'` | main → UI | `{ target: SelectionTarget \| null }`  | Drive the Drop banner                     |
+
+Two `figma.on(...)` events on the main thread:
+
+- `selectionchange` — fires `pushHighlight()` and `pushSelectionTarget()`.
+- `drop` — three MIME types: `application/htg-offer`,
+  `application/htg-offer-multi`, `application/htg-section`. Returning
+  `false` suppresses Figma's default text-node insertion.
+
+## Interaction model — four ways to drop
+
+1. **Click the Drop CTA** (single mode, no selection) → card lands at
+   viewport centre.
+2. **Click the Drop CTA with a #fieldName frame selected** → the
+   plugin populates `#title`, `#image`, etc. instead of creating a
+   new card.
+3. **Drag a tile onto a frame on the canvas** → routed through
+   `figma.on('drop')` → main lands the card inside the dropped-on
+   frame at the cursor's local coordinates.
+4. **Drag a tile onto empty canvas** → same channel, lands on the
+   page at `event.absoluteX / absoluteY`.
+
+The "Drop into 'X' with Replace" banner adds a fifth path on top of
+(2): when the user clicks Drop with a non-`#field` frame selected and
+Replace ON, the target frame's children are cleared first and the
+fresh card becomes its only child.
 
 ## Locale + Platform
 
@@ -131,9 +187,12 @@ strikethrough price. See `docs/BRAND.md` for the palette.
 | Add a new offer field | `src/shared/types.ts` → `src/data/products.json` → `src/shared/layer-names.ts` (add key + formatter) → `src/main/generate.ts` (render it) |
 | Add an amenity icon | `src/main/icons.ts` (add SVG) → `AMENITY_TO_ICON` in `src/main/generate.ts` |
 | Change card visuals | `src/main/generate.ts` + tokens in `src/main/brand.ts` |
-| Change plugin UI look | `src/ui/styles.css` + CSS-var tokens at top |
+| Change plugin UI look | `src/ui/styles.css` + CSS-var tokens at top (light + dark sets) |
 | Add a filter chip | `src/ui/components/FilterBar.tsx` + `Filters` type + matching filter in `App.tsx` |
-| Wire to a real API | Replace the `productsJson` import in `src/main/index.ts` with a `fetch` in the UI thread; add domain to `package.json` → `figma-plugin.networkAccess.allowedDomains` |
+| Add a palette command | `paletteCommands` array in `src/ui/App.tsx` |
+| Add a new message channel | `src/shared/messages.ts` (handler interface) → wire `on/emit` in `src/main/index.ts` and `src/ui/App.tsx` |
+| Wire to a real API | Implement `ApiOffersSource` in `src/ui/offers-source.ts` (the file already has a commented sketch). Swap `defaultOffersSource` → `new ApiOffersSource(url)` in `App.tsx`. Add the API host + image CDN to `package.json` → `figma-plugin.networkAccess.allowedDomains`. Delete `localize()` + the `i18n` block on `Offer` once the API returns locale-specific data directly. |
+| Add a new data field | Add it to `Offer` in `src/shared/types.ts`. Either populate `products.json` (for the PoC) or extend `parseApiOffer()` (for v2). Render it in `src/main/generate.ts` and add a `#fieldName` mapping in `src/shared/layer-names.ts`. |
 
 ## Gotchas (from the research)
 

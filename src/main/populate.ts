@@ -63,3 +63,30 @@ export function firstTargetInSelection(selection: readonly SceneNode[]): TargetN
   }
   return null;
 }
+
+/** True when the target has any direct or nested #fieldName layer. */
+export function hasFieldNames(root: TargetNode): boolean {
+  const found = root.findOne((n) => n.name.startsWith('#') && !!matchLayerKey(n.name));
+  return !!found;
+}
+
+/**
+ * Drop `child` into `target`. When `opts.replaceContents` is true,
+ * every existing child of `target` is removed first (the "Replace"
+ * toggle in the drop banner). Otherwise the child is appended at the
+ * end of the children list.
+ *
+ * The `[...target.children]` shallow copy is mandatory: removing
+ * children while iterating the live `target.children` array would
+ * skip every other entry as the indices shift.
+ */
+export function fillIntoTarget(
+  target: TargetNode,
+  child: SceneNode,
+  opts: { replaceContents?: boolean } = {},
+): void {
+  if (opts.replaceContents) {
+    for (const c of [...target.children]) c.remove();
+  }
+  target.appendChild(child);
+}

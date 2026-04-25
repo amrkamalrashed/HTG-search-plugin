@@ -30,6 +30,17 @@ populated HomeToGo product card onto the canvas.
   contract so HTG designers can retro-fit their own components.
 - **Adaptive rendering**: every card section is conditional on the offer
   actually having that data. No placeholder noise.
+- **UX polish (v0.6 / v0.7)**:
+  - Drag-tile-onto-canvas → drops a card or populates `#fieldName`
+    layers in the selected frame.
+  - Dark mode (Auto / Light / Dark), persisted across sessions.
+  - Resizable plugin window with size persisted in clientStorage.
+  - Multi-select with shift / cmd anchor range, persistent favourites
+    (★), randomize button + R shortcut.
+  - ⌘K command palette; bottom Toast with Undo; saved presets
+    (mode + platform + locale + gridColumns + sort).
+  - Canvas selection awareness: tiles pulse when their card is
+    selected on the canvas; a banner names the active drop target.
 
 ## Non-goals — what the plugin intentionally does NOT do
 
@@ -70,12 +81,33 @@ screen chrome.
 
 ## Success criteria
 
-1. Designer opens plugin, picks a property, clicks **Insert** → a full
-   HomeToGo product card appears on canvas, ready to drop into their mockup.
+1. Designer opens HomeDrop, picks a property, clicks **Drop** → a
+   full HomeToGo product card appears on canvas, ready to slot into
+   their mockup.
 2. Designer switches to **List** or **Grid** mode, multi-selects 3–5
-   properties, clicks **Insert** → an auto-layout container with populated
-   cards is placed.
-3. Designer selects an existing frame with `#title`/`#pricePerNight`/`#image`
-   layers and clicks **Insert** in Single mode → those layers are overridden.
-4. Demo runs end-to-end without internet access beyond the Unsplash allowlist.
-5. The decision to build v2 (API-backed) is informed by what the demo reveals.
+   properties (shift / cmd-click), clicks **Drop** → an auto-layout
+   container with populated cards is placed.
+3. Designer selects a frame with `#title` / `#pricePerNight` /
+   `#image` layers and clicks **Drop** in Single mode → those layers
+   are overridden in place (no new card is created).
+4. Designer drags a tile from the plugin onto the canvas → card
+   lands at the cursor position via `figma.on('drop')`.
+5. Designer drags a tile onto a non-`#field` frame → card is filled
+   in as a child of that frame; the "Drop into 'X'" banner offers a
+   Replace toggle.
+6. Designer toggles between Auto / Light / Dark → the plugin colour
+   scheme flips immediately and persists across sessions.
+7. Designer resizes the plugin window via the corner handle → new
+   size persists across sessions.
+8. Designer multi-selects via shift / cmd, stars favourites,
+   randomises with `R`, opens the ⌘K palette → all behaviours work
+   without lag and persist what they should.
+9. Designer presses Undo on the toast after any successful drop →
+   the freshly-placed nodes are removed.
+10. Designer runs Refresh on selected HomeDrop cards → cards rebuild
+    against the current data in the same locale + platform they were
+    inserted in.
+11. Demo runs end-to-end without internet access beyond the Unsplash
+    allowlist.
+12. The decision to build v2 (API-backed) is informed by what the
+    demo reveals.

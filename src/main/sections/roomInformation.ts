@@ -31,7 +31,7 @@ export function buildRoomInformation(
   platform: Platform,
 ): FrameNode {
   const m = metrics(platform);
-  const section = sectionFrame(`HTG Section · Rooms · ${offer.title}`, platform);
+  const section = sectionFrame(`HomeDrop Section · Rooms · ${offer.title}`, platform);
   section.appendChild(sectionHeading(t('roomInformation', locale), platform));
 
   const rooms =
@@ -55,7 +55,7 @@ export function buildRoomInformation(
     card.layoutAlign = 'STRETCH';
     card.primaryAxisSizingMode = 'AUTO';
     card.counterAxisSizingMode = 'FIXED';
-    card.resize(innerWidth, 1);
+    card.resizeWithoutConstraints(innerWidth, 1);
     card.paddingTop = card.paddingBottom = 14;
     card.paddingLeft = card.paddingRight = 14;
     card.cornerRadius = 12;

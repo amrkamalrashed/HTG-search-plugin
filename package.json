@@ -1,8 +1,8 @@
 {
-  "name": "htg-data-plugin",
+  "name": "homedrop-plugin",
   "version": "0.1.0",
   "private": true,
-  "description": "Figma plugin PoC: insert real HomeToGo product data into designs.",
+  "description": "HomeDrop — Figma plugin that drops real HomeToGo product data into your designs.",
   "scripts": {
     "build": "build-figma-plugin --typecheck --minify",
     "watch": "build-figma-plugin --typecheck --watch",
@@ -15,8 +15,8 @@
     "editorType": [
       "figma"
     ],
-    "id": "htg-data-plugin-poc",
-    "name": "HTG HomeDrop",
+    "id": "homedrop-plugin",
+    "name": "HomeDrop",
     "main": "src/main/index.ts",
     "ui": "src/ui/index.tsx",
     "documentAccess": "dynamic-page",

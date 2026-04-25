@@ -29,7 +29,7 @@ export function buildQuickFacts(
   platform: Platform,
 ): FrameNode {
   const m = metrics(platform);
-  const section = sectionFrame(`HTG Section · Quick facts · ${offer.title}`, platform);
+  const section = sectionFrame(`HomeDrop Section · Quick facts · ${offer.title}`, platform);
   section.appendChild(sectionHeading(t('quickFacts', locale), platform));
 
   const facts: Fact[] = [];
@@ -63,7 +63,7 @@ export function buildQuickFacts(
   grid.layoutWrap = 'WRAP';
   grid.primaryAxisSizingMode = 'FIXED';
   grid.counterAxisSizingMode = 'AUTO';
-  grid.resize(innerWidth, 1);
+  grid.resizeWithoutConstraints(innerWidth, 1);
   grid.itemSpacing = 12;
   grid.counterAxisSpacing = 12;
   grid.fills = [];
@@ -75,7 +75,7 @@ export function buildQuickFacts(
     const row = hframe(`fact_${fact.label}`, 10);
     row.primaryAxisSizingMode = 'FIXED';
     row.counterAxisAlignItems = 'CENTER';
-    row.resize(colWidth, 1);
+    row.resizeWithoutConstraints(colWidth, 1);
     row.appendChild(placeIcon(fact.icon, BRAND.textPrimary));
     row.appendChild(
       makeText('factLabel', fact.label, FONT.regular, 14, BRAND.textPrimary),

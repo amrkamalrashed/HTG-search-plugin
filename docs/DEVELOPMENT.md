@@ -26,8 +26,7 @@ generated file (which is gitignored).
 1. Open Figma desktop.
 2. **Menu → Plugins → Development → Import plugin from manifest…**
 3. Select the `manifest.json` at the repo root.
-4. Open any Figma file. Run **Plugins → Development → HomeToGo Data →
-   Browse properties**.
+4. Open any Figma file. Run **Plugins → Development → HomeDrop**.
 
 When watching, each plugin run picks up the latest bundle — no re-import.
 
@@ -60,7 +59,24 @@ correctly.
 ### Change the plugin UI visual
 
 Edit `src/ui/styles.css` (top-level CSS variables carry the palette) and the
-Preact components under `src/ui/components/`.
+Preact components under `src/ui/components/`. The light tokens live under
+`:root`; the dark overrides live under
+`html.figma-dark:not([data-theme="light"]), html[data-theme="dark"]`. To
+add a new themed value, declare it in both blocks.
+
+### Add a command palette entry
+
+Edit the `paletteCommands` array in `src/ui/App.tsx`. Each command is an
+object with `{ id, label, hint?, run }`. The command palette filters by
+fuzzy substring match on `label`, so make labels descriptive.
+
+### Add a new message channel
+
+1. Add the handler interface to `src/shared/messages.ts` (e.g.
+   `MyHandler extends EventHandler { name: 'MY_CHANNEL'; ... }`).
+2. Subscribe with `on<MyHandler>(...)` in `src/main/index.ts` (main → UI)
+   or `src/ui/App.tsx` (UI → main, inside a `useEffect`).
+3. Emit with `emit<MyHandler>('MY_CHANNEL', payload)` from the other side.
 
 ### Add a filter
 
@@ -70,20 +86,32 @@ Preact components under `src/ui/components/`.
 
 ### Wire a real API
 
-Today: `src/main/index.ts` imports `products.json` at build time.
+Today: `src/ui/offers-source.ts` exports `JsonOffersSource`, which wraps the
+bundled `products.json`. `App.tsx` instantiates it via `defaultOffersSource`.
 
 For v2:
 
-1. Move the import out — the UI thread owns the `fetch`.
-2. In `src/ui/App.tsx`, call `fetch(apiUrl)` inside a `useEffect`, parse, and
-   pass the offers into the existing state.
-3. Add the API host + image CDN to `package.json → "figma-plugin"
-   .networkAccess.allowedDomains`.
-4. If the API rejects the Figma iframe's CORS origin, route through a
+1. Implement `ApiOffersSource` in `src/ui/offers-source.ts` (the file already
+   has a commented sketch). It takes the `SearchQuery` shape and forwards the
+   fields to the API as query parameters / `Accept-Language` header.
+2. Implement `parseApiOffer(raw)` in the same file — the single mapping
+   layer between API response shape and `Offer`. Keep it pure (no IO) so
+   it's trivially unit-testable against fixtures.
+3. In `src/ui/App.tsx`, swap `defaultOffersSource` for
+   `new ApiOffersSource(API_URL)`. That's the entire wiring change.
+4. Add the API host + image CDN to
+   `package.json → figma-plugin.networkAccess.allowedDomains`.
+5. If the API rejects the Figma iframe's CORS origin, route through a
    lightweight proxy (Cloudflare Worker / Vercel serverless function) that
    adds `Access-Control-Allow-Origin`.
-5. Keep the `Offer` shape identical — map API fields into it at the fetch
-   site, not downstream.
+6. Once the API returns locale-specific data directly, delete
+   `src/shared/localize.ts` and the `i18n` block from `Offer`. The
+   locale-aware `OffersSource.search({ locale })` re-fetches on locale
+   change, which is already wired.
+
+The skeleton + error states in App.tsx are already in place — the
+loading UI shows automatically while the fetch is in flight, and a
+rejection surfaces a Retry button.
 
 ## Gotchas
 

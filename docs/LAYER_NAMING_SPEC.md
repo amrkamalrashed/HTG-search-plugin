@@ -101,3 +101,41 @@ Create a frame named `HTG Card` containing:
 - A `TEXT` layer named `#pricePerNight`
 
 Select it, run the plugin, pick a property, click **Insert**. Done.
+
+## How populate fires
+
+There are four user actions that can trigger `populateSelection()`:
+
+1. **Click "Drop" in single mode with a non-HomeDrop frame selected.**
+   If that frame contains any `#fieldName` child layers,
+   `populateSelection` runs and overrides them in place. Otherwise the
+   plugin falls back to inserting a new card (same path as no
+   selection).
+2. **Drag a tile onto a frame with `#fieldName` children.** The native
+   `figma.on('drop')` handler resolves `event.node` to the target
+   frame and runs `populateSelection` against it.
+3. **`INSERT` message with `dropInto.targetId` set.** The
+   `DropTargetBanner` populates this when the user has a frame
+   selected. Replace toggle is separate (it only matters when the
+   frame has no `#fieldName` layers).
+4. **Refresh.** When the user runs Refresh on selected HomeDrop nodes,
+   the main thread rebuilds each via `buildCard` / `buildSection`. If
+   the selected node was originally a populated frame (i.e. has
+   `htgOfferId` plugin-data but no `htgSectionKind`), the rebuild path
+   re-runs `populateSelection` against fresh data.
+
+In all four cases, the matched layers are overridden in the chosen
+locale; `figma.loadFontAsync` is awaited before any `TextNode.characters`
+assignment.
+
+## Drag and drop (v0.7)
+
+You can also **drag a tile from the plugin onto your frame** instead of
+clicking Insert:
+
+- Drop on a frame whose children include `#fieldName` layers → those
+  layers populate, exactly as if you'd clicked Insert in Single mode.
+- Drop on any other selected frame → the generated HomeDrop card is filled
+  in as a child of that frame. The "Drop into 'X'" banner inside the
+  plugin lets you toggle **Replace** to clear existing children first.
+- Drop on empty canvas → the card lands at the drop point.

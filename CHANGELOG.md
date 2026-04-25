@@ -1,9 +1,170 @@
-# Changelog
+# Changelog — HomeDrop
 
-All notable changes to this plugin will be documented in this file. Dates are
-in ISO-8601 (YYYY-MM-DD).
+All notable changes to the HomeDrop plugin will be documented in this file.
+Dates are in ISO-8601 (YYYY-MM-DD).
 
 ## [Unreleased]
+
+### 0.8.1 — 2026-04-25 — Rebrand polish + UX cleanup
+
+- Every user-facing "HTG" / "HomeToGo cards" string in main thread
+  notifies + container node names + the ⌘K Find-all command label
+  now reads "HomeDrop". Plugin-data keys (`htgOfferId` etc.) stay
+  unchanged so cards inserted before the rebrand still round-trip.
+- ⭐ Favourites filter chip in FilterBar with a count badge.
+  Disabled with a tooltip when no tiles are starred.
+- Toast moved from `bottom: 16px` to `60px` so it sits clear of the
+  Drop button.
+- DropTargetBanner sub-line now describes what will land
+  ("3 properties will land here as a grid" / "Populate matching
+  #fields with the selected property" / etc.) rather than printing
+  the frame's id fragment.
+
+### 0.8.0 — 2026-04-25 — Data layer moves to the UI thread (v2-ready)
+
+The catalogue used to load on the main thread (which works for the
+bundled PoC JSON but doesn't for a real API — the QuickJS sandbox
+has limited networking). This release moves the seam to the right
+place so the v2 API swap is a one-line change.
+
+- New `src/ui/offers-source.ts` exporting `OffersSource`,
+  `SearchQuery`, `JsonOffersSource`, and a `parseApiOffer` /
+  `ApiOffersSource` placeholder.
+- `OffersSource.search(query)` takes locale + text + filters + sort
+  + limit + cursor — the same query shape a real API would expect.
+  Today's `JsonOffersSource` runs that locally; v2's
+  `ApiOffersSource` will forward it as query parameters.
+- `LoadedPayload` no longer ships `offers`. Main boots with just
+  saved state + size; UI fetches the catalogue itself.
+- New `SYNC_OFFERS` channel (UI → main) so main keeps a cache for
+  Refresh / DROP / native-drop offer-by-id lookups.
+- App.tsx gets loading + error states. While the source is fetching,
+  the grid renders 6 skeleton tiles with a dark-mode-aware shimmer.
+  On error, an empty-state with a Retry button bumps a tick that
+  re-triggers the effect.
+- `localize()` and the `i18n` block on `Offer` stay for now — the
+  PoC JSON still uses them — but they get a `// v2: delete` comment.
+  When the API returns locale-specific data directly, these go away.
+
+### 0.7.2 — 2026-04-25 — Spec alignment pass
+
+Cleanup pass to bring the v0.7 surface in line with the spec wording
+and to fix the locked card height. No user-facing behaviour
+regressions; mostly renames + one geometry fix + native drop.
+
+- **Renames** (wire names unchanged for back-compat):
+  `ThemeMode` → `Theme`, `Preset` → `UiPreset` (`name` → `label`),
+  `HighlightOfferHandler` → `HighlightHandler`,
+  `InsertResultHandler` → `InsertedHandler` (`InsertResultPayload`
+  → `ToastMessage`, `nodeIds` → `createdNodeIds`),
+  `SelectionTargetInfo` → `SelectionTarget` (payload now
+  `{ target: SelectionTarget | null }`).
+- **`fillIntoTarget` signature**: `(target, child, { replaceContents })`
+  rather than `(target, child, replace)`.
+- **Confetti** moved out of the React tree to a top-level
+  `src/ui/confetti.ts` exporting `runConfetti()`.
+- **`PresetsMenu.tsx`** added — a header dropdown listing every saved
+  preset with apply / delete actions.
+- **Card height fix**: web cards no longer lock at 320 px. The
+  `minHeight` was removed and the actions column now uses
+  `primaryAxisSizingMode = 'AUTO'` with `layoutAlign = 'STRETCH'`,
+  so the card hugs to the content column's natural height while
+  the right pillar still stretches to fill.
+- **Native `figma.on('drop')`** with three MIME types
+  (`application/htg-offer`, `-multi`, `-section`). The UI tile sets
+  the matching MIME data on `dragstart`. The legacy emit-based
+  `DROP` channel stays for the click-CTA path.
+- **Behaviour fixes**:
+  - Cmd / Ctrl-click now additively toggles selection without moving
+    the anchor (plain click still moves the anchor; shift-click still
+    extends).
+  - `LOCALES` flag emojis swapped from regional-indicator pairs to
+    plain text codes (EN / DE / ES / FR) — fixes the "doubled-flag"
+    bug some emoji fonts render.
+  - Platform label "iPhone" → "iOS".
+  - Randomize button moved out of the header and into SortBar.
+  - New Header **Find all** button emits `FIND_ALL`.
+  - Section corner radii on mobile: iOS 16, Android 12 (were both 0).
+  - Primary CTA reads "Drop / Drop N / Drop as list / Drop as grid"
+    matching the plugin name.
+- **Docs**: CLAUDE.md gets a Message channels table and an
+  Interaction model section. ARCHITECTURE.md adds a `figma.on(...)`
+  table. LAYER_NAMING_SPEC.md adds "How populate fires" (4 triggers).
+  SCOPE.md success criteria expanded from 5 to 12 bullets.
+
+### 0.7.1 — 2026-04-25 — Rebrand to HomeDrop
+
+The plugin is now called **HomeDrop** end-to-end. HomeToGo remains the data
+brand; only the wrapper that places it changed.
+
+- `package.json` plugin id and name → `homedrop-plugin` / `HomeDrop`.
+- Header wordmark simplified to "HomeDrop" (the HomeToGo logo was redundant
+  next to the listing data it stamps onto every card).
+- All `htg*` plugin-data keys are unchanged so previously inserted cards
+  still round-trip through Refresh.
+
+### 0.7.0 — 2026-04-25 — UX polish: multi-select, palette, canvas awareness, drop-into-frame
+
+Four sub-chunks landed in their own commits.
+
+**Chunk 1 — Selection + drag**
+- Shift / cmd multi-select with last-anchor range. Cmd-click toggles a
+  tile and sets the anchor; shift-click selects the visible-list range
+  from the anchor.
+- Persistent favourites (★) on every tile. Stored in clientStorage with
+  the rest of `UiState` (`favourites: string[]`).
+- Custom drag-image preview. We snapshot a small 220 px hover card with
+  hero photo + title + price via `setDragImage`, replacing the browser's
+  default full-tile bitmap.
+- Hover-peek side panel after 450 ms tile hover. Auto-flips to the left
+  when there isn't room on the right.
+- `NumberTicker` — RAF-animated tween component used for the result
+  count in `SortBar` so it eases between values rather than snapping.
+
+**Chunk 2 — Toast + palette + presets + confetti**
+- Bottom Toast with 5 s timeout + Undo button. The Undo button appears
+  whenever the latest `INSERT_RESULT` carried node ids; clicking it
+  emits `UNDO` and the main thread removes those nodes.
+- ⌘K command palette with fuzzy substring matching. Commands: Drop,
+  Random, Refresh, Find all, mode/platform/locale/theme switching,
+  Save preset, Apply preset (one entry per saved preset).
+- Saved presets capture `mode + platform + locale + gridColumns + sort`
+  under a user-supplied name. Persisted in clientStorage UiState.
+- Confetti burst on the first successful drop per session.
+
+**Chunk 3 — Canvas ↔ plugin awareness**
+- New `HIGHLIGHT_OFFER` channel (main → UI). Pulses the matching tile
+  when a tagged HTG card is selected on the canvas.
+- New `SELECTION_TARGET` channel (main → UI). Surfaces the currently
+  selected non-HTG frame so the UI can show a "Drop into 'X'" banner.
+- New `UNDO` channel (UI → main). Removes nodes from the most recent
+  toast.
+- New `FIND_ALL` channel (UI → main). Selects every HTG-tagged frame
+  on the current page and zooms to fit.
+- Drag-onto-frame triggers `populate` when the frame has `#fieldName`
+  children (already plumbed in chunks 3 and 4 of the main router).
+
+**Chunk 4 — Drop INTO selected frame**
+- `DropTargetBanner` with a Replace toggle. Renders above the search bar
+  whenever a non-HTG frame is selected.
+- `fillIntoTarget` helper appends the new card as a child of the target,
+  optionally clearing existing children when Replace is on.
+- `resolveDropTarget` picks one of `populate | fill | viewport` based on
+  selection + `#fieldName` presence.
+
+### 0.6.0 — 2026-04-25 — UX polish wave one
+
+- Randomize button (header) + R keyboard shortcut. Pulls from the
+  currently filtered/sorted list.
+- Drag tiles onto the canvas to drop a card directly. UI emits the new
+  `DROP` message; main routes the drop based on the current selection.
+- Dark mode (Auto / Light / Dark). Auto follows Figma's `html.figma-dark`
+  class; Light and Dark force the theme via `html[data-theme]`.
+- Sticky breadcrumb in the detail view so the back button stays
+  reachable while scrolling long section grids.
+- Resizable plugin window. Bottom-right corner handle live-resizes via
+  the new `RESIZE` message and persists the final size via
+  `SAVE_UI_SIZE` → clientStorage `htgUiSize`. Min 360×480, max 900×1200.
 
 ### 0.5.0 — 2026-04-23 — Full mobile detail page (12 sections, platform-aware)
 

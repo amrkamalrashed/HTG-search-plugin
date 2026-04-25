@@ -20,7 +20,7 @@ function ratingBar(label: string, score: number): FrameNode {
   row.counterAxisAlignItems = 'CENTER';
   row.primaryAxisAlignItems = 'SPACE_BETWEEN';
   row.layoutAlign = 'STRETCH';
-  row.resize(300, 1);
+  row.resizeWithoutConstraints(300, 1);
   row.primaryAxisSizingMode = 'FIXED';
 
   row.appendChild(makeText('label', label, FONT.regular, 13, BRAND.textPrimary));
@@ -60,7 +60,7 @@ export function buildReviews(
   platform: Platform = 'web',
 ): FrameNode {
   const m = metrics(platform);
-  const section = sectionFrame(`HTG Section · Reviews · ${offer.title}`, platform);
+  const section = sectionFrame(`HomeDrop Section · Reviews · ${offer.title}`, platform);
   section.appendChild(sectionHeading(t('reviewsHeader', locale), platform));
 
   const details = offer.reviewDetails;
@@ -147,7 +147,7 @@ export function buildReviews(
       reviewsRow.primaryAxisSizingMode = 'AUTO'; // vertical = hug
       reviewsRow.counterAxisSizingMode = 'FIXED'; // horizontal = FIXED width
     }
-    reviewsRow.resize(innerWidth, 1);
+    reviewsRow.resizeWithoutConstraints(innerWidth, 1);
     reviewsRow.itemSpacing = platform === 'web' ? 16 : 12;
     reviewsRow.fills = [];
 
@@ -156,7 +156,7 @@ export function buildReviews(
     for (const item of details.items.slice(0, 3)) {
       const card = vframe(`review_${item.author}`, 8);
       card.counterAxisSizingMode = 'FIXED';
-      card.resize(cardWidth, 1);
+      card.resizeWithoutConstraints(cardWidth, 1);
       card.paddingTop = card.paddingBottom = 16;
       card.paddingLeft = card.paddingRight = 16;
       card.cornerRadius = 12;

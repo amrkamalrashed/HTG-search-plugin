@@ -155,6 +155,28 @@ All of these map 1:1 to fields on `Offer`. When the real API spec lands, any
 extra fields should be added here first, then wired into `products.json` and
 `src/main/generate.ts`.
 
+## v2 transition: the `i18n` block goes away
+
+The PoC's `Offer.i18n` block carries `de/es/fr` translations alongside the
+English source so a single bundled JSON can serve all four locales without a
+network call. `localize(offer, locale)` picks the right strings client-side.
+
+**This is a PoC artifact**. v2 assumes the real API takes a locale parameter
+(via `Accept-Language` or `?locale=de`) and returns data already in that
+locale. When `ApiOffersSource` lands:
+
+- `Offer.i18n` is deleted from the type.
+- Every field on `Offer` is the locale-specific value directly.
+- `src/shared/localize.ts` is deleted.
+- `OffersSource.search({ locale, ... })` re-fetches whenever the user
+  switches locale — that's already wired in `App.tsx`'s search effect.
+- The `parseApiOffer(raw)` helper in `src/ui/offers-source.ts` becomes
+  the single mapping layer between API response shape and `Offer`.
+
+The card renderer, populate path, and layer-naming spec don't change. They
+already consume a single-locale `Offer`; today's `localize()` just produces
+that shape from the multi-locale JSON.
+
 ## Edge-case coverage in `products.json`
 
 The 10 seed offers cover:

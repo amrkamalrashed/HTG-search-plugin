@@ -8,20 +8,52 @@ import { formatPrice } from '@shared/format';
 interface Props {
   offer: Offer;
   selected: boolean;
-  onToggle: () => void;
+  favourite: boolean;
+  /** When true, render a brief outline pulse (canvas selection echo). */
+  pulse?: boolean;
+  onToggle: (e: MouseEvent) => void;
   onPreview: () => void;
   onOpen: () => void;
+  onToggleFavourite: () => void;
+  onMouseEnter?: (rect: DOMRect) => void;
+  onMouseLeave?: () => void;
+  onDragStart?: (e: DragEvent) => void;
+  onDragEnd?: (e: DragEvent) => void;
   locale: Locale;
 }
 
-export function ProductTile({ offer, selected, onToggle, onPreview, onOpen, locale }: Props) {
+export function ProductTile({
+  offer,
+  selected,
+  favourite,
+  pulse,
+  onToggle,
+  onPreview,
+  onOpen,
+  onToggleFavourite,
+  onMouseEnter,
+  onMouseLeave,
+  onDragStart,
+  onDragEnd,
+  locale,
+}: Props) {
   const badge = offer.badges[0];
   const isDeal = badge === 'great_deal';
 
   return (
     <div
-      class={`${styles.tile} ${selected ? styles.tileSelected : ''}`}
-      onClick={onToggle}
+      class={`${styles.tile} ${selected ? styles.tileSelected : ''} ${pulse ? styles.tilePulse : ''}`}
+      onClick={(e) => onToggle(e as unknown as MouseEvent)}
+      data-offer-id={offer.id}
+      draggable={!!onDragStart}
+      onDragStart={onDragStart}
+      onDragEnd={onDragEnd}
+      onMouseEnter={(e) => {
+        if (onMouseEnter) {
+          onMouseEnter((e.currentTarget as HTMLElement).getBoundingClientRect());
+        }
+      }}
+      onMouseLeave={onMouseLeave}
     >
       <div
         class={styles.tileImage}
@@ -35,6 +67,17 @@ export function ProductTile({ offer, selected, onToggle, onPreview, onOpen, loca
         {offer.discount && (
           <span class={styles.tileDiscount}>-{offer.discount.percent}%</span>
         )}
+        <button
+          class={`${styles.tileFavBtn} ${favourite ? styles.tileFavBtnActive : ''}`}
+          onClick={(e) => {
+            e.stopPropagation();
+            onToggleFavourite();
+          }}
+          title={t(favourite ? 'uiFavouriteRemove' : 'uiFavouriteAdd', locale)}
+          aria-pressed={favourite}
+        >
+          {favourite ? '★' : '☆'}
+        </button>
         {selected && <span class={styles.tileCheck}>✓</span>}
         <div class={styles.tileHoverActions}>
           <button

@@ -53,7 +53,7 @@ export function buildReasonsToBook(
   locale: Locale,
   platform: Platform,
 ): FrameNode {
-  const section = sectionFrame(`HTG Section · Reasons · ${offer.title}`, platform);
+  const section = sectionFrame(`HomeDrop Section · Reasons · ${offer.title}`, platform);
   section.appendChild(sectionHeading(t('reasonsToBook', locale), platform));
 
   const items =
@@ -66,7 +66,7 @@ export function buildReasonsToBook(
     row.counterAxisAlignItems = 'MIN';
     row.layoutAlign = 'STRETCH';
     row.primaryAxisSizingMode = 'FIXED';
-    row.resize(metrics(platform).width - metrics(platform).padding * 2, 1);
+    row.resizeWithoutConstraints(metrics(platform).width - metrics(platform).padding * 2, 1);
 
     const iconBg = figma.createFrame();
     iconBg.resize(32, 32);
@@ -87,7 +87,7 @@ export function buildReasonsToBook(
     col.layoutGrow = 1;
     col.primaryAxisSizingMode = 'AUTO';
     col.counterAxisSizingMode = 'FIXED';
-    col.resize(200, 1);
+    col.resizeWithoutConstraints(200, 1);
     col.appendChild(
       makeText('reasonTitle', reason.title, FONT.semibold, 14, BRAND.textPrimary),
     );
