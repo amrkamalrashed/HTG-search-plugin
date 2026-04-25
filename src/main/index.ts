@@ -394,37 +394,51 @@ async function insertSections(payload: InsertSectionsPayload): Promise<void> {
   });
 }
 
+type DropMode = 'populate' | 'fill' | 'viewport';
+
 /**
- * Resolve where a tile-drop should land. Picks one of three modes:
- *   1. populate — drop a single offer onto a frame with #fieldName
- *      children. Replace state is irrelevant (we override existing
- *      text/image fills regardless).
- *   2. fill — drop into the selected frame as a child. Clears the
- *      frame's children when `replaceOnDrop` is on, otherwise appends.
- *   3. viewport — fall back to the drop coordinates and append to the
- *      current page.
+ * Picks where a tile-drop should land based on:
+ *   - whether the user has a frame selected,
+ *   - whether that frame has any #fieldName layers (populate-eligible),
+ *   - and the user's Replace toggle state.
+ *
+ * Rules:
+ *   selection has #fields  → populate (Replace toggle ignored)
+ *   selection w/o #fields  → fill    (Replace flag determines clear vs append)
+ *   no selection           → viewport (drop at canvas coords)
  */
+function resolveDropTarget(
+  target: ReturnType<typeof firstTargetInSelection>,
+): DropMode {
+  if (!target) return 'viewport';
+  if (target.getPluginData('htgOfferId')) return 'viewport';
+  return hasFieldNames(target) ? 'populate' : 'fill';
+}
+
 async function handleDrop(payload: DropPayload): Promise<void> {
   const { offerId, locale, platform, canvasX, canvasY, replaceOnDrop } = payload;
   const offer = OFFER_BY_ID[offerId];
   if (!offer) return;
 
   const target = firstTargetInSelection(figma.currentPage.selection);
-  if (target && !target.getPluginData('htgOfferId')) {
-    // Try populate first; if no #fieldName children, fall through to fill.
-    if (hasFieldNames(target)) {
-      const filled = await populateSelection(target, offer, locale);
-      if (filled > 0) {
-        const label = `Populated ${filled} layer${filled === 1 ? '' : 's'} in "${target.name}".`;
-        figma.notify(label);
-        emit<InsertResultHandler>('INSERT_RESULT', {
-          nodeIds: [],
-          label,
-          kind: 'populated',
-        });
-        return;
-      }
+  const mode = resolveDropTarget(target);
+
+  if (mode === 'populate' && target) {
+    const filled = await populateSelection(target, offer, locale);
+    if (filled > 0) {
+      const label = `Populated ${filled} layer${filled === 1 ? '' : 's'} in "${target.name}".`;
+      figma.notify(label);
+      emit<InsertResultHandler>('INSERT_RESULT', {
+        nodeIds: [],
+        label,
+        kind: 'populated',
+      });
+      return;
     }
+    // No layer keys matched — fall through to fill.
+  }
+
+  if ((mode === 'fill' || mode === 'populate') && target) {
     const card = await buildCard(offer, locale, platform);
     fillIntoTarget(target, card, !!replaceOnDrop);
     figma.currentPage.selection = [card];
@@ -438,7 +452,7 @@ async function handleDrop(payload: DropPayload): Promise<void> {
     return;
   }
 
-  // Fall back: place the card at the drop point on the page.
+  // Viewport fallback: place the card at the drop point on the page.
   const card = await buildCard(offer, locale, platform);
   if (typeof canvasX === 'number' && typeof canvasY === 'number') {
     card.x = canvasX - card.width / 2;

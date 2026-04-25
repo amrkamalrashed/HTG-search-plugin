@@ -44,6 +44,7 @@ import { NumberTicker } from './components/NumberTicker';
 import { Toast } from './components/Toast';
 import { CommandPalette, type PaletteCommand } from './components/CommandPalette';
 import { Confetti } from './components/Confetti';
+import { DropTargetBanner } from './components/DropTargetBanner';
 import { attachDragImage } from './dragImage';
 import { applyTheme } from './theme';
 import styles from './styles.css';
@@ -185,10 +186,23 @@ export function App(props: LoadedPayload) {
         theme,
         favourites: Array.from(favourites),
         presets,
+        replaceOnDrop,
       });
     }, 250);
     return () => clearTimeout(handle);
-  }, [mode, search, sort, gridColumns, locale, platform, filters, theme, favourites, presets]);
+  }, [
+    mode,
+    search,
+    sort,
+    gridColumns,
+    locale,
+    platform,
+    filters,
+    theme,
+    favourites,
+    presets,
+    replaceOnDrop,
+  ]);
 
   const localizedOffers = useMemo(
     () => offers.map((o) => localize(o, locale)),
@@ -385,6 +399,7 @@ export function App(props: LoadedPayload) {
       clientY: data.clientY,
       locale,
       platform,
+      replaceOnDrop,
     };
     emit<DropHandler>('DROP', payload);
   };
@@ -679,6 +694,14 @@ export function App(props: LoadedPayload) {
         platform={platform}
         onPlatformChange={setPlatform}
       />
+      {dropTarget && (
+        <DropTargetBanner
+          target={dropTarget}
+          replace={replaceOnDrop}
+          onReplaceChange={setReplaceOnDrop}
+          locale={locale}
+        />
+      )}
       <SearchBar value={search} onChange={setSearch} locale={locale} />
       <FilterBar filters={filters} onChange={setFilters} locale={locale} />
       <SortBar
