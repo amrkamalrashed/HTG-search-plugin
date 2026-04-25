@@ -27,7 +27,7 @@ export function LocaleBar({ locale, onLocaleChange, platform, onPlatformChange }
           >
             {LOCALES.map((l) => (
               <option key={l.id} value={l.id}>
-                {l.flag}  {l.label} ({l.id.toUpperCase()})
+                {l.label} ({l.id.toUpperCase()})
               </option>
             ))}
           </select>

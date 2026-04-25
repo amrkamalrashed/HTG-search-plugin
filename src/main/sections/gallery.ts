@@ -20,8 +20,8 @@ export async function buildGallery(
   section.paddingTop = section.paddingBottom = 0;
   section.paddingLeft = section.paddingRight = 0;
   section.itemSpacing = 8;
-  section.cornerRadius = platform === 'web' ? 16 : 0;
-  if (platform !== 'web') section.strokes = [];
+  section.cornerRadius = 16;
+  section.clipsContent = true;
 
   const isWeb = platform === 'web';
   const width = m.width;

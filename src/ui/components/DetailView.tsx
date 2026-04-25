@@ -13,6 +13,7 @@ interface Props {
   onBack: () => void;
   onSelectAll: () => void;
   onClear: () => void;
+  onSectionDragStart?: (kind: SectionKind, e: DragEvent) => void;
   locale: Locale;
 }
 
@@ -38,6 +39,7 @@ export function DetailView({
   onBack,
   onSelectAll,
   onClear,
+  onSectionDragStart,
   locale,
 }: Props) {
   const heroUrl = offer.images[0]?.url;
@@ -97,6 +99,8 @@ export function DetailView({
               class={`${styles.sectionTile} ${isSelected ? styles.sectionTileSelected : ''} ${!hasData ? styles.sectionTileDisabled : ''}`}
               onClick={() => hasData && onToggle(kind)}
               disabled={!hasData}
+              draggable={hasData && !!onSectionDragStart}
+              onDragStart={(e) => hasData && onSectionDragStart?.(kind, e as unknown as DragEvent)}
               title={!hasData ? t('uiTileNotAvailable', locale) : undefined}
             >
               <div class={styles.sectionTileLabel}>{t(keys.label, locale)}</div>

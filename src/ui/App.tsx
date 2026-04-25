@@ -450,6 +450,14 @@ export function App(props: LoadedPayload) {
     onTileHoverLeave();
   };
 
+  const onSectionDragStart = (offer: Offer, kind: SectionKind, e: DragEvent) => {
+    if (!e.dataTransfer) return;
+    const body = { offerId: offer.id, sectionKind: kind, locale, platform };
+    e.dataTransfer.setData('application/htg-section', JSON.stringify(body));
+    e.dataTransfer.setData('text/plain', `${kind} · ${offer.title}`);
+    e.dataTransfer.effectAllowed = 'copy';
+  };
+
   const onTileDragEnd = (offer: Offer, e: DragEvent) => {
     // Figma exposes drop coords on the dragend event when the drop
     // landed on the canvas (vs another iframe). Falling back to the
@@ -722,6 +730,7 @@ export function App(props: LoadedPayload) {
           onBack={backToSearch}
           onSelectAll={selectAllSections}
           onClear={clearAllSections}
+          onSectionDragStart={(kind, e) => onSectionDragStart(detailOffer, kind, e)}
           locale={locale}
         />
         <div class={styles.footer}>

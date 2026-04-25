@@ -366,7 +366,7 @@ async function buildMobileCard(
   card.layoutMode = 'VERTICAL';
   card.counterAxisSizingMode = 'FIXED';
   card.primaryAxisSizingMode = 'AUTO';
-  card.resize(width, spec.cardHeight);
+  card.resizeWithoutConstraints(width, 1);
   card.cornerRadius = spec.radius;
   card.fills = [{ type: 'SOLID', color: BRAND.white }];
   card.strokes = platform === 'android' ? [] : [{ type: 'SOLID', color: BRAND.border }];
