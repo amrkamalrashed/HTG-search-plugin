@@ -30,13 +30,10 @@ import { t } from '@shared/locales';
 import type { Platform } from '@shared/platforms';
 import { defaultOffersSource, type OffersSource, type SearchQuery } from './offers-source';
 import { Header } from './components/Header';
-import { SearchBar } from './components/SearchBar';
-import { FilterBar, type Filters } from './components/FilterBar';
-import { SortBar } from './components/SortBar';
 import { LocaleBar } from './components/LocaleBar';
-import { ProductTile } from './components/ProductTile';
-import { DropCta } from './components/DropCta';
-import { DetailView } from './components/DetailView';
+import { LevelDetail } from './components/LevelDetail';
+import { LevelSearch } from './components/LevelSearch';
+import type { Filters } from './components/FilterBar';
 import { ResizeHandle } from './components/ResizeHandle';
 import { Toast } from './components/Toast';
 import { CommandPalette, type PaletteCommand } from './components/CommandPalette';
@@ -690,61 +687,6 @@ export function App(props: LoadedPayload) {
     </Fragment>
   );
 
-  if (level === 'detail' && detailOffer) {
-    return (
-      <div class={styles.root}>
-        <Header {...headerProps} />
-        <LocaleBar
-          locale={locale}
-          onLocaleChange={setLocale}
-          platform={platform}
-          onPlatformChange={setPlatform}
-          appearance={appearance}
-          onAppearanceChange={setAppearance}
-        />
-        <DetailView
-          offer={detailOffer}
-          selected={selectedSections}
-          onToggle={toggleSection}
-          onBack={backToSearch}
-          onSelectAll={selectAllSections}
-          onClear={clearAllSections}
-          onSectionDragStart={(kind, e) => onSectionDragStart(detailOffer, kind, e)}
-          onCardDragStart={(e) => onTileDragStart(detailOffer, e)}
-          locale={locale}
-        />
-        <div class={styles.footer}>
-          <div class={`${styles.footerInfo} ${selectedSections.size > 0 ? styles.footerInfoActive : ''}`}>
-            {selectedSections.size === 0
-              ? t('uiPickSectionsToInsert', locale)
-              : selectedSections.size === 1
-                ? t('uiNSection', locale, { n: 1 })
-                : t('uiNSections', locale, { n: selectedSections.size })}
-          </div>
-          <button
-            class={`${styles.btn} ${styles.btnPrimary}`}
-            onClick={insertSections}
-            disabled={selectedSections.size === 0}
-          >
-            {selectedSections.size === 0
-              ? t('uiSelectSections', locale)
-              : selectedSections.size === 1
-                ? t('uiInsertSection', locale)
-                : t('uiInsertNSections', locale, { n: selectedSections.size })}
-          </button>
-        </div>
-        <ResizeHandle
-          size={uiSize}
-          min={MIN_SIZE}
-          max={MAX_SIZE}
-          onResize={handleResize}
-          onCommit={handleResizeCommit}
-        />
-        {overlays}
-      </div>
-    );
-  }
-
   return (
     <div class={styles.root}>
       <Header {...headerProps} />
@@ -756,162 +698,57 @@ export function App(props: LoadedPayload) {
         appearance={appearance}
         onAppearanceChange={setAppearance}
       />
-      <SearchBar value={search} onChange={setSearch} locale={locale} />
-      <FilterBar
-        filters={filters}
-        onChange={setFilters}
-        favouritesCount={favourites.size}
-        locale={locale}
-      />
-      <SortBar
-        count={visible.length}
-        total={offers.length}
-        sort={sort}
-        onSortChange={setSort}
-        multiLayout={multiLayout}
-        gridColumns={gridColumns}
-        onGridColumnsChange={setGridColumns}
-        locale={locale}
-      />
 
-      {showBulkBar && (
-        <div class={styles.bulkBar}>
-          <span class={styles.bulkBarText}>
-            {t('uiNSelected', locale, { n: count })}
-          </span>
-          <div class={styles.bulkBarActions}>
-            <button
-              class={styles.bulkBarBtn}
-              onClick={selectAllVisible}
-              disabled={count === visible.length}
-            >
-              {t('uiSelectAllN', locale, { n: visible.length })}
-            </button>
-            <button
-              class={styles.bulkBarBtnGhost}
-              onClick={clearSelection}
-              disabled={count === 0}
-            >
-              {t('uiClear', locale)}
-            </button>
-          </div>
-        </div>
-      )}
-
-      <div class={styles.scroll}>
-        {loading ? (
-          <div
-            class={styles.grid}
-            style={{
-              gridTemplateColumns: `repeat(${
-                multiLayout === 'grid' ? Math.max(2, Math.min(4, gridColumns)) : 2
-              }, 1fr)`,
-            }}
-          >
-            {Array.from({ length: multiLayout === 'grid' ? Math.max(2, Math.min(4, gridColumns)) * 2 : 6 }).map((_, i) => (
-              <div key={`skeleton-${i}`} class={styles.tileSkeleton}>
-                <div class={styles.tileSkeletonImg} />
-                <div class={styles.tileSkeletonBody}>
-                  <div class={styles.tileSkeletonLine} />
-                  <div class={`${styles.tileSkeletonLine} ${styles.tileSkeletonLineShort}`} />
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : loadError ? (
-          <div class={styles.empty}>
-            <div class={styles.emptyIcon}>!</div>
-            <div class={styles.emptyTitle}>{t('uiLoadErrorTitle', locale)}</div>
-            <div class={styles.emptySubtitle}>{loadError}</div>
-            <button
-              class={styles.emptyBtn}
-              onClick={() => setReloadTick((n) => n + 1)}
-            >
-              {t('uiLoadErrorRetry', locale)}
-            </button>
-          </div>
-        ) : visible.length === 0 ? (
-          <div class={styles.empty}>
-            <div class={styles.emptyIcon}>⌕</div>
-            <div class={styles.emptyTitle}>{t('uiNoMatchTitle', locale)}</div>
-            <div class={styles.emptySubtitle}>
-              {t('uiNoMatchHint', locale)}
-            </div>
-            {hasActiveFilters && (
-              <button class={styles.emptyBtn} onClick={clearAllFilters}>
-                {t('uiClearAllFilters', locale)}
-              </button>
-            )}
-          </div>
-        ) : (
-          <div
-            class={styles.grid}
-            style={{
-              gridTemplateColumns: `repeat(${
-                multiLayout === 'grid' ? Math.max(2, Math.min(4, gridColumns)) : 2
-              }, 1fr)`,
-            }}
-          >
-            {visible.map((o) => (
-              <ProductTile
-                key={o.id}
-                offer={o}
-                selected={selectedIds.has(o.id)}
-                favourite={favourites.has(o.id)}
-                pulse={pulseId === o.id}
-                onToggle={(e) => toggle(o.id, e)}
-                onToggleFavourite={() => toggleFavourite(o.id)}
-                onOpen={() => openDetail(o.id)}
-                onDragStart={(e) => onTileDragStart(o, e)}
-                locale={locale}
-              />
-            ))}
-          </div>
-        )}
-      </div>
-
-      <div class={styles.footer}>
-        <div class={`${styles.footerInfo} ${count > 0 ? styles.footerInfoActive : ''}`}>
-          {count === 0
-            ? t('uiHintClickSingle', locale)
-            : t('uiEnterToInsert', locale, { n: count })}
-        </div>
-        {lastUndo && (
-          <button
-            class={styles.footerUndoBtn}
-            onClick={() => {
-              emit<UndoHandler>('UNDO', { nodeIds: lastUndo.nodeIds });
-              setLastUndo(null);
-            }}
-            title={lastUndo.label}
-          >
-            ↺ {t('uiToastUndo', locale)}
-          </button>
-        )}
-        <button
-          class={styles.footerRandomBtn}
-          onClick={randomize}
-          title={t('uiRandomizeTooltip', locale)}
-          aria-label={t('uiRandomize', locale)}
-        >
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="3" width="18" height="18" rx="3" />
-            <circle cx="8" cy="8" r="1" fill="currentColor" />
-            <circle cx="16" cy="8" r="1" fill="currentColor" />
-            <circle cx="8" cy="16" r="1" fill="currentColor" />
-            <circle cx="16" cy="16" r="1" fill="currentColor" />
-            <circle cx="12" cy="12" r="1" fill="currentColor" />
-          </svg>
-        </button>
-        <DropCta
-          count={count}
-          multiLayout={multiLayout}
-          onMultiLayoutChange={setMultiLayout}
-          onDrop={() => insert()}
-          label={insertLabel()}
+      {level === 'detail' && detailOffer ? (
+        <LevelDetail
+          offer={detailOffer}
+          selectedSections={selectedSections}
+          toggleSection={toggleSection}
+          selectAllSections={selectAllSections}
+          clearAllSections={clearAllSections}
+          onBack={backToSearch}
+          onSectionDragStart={(kind: SectionKind, e: DragEvent) => onSectionDragStart(detailOffer, kind, e)}
+          onCardDragStart={(e: DragEvent) => onTileDragStart(detailOffer, e)}
+          onInsertSections={insertSections}
           locale={locale}
         />
-      </div>
+      ) : (
+        <LevelSearch
+          offers={offers}
+          visible={visible}
+          loading={loading}
+          loadError={loadError}
+          onRetry={() => setReloadTick((n) => n + 1)}
+          search={search}
+          onSearchChange={setSearch}
+          filters={filters}
+          onFiltersChange={setFilters}
+          favouritesCount={favourites.size}
+          sort={sort}
+          onSortChange={setSort}
+          multiLayout={multiLayout}
+          onMultiLayoutChange={setMultiLayout}
+          gridColumns={gridColumns}
+          onGridColumnsChange={setGridColumns}
+          selectedIds={selectedIds}
+          favourites={favourites}
+          pulseId={pulseId}
+          onToggle={toggle}
+          onToggleFavourite={toggleFavourite}
+          onOpenDetail={openDetail}
+          onTileDragStart={onTileDragStart}
+          onSelectAllVisible={selectAllVisible}
+          onClearSelection={clearSelection}
+          hasActiveFilters={hasActiveFilters}
+          onClearAllFilters={clearAllFilters}
+          insertLabel={insertLabel()}
+          onInsert={() => insert()}
+          onRandomize={randomize}
+          lastUndo={lastUndo}
+          onClearLastUndo={() => setLastUndo(null)}
+          locale={locale}
+        />
+      )}
 
       <ResizeHandle
         size={uiSize}
