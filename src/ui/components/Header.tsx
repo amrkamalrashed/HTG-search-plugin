@@ -14,7 +14,7 @@ interface Props {
   onThemeChange: (theme: Theme) => void;
   presets: UiPreset[];
   onApplyPreset: (p: UiPreset) => void;
-  onSavePreset: () => void;
+  onSavePreset: (name: string) => void;
   onDeletePreset: (id: string) => void;
   locale: Locale;
 }

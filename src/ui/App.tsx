@@ -37,10 +37,8 @@ import { ProductTile } from './components/ProductTile';
 import { DropCta } from './components/DropCta';
 import { DetailView } from './components/DetailView';
 import { ResizeHandle } from './components/ResizeHandle';
-import { NumberTicker } from './components/NumberTicker';
 import { Toast } from './components/Toast';
 import { CommandPalette, type PaletteCommand } from './components/CommandPalette';
-import { runConfetti } from './confetti';
 import { attachDragImage, attachSectionDragImage } from './dragImage';
 import { applyTheme } from './theme';
 import styles from './styles.css';
@@ -105,7 +103,11 @@ export function App(props: LoadedPayload) {
     nodeIds: string[];
     seq: number;
   } | null>(null);
-  const firstDropFiredRef = useRef(false);
+  // Persistent undo handle — outlives the toast's 5 s timeout so a
+  // designer who looked away can still revert the most recent drop.
+  // Cleared by clicking the footer Undo pill or replaced by the next
+  // drop that produced node ids.
+  const [lastUndo, setLastUndo] = useState<{ nodeIds: string[]; label: string } | null>(null);
 
   // v0.7 chunk 3: canvas → UI awareness
   const [pulseId, setPulseId] = useState<string | null>(null);
@@ -170,9 +172,8 @@ export function App(props: LoadedPayload) {
     };
   }, [source, locale, search, filters, sort, favourites, reloadTick]);
 
-  // Listen for INSERT_RESULT from main → show a toast with optional Undo,
-  // and fire a one-shot confetti burst on the very first successful drop
-  // of the current session.
+  // Listen for INSERT_RESULT from main → show a toast with optional Undo
+  // and stash the node ids so the footer Undo pill can outlive the toast.
   useEffect(() => {
     const off = on<InsertedHandler>('INSERTED', (payload: ToastMessage) => {
       setToast({
@@ -180,9 +181,8 @@ export function App(props: LoadedPayload) {
         nodeIds: payload.createdNodeIds,
         seq: Date.now(),
       });
-      if (!firstDropFiredRef.current && payload.kind !== 'populated') {
-        firstDropFiredRef.current = true;
-        runConfetti();
+      if (payload.createdNodeIds.length > 0) {
+        setLastUndo({ nodeIds: payload.createdNodeIds, label: payload.label });
       }
     });
     return () => off();
@@ -522,12 +522,12 @@ export function App(props: LoadedPayload) {
     sort !== 'default' ||
     Object.values(filters).some((v) => v !== undefined);
 
-  const savePreset = () => {
-    const name = window.prompt(t('uiPresetNamePrompt', locale));
-    if (!name || !name.trim()) return;
+  const savePreset = (rawName: string) => {
+    const name = rawName.trim();
+    if (!name) return;
     const preset: UiPreset = {
       id: `preset-${Date.now()}`,
-      label: name.trim(),
+      label: name,
       multiLayout,
       platform,
       locale,
@@ -574,11 +574,6 @@ export function App(props: LoadedPayload) {
         id: 'drop',
         label: t('uiPaletteDrop', locale),
         run: () => insert(),
-      },
-      {
-        id: 'save-preset',
-        label: t('uiPaletteSavePreset', locale),
-        run: savePreset,
       },
     ];
 
@@ -853,6 +848,18 @@ export function App(props: LoadedPayload) {
             ? t('uiHintClickSingle', locale)
             : t('uiEnterToInsert', locale, { n: count })}
         </div>
+        {lastUndo && (
+          <button
+            class={styles.footerUndoBtn}
+            onClick={() => {
+              emit<UndoHandler>('UNDO', { nodeIds: lastUndo.nodeIds });
+              setLastUndo(null);
+            }}
+            title={lastUndo.label}
+          >
+            ↺ {t('uiToastUndo', locale)}
+          </button>
+        )}
         <DropCta
           count={count}
           multiLayout={multiLayout}

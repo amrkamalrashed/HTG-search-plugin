@@ -91,6 +91,7 @@ export type StringKey =
   | 'uiSurface'
   | 'uiRefresh'
   | 'uiSearchPlaceholder'
+  | 'uiSearchClear'
   | 'uiFilterAll'
   | 'uiFilterPriceMax'
   | 'uiFilterRatingPlus'
@@ -170,7 +171,6 @@ export type StringKey =
   | 'uiPaletteSetPlatform'
   | 'uiPaletteSetLocale'
   | 'uiPaletteSetTheme'
-  | 'uiPaletteSavePreset'
   | 'uiPaletteApplyPreset'
   | 'uiPaletteSetLayout'
   | 'uiLayoutList'
@@ -205,6 +205,7 @@ export type StringKey =
   | 'uiPresetsTooltip'
   | 'uiPresetsEmpty'
   | 'uiPresetsSaveCurrent'
+  | 'uiPresetSave'
   | 'uiPresetDelete'
   | 'uiFilterFavourites'
   | 'uiFilterFavouritesEmpty'
@@ -277,7 +278,8 @@ export const STRINGS: Record<Locale, Record<StringKey, string>> = {
     uiMarket: 'Market',
     uiSurface: 'Surface',
     uiRefresh: 'Refresh selected cards (re-render against current data)',
-    uiSearchPlaceholder: 'Where to? City or country',
+    uiSearchPlaceholder: 'Search property, city or country',
+    uiSearchClear: 'Clear search',
     uiFilterAll: 'All',
     uiFilterPriceMax: 'Under {amount}',
     uiFilterRatingPlus: '★ 4.5+',
@@ -356,7 +358,6 @@ export const STRINGS: Record<Locale, Record<StringKey, string>> = {
     uiPaletteSetPlatform: 'Surface: {value}',
     uiPaletteSetLocale: 'Market: {value}',
     uiPaletteSetTheme: 'Theme: {value}',
-    uiPaletteSavePreset: 'Save current settings as preset…',
     uiPaletteApplyPreset: 'Apply preset · {value}',
     uiPaletteSetLayout: 'Multi layout: {value}',
     uiLayoutList: 'List',
@@ -391,6 +392,7 @@ export const STRINGS: Record<Locale, Record<StringKey, string>> = {
     uiPresetsTooltip: 'Presets',
     uiPresetsEmpty: 'No presets yet.',
     uiPresetsSaveCurrent: 'Save current settings…',
+    uiPresetSave: 'Save',
     uiPresetDelete: 'Delete preset',
     uiFilterFavourites: 'Favourites ({n})',
     uiFilterFavouritesEmpty: 'Star a tile to add it to favourites',
@@ -462,7 +464,8 @@ export const STRINGS: Record<Locale, Record<StringKey, string>> = {
     uiMarket: 'Markt',
     uiSurface: 'Oberfläche',
     uiRefresh: 'Ausgewählte Karten aktualisieren (mit aktuellen Daten neu rendern)',
-    uiSearchPlaceholder: 'Wohin? Stadt oder Land',
+    uiSearchPlaceholder: 'Unterkunft, Stadt oder Land suchen',
+    uiSearchClear: 'Suche löschen',
     uiFilterAll: 'Alle',
     uiFilterPriceMax: 'Unter {amount}',
     uiFilterRatingPlus: '★ 4,5+',
@@ -541,7 +544,6 @@ export const STRINGS: Record<Locale, Record<StringKey, string>> = {
     uiPaletteSetPlatform: 'Oberfläche: {value}',
     uiPaletteSetLocale: 'Markt: {value}',
     uiPaletteSetTheme: 'Design: {value}',
-    uiPaletteSavePreset: 'Aktuelle Einstellungen als Preset speichern…',
     uiPaletteApplyPreset: 'Preset anwenden · {value}',
     uiPaletteSetLayout: 'Mehrfach-Layout: {value}',
     uiLayoutList: 'Liste',
@@ -576,6 +578,7 @@ export const STRINGS: Record<Locale, Record<StringKey, string>> = {
     uiPresetsTooltip: 'Voreinstellungen',
     uiPresetsEmpty: 'Noch keine Voreinstellungen.',
     uiPresetsSaveCurrent: 'Aktuelle Einstellungen speichern…',
+    uiPresetSave: 'Speichern',
     uiPresetDelete: 'Voreinstellung löschen',
     uiFilterFavourites: 'Favoriten ({n})',
     uiFilterFavouritesEmpty: 'Markiere Karten als Favoriten',
@@ -647,7 +650,8 @@ export const STRINGS: Record<Locale, Record<StringKey, string>> = {
     uiMarket: 'Mercado',
     uiSurface: 'Superficie',
     uiRefresh: 'Actualizar las tarjetas seleccionadas (volver a renderizar con los datos actuales)',
-    uiSearchPlaceholder: '¿Adónde? Ciudad o país',
+    uiSearchPlaceholder: 'Buscar propiedad, ciudad o país',
+    uiSearchClear: 'Limpiar búsqueda',
     uiFilterAll: 'Todos',
     uiFilterPriceMax: 'Menos de {amount}',
     uiFilterRatingPlus: '★ 4,5+',
@@ -726,7 +730,6 @@ export const STRINGS: Record<Locale, Record<StringKey, string>> = {
     uiPaletteSetPlatform: 'Superficie: {value}',
     uiPaletteSetLocale: 'Mercado: {value}',
     uiPaletteSetTheme: 'Tema: {value}',
-    uiPaletteSavePreset: 'Guardar ajustes actuales como preset…',
     uiPaletteApplyPreset: 'Aplicar preset · {value}',
     uiPaletteSetLayout: 'Diseño múltiple: {value}',
     uiLayoutList: 'Lista',
@@ -761,6 +764,7 @@ export const STRINGS: Record<Locale, Record<StringKey, string>> = {
     uiPresetsTooltip: 'Presets',
     uiPresetsEmpty: 'Aún no hay presets.',
     uiPresetsSaveCurrent: 'Guardar ajustes actuales…',
+    uiPresetSave: 'Guardar',
     uiPresetDelete: 'Eliminar preset',
     uiFilterFavourites: 'Favoritos ({n})',
     uiFilterFavouritesEmpty: 'Marca tarjetas como favoritas',
@@ -832,7 +836,8 @@ export const STRINGS: Record<Locale, Record<StringKey, string>> = {
     uiMarket: 'Marché',
     uiSurface: 'Surface',
     uiRefresh: 'Actualiser les fiches sélectionnées (re-rendre avec les données actuelles)',
-    uiSearchPlaceholder: 'Où ? Ville ou pays',
+    uiSearchPlaceholder: 'Rechercher logement, ville ou pays',
+    uiSearchClear: 'Effacer la recherche',
     uiFilterAll: 'Tous',
     uiFilterPriceMax: 'Moins de {amount}',
     uiFilterRatingPlus: '★ 4,5+',
@@ -911,7 +916,6 @@ export const STRINGS: Record<Locale, Record<StringKey, string>> = {
     uiPaletteSetPlatform: 'Surface : {value}',
     uiPaletteSetLocale: 'Marché : {value}',
     uiPaletteSetTheme: 'Thème : {value}',
-    uiPaletteSavePreset: 'Enregistrer les réglages actuels comme préréglage…',
     uiPaletteApplyPreset: 'Appliquer le préréglage · {value}',
     uiPaletteSetLayout: 'Mise en page multi : {value}',
     uiLayoutList: 'Liste',
@@ -946,6 +950,7 @@ export const STRINGS: Record<Locale, Record<StringKey, string>> = {
     uiPresetsTooltip: 'Préréglages',
     uiPresetsEmpty: 'Aucun préréglage pour le moment.',
     uiPresetsSaveCurrent: 'Enregistrer les réglages actuels…',
+    uiPresetSave: 'Enregistrer',
     uiPresetDelete: 'Supprimer le préréglage',
     uiFilterFavourites: 'Favoris ({n})',
     uiFilterFavouritesEmpty: 'Mettez une fiche en favori',

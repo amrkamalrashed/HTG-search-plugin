@@ -8,7 +8,7 @@ import styles from '../styles.css';
 interface Props {
   presets: UiPreset[];
   onApply: (p: UiPreset) => void;
-  onSave: () => void;
+  onSave: (name: string) => void;
   onDelete: (id: string) => void;
   locale: Locale;
 }
@@ -23,10 +23,17 @@ interface Props {
  */
 export function PresetsMenu({ presets, onApply, onSave, onDelete, locale }: Props) {
   const [open, setOpen] = useState(false);
+  const [naming, setNaming] = useState(false);
+  const [draftName, setDraftName] = useState('');
   const wrapRef = useRef<HTMLDivElement | null>(null);
+  const nameInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
-    if (!open) return;
+    if (!open) {
+      setNaming(false);
+      setDraftName('');
+      return;
+    }
     const onClick = (e: MouseEvent) => {
       if (wrapRef.current && !wrapRef.current.contains(e.target as Node)) {
         setOpen(false);
@@ -42,6 +49,20 @@ export function PresetsMenu({ presets, onApply, onSave, onDelete, locale }: Prop
       window.removeEventListener('keydown', onKey);
     };
   }, [open]);
+
+  // Focus the inline naming input as soon as it appears.
+  useEffect(() => {
+    if (naming) nameInputRef.current?.focus();
+  }, [naming]);
+
+  const commitSave = () => {
+    const trimmed = draftName.trim();
+    if (!trimmed) return;
+    onSave(trimmed);
+    setDraftName('');
+    setNaming(false);
+    setOpen(false);
+  };
 
   return (
     <div class={styles.presetsMenu} ref={wrapRef}>
@@ -93,15 +114,43 @@ export function PresetsMenu({ presets, onApply, onSave, onDelete, locale }: Prop
               </div>
             ))
           )}
-          <button
-            class={styles.presetsSaveBtn}
-            onClick={() => {
-              onSave();
-              setOpen(false);
-            }}
-          >
-            + {t('uiPresetsSaveCurrent', locale)}
-          </button>
+          {naming ? (
+            <div class={styles.presetsSaveRow}>
+              <input
+                ref={nameInputRef}
+                class={styles.presetsSaveInput}
+                type="text"
+                placeholder={t('uiPresetNamePrompt', locale)}
+                value={draftName}
+                maxLength={40}
+                onInput={(e) => setDraftName((e.target as HTMLInputElement).value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    commitSave();
+                  } else if (e.key === 'Escape') {
+                    e.preventDefault();
+                    setNaming(false);
+                    setDraftName('');
+                  }
+                }}
+              />
+              <button
+                class={styles.presetsSaveConfirm}
+                onClick={commitSave}
+                disabled={!draftName.trim()}
+              >
+                {t('uiPresetSave', locale)}
+              </button>
+            </div>
+          ) : (
+            <button
+              class={styles.presetsSaveBtn}
+              onClick={() => setNaming(true)}
+            >
+              + {t('uiPresetsSaveCurrent', locale)}
+            </button>
+          )}
         </div>
       )}
     </div>

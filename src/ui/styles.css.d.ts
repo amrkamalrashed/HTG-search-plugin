@@ -12,7 +12,6 @@ declare const styles: {
   readonly "colStepper": string;
   readonly "colStepperBtn": string;
   readonly "colStepperBtnActive": string;
-  readonly "confettiCanvas": string;
   readonly "detail": string;
   readonly "detailAmenities": string;
   readonly "detailAmenityChip": string;
@@ -64,6 +63,7 @@ declare const styles: {
   readonly "footer": string;
   readonly "footerInfo": string;
   readonly "footerInfoActive": string;
+  readonly "footerUndoBtn": string;
   readonly "grid": string;
   readonly "header": string;
   readonly "headerDivider": string;
@@ -116,11 +116,15 @@ declare const styles: {
   readonly "presetsRowLabel": string;
   readonly "presetsRowMeta": string;
   readonly "presetsSaveBtn": string;
+  readonly "presetsSaveConfirm": string;
+  readonly "presetsSaveInput": string;
+  readonly "presetsSaveRow": string;
   readonly "refreshBtn": string;
   readonly "resizeHandle": string;
   readonly "root": string;
   readonly "scroll": string;
   readonly "searchBox": string;
+  readonly "searchClearBtn": string;
   readonly "searchIcon": string;
   readonly "searchInput": string;
   readonly "searchRow": string;
@@ -144,7 +148,6 @@ declare const styles: {
   readonly "themeDropdownItem": string;
   readonly "themeDropdownItemActive": string;
   readonly "themeMenu": string;
-  readonly "ticker": string;
   readonly "tile": string;
   readonly "tileBadge": string;
   readonly "tileBadgeGreen": string;

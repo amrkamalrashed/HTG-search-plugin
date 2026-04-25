@@ -59,25 +59,29 @@
 :global(html.figma-dark:not([data-theme="light"])),
 :global(html.figma-darker:not([data-theme="light"])),
 :global(html[data-theme="dark"]) {
-  --htg-violet: #8b6cf0;
-  --htg-violet-dark: #7858e3;
-  --htg-violet-soft: #2a2147;
+  /* Tokens align with Figma's native dark UI (#2c2c2c panels, #3a3a3a
+     surfaces, white-alpha text) so the plugin feels like part of the
+     host rather than a foreign window. The HomeToGo purple stays — only
+     bumped slightly so it has enough contrast against #2c2c2c. */
+  --htg-violet: #9b7ef5;
+  --htg-violet-dark: #8b6cf0;
+  --htg-violet-soft: rgba(155, 126, 245, 0.18);
   --htg-magenta: #e26ed5;
-  --htg-coral: #ff5f6d;
-  --htg-coral-soft: #3a1e22;
-  --htg-text: #e8ebf0;
-  --htg-text-muted: #9aa6b6;
-  --htg-text-subtle: #6b7888;
-  --htg-border: #2c333d;
-  --htg-border-strong: #3a4250;
-  --htg-surface: #1a1f27;
-  --htg-bg: #11151b;
-  --htg-card: #161b22;
+  --htg-coral: #ff6f7c;
+  --htg-coral-soft: rgba(255, 111, 124, 0.15);
+  --htg-text: #ffffff;
+  --htg-text-muted: rgba(255, 255, 255, 0.7);
+  --htg-text-subtle: rgba(255, 255, 255, 0.5);
+  --htg-border: rgba(255, 255, 255, 0.12);
+  --htg-border-strong: rgba(255, 255, 255, 0.24);
+  --htg-bg: #2c2c2c;
+  --htg-surface: #383838;
+  --htg-card: #4a4a4a;
   --htg-overlay: rgba(0, 0, 0, 0.55);
   --htg-shadow-1: 0 1px 2px rgba(0, 0, 0, 0.45);
   --htg-shadow-2: 0 4px 12px rgba(0, 0, 0, 0.45);
   --htg-shadow-3: 0 8px 24px rgba(0, 0, 0, 0.7);
-  --htg-green: #2dc486;
+  --htg-green: #4ec48f;
 }
 
 :global(html),
@@ -330,9 +334,31 @@
 }
 
 .searchIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   color: var(--htg-text-muted);
+  flex-shrink: 0;
+}
+
+.searchClearBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  color: var(--htg-text-muted);
+  background: var(--htg-surface);
   font-size: 14px;
   line-height: 1;
+  flex-shrink: 0;
+  transition: background 0.1s, color 0.1s;
+}
+
+.searchClearBtn:hover {
+  background: var(--htg-border);
+  color: var(--htg-text);
 }
 
 /* ---------- Filter chips ---------- */
@@ -368,6 +394,18 @@
 .chipActive {
   background: var(--htg-text);
   border-color: var(--htg-text);
+  color: var(--htg-bg);
+}
+
+/* In dark mode `--htg-text` resolves to white, so the default light
+   recipe (text-coloured background + #fff text) would render the active
+   chip as white-on-white. Use the brand violet instead so the active
+   state stays unmistakable on a #2c2c2c panel. */
+:global(html.figma-dark:not([data-theme="light"])) .chipActive,
+:global(html.figma-darker:not([data-theme="light"])) .chipActive,
+:global(html[data-theme="dark"]) .chipActive {
+  background: var(--htg-violet);
+  border-color: var(--htg-violet);
   color: #ffffff;
 }
 
@@ -714,6 +752,33 @@
 .footerInfoActive {
   color: var(--htg-text);
   font-weight: 600;
+}
+
+.footerInfo {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.footerUndoBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--htg-violet);
+  background: var(--htg-violet-soft);
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  transition: background 0.1s, color 0.1s;
+  flex-shrink: 0;
+}
+
+.footerUndoBtn:hover {
+  background: var(--htg-violet);
+  color: #ffffff;
 }
 
 .btn {
@@ -1503,6 +1568,50 @@
   background: var(--htg-violet-soft);
 }
 
+.presetsSaveRow {
+  display: flex;
+  gap: 6px;
+  margin-top: 4px;
+  padding: 6px 8px;
+  border-top: 1px solid var(--htg-border);
+}
+
+.presetsSaveInput {
+  flex: 1;
+  border: 1px solid var(--htg-border);
+  outline: none;
+  background: var(--htg-card);
+  color: var(--htg-text);
+  font-size: 12px;
+  padding: 5px 8px;
+  border-radius: var(--radius-sm);
+  min-width: 0;
+}
+
+.presetsSaveInput:focus {
+  border-color: var(--htg-violet);
+}
+
+.presetsSaveConfirm {
+  font-size: 12px;
+  font-weight: 700;
+  color: #ffffff;
+  background: var(--htg-violet);
+  padding: 5px 10px;
+  border-radius: var(--radius-sm);
+  transition: background 0.1s;
+}
+
+.presetsSaveConfirm:hover:not(:disabled) {
+  background: var(--htg-violet-dark);
+}
+
+.presetsSaveConfirm:disabled {
+  background: var(--htg-border);
+  color: var(--htg-text-muted);
+  cursor: not-allowed;
+}
+
 .themeDropdown {
   position: absolute;
   top: calc(100% + 4px);
@@ -1645,13 +1754,6 @@
   font-size: 11px;
   color: var(--htg-text-muted);
   margin-top: 2px;
-}
-
-/* ---------- v0.7: NumberTicker ---------- */
-.ticker {
-  display: inline-block;
-  font-variant-numeric: tabular-nums;
-  transition: transform 0.18s ease-out;
 }
 
 /* ---------- v0.7: Toast ---------- */
@@ -1806,10 +1908,3 @@
   color: var(--htg-text-muted);
 }
 
-/* ---------- v0.7: Confetti ---------- */
-.confettiCanvas {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 60;
-}
