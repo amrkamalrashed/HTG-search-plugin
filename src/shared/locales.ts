@@ -4,11 +4,16 @@ export type Locale = 'en' | 'de' | 'es' | 'fr';
 // platforms (Windows, certain emoji fonts) render `🇬🇧 🇩🇪 🇪🇸 🇫🇷`
 // as doubled letter blocks (the "doubled-flag" bug); the text codes
 // look correct everywhere and stay short enough for the locale pill.
-export const LOCALES: Array<{ id: Locale; label: string; flag: string }> = [
-  { id: 'en', label: 'English', flag: 'EN' },
-  { id: 'de', label: 'Deutsch', flag: 'DE' },
-  { id: 'es', label: 'Español', flag: 'ES' },
-  { id: 'fr', label: 'Français', flag: 'FR' },
+// Emoji flags for each locale. The "doubled flag" rendering bug
+// (Windows + a handful of monochrome emoji fonts) is sidestepped by
+// the custom LocaleBar dropdown rendering each option as
+// "<flag> <label>" with a single consistent layout — there is no
+// native `<select>` to mis-render the regional-indicator pair.
+export const LOCALES: Array<{ id: Locale; label: string; flag: string; code: string }> = [
+  { id: 'en', label: 'English', flag: '🇬🇧', code: 'EN' },
+  { id: 'de', label: 'Deutsch', flag: '🇩🇪', code: 'DE' },
+  { id: 'es', label: 'Español', flag: '🇪🇸', code: 'ES' },
+  { id: 'fr', label: 'Français', flag: '🇫🇷', code: 'FR' },
 ];
 
 export const LOCALE_TO_INTL: Record<Locale, string> = {
