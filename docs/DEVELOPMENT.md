@@ -41,7 +41,8 @@ When watching, each plugin run picks up the latest bundle — no re-import.
    `textForKey` (or `imageUrlForKey`).
 4. Render it in `src/main/generate.ts` inside the relevant panel
    (`buildImagePanel` / `buildContent` / `buildActions`).
-5. Optional: surface it in the UI (`ProductTile.tsx`, `PreviewModal.tsx`).
+5. Optional: surface it in the UI (`ProductTile.tsx` for the search-grid
+   tile, `DetailView.tsx` for the property-facts panel on Level 2).
 6. Document it in `docs/DATA_MODEL.md` and `docs/LAYER_NAMING_SPEC.md`.
 
 ### Add an amenity icon
