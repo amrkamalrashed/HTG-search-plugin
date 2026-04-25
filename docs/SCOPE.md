@@ -30,6 +30,17 @@ populated HomeToGo product card onto the canvas.
   contract so HTG designers can retro-fit their own components.
 - **Adaptive rendering**: every card section is conditional on the offer
   actually having that data. No placeholder noise.
+- **UX polish (v0.6 / v0.7)**:
+  - Drag-tile-onto-canvas → drops a card or populates `#fieldName`
+    layers in the selected frame.
+  - Dark mode (Auto / Light / Dark), persisted across sessions.
+  - Resizable plugin window with size persisted in clientStorage.
+  - Multi-select with shift / cmd anchor range, persistent favourites
+    (★), randomize button + R shortcut.
+  - ⌘K command palette; bottom Toast with Undo; saved presets
+    (mode + platform + locale + gridColumns + sort).
+  - Canvas selection awareness: tiles pulse when their card is
+    selected on the canvas; a banner names the active drop target.
 
 ## Non-goals — what the plugin intentionally does NOT do
 

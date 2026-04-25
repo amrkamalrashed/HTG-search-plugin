@@ -52,6 +52,26 @@ left, content middle, actions column right with the purple→pink gradient
 neighbourhood, fewer amenities? The card trims those sections automatically
 so it always looks right without cleanup.
 
+### v0.6 / v0.7 polish
+
+- **Drag tiles onto the canvas.** Drop on empty space → card lands at the
+  drop point. Drop on a selected frame with `#fieldName` children → the
+  plugin populates them. Drop on any other selected frame → the card is
+  filled in as a child (toggle Replace in the banner to clear siblings
+  first).
+- **Dark mode.** Auto follows Figma's theme; Light / Dark force an override.
+- **Multi-select.** Cmd-click toggles, shift-click extends from the last
+  anchor.
+- **Favourites.** Star tiles to keep them around; ★ persists in
+  clientStorage.
+- **Randomize** (R / dice button) picks a random visible tile.
+- **⌘K** opens a command palette: Drop, Random, Refresh, Find all,
+  mode/platform/locale/theme switching, presets.
+- **Toast + Undo.** Every insert ends with a 5 s toast; click Undo to
+  remove the freshly-dropped nodes.
+- **Resizable window.** Drag the corner handle; size persists across
+  sessions.
+
 ---
 
 ## Project layout

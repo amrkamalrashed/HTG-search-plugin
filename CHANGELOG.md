@@ -5,6 +5,69 @@ in ISO-8601 (YYYY-MM-DD).
 
 ## [Unreleased]
 
+### 0.7.0 — 2026-04-25 — UX polish: multi-select, palette, canvas awareness, drop-into-frame
+
+Four sub-chunks landed in their own commits.
+
+**Chunk 1 — Selection + drag**
+- Shift / cmd multi-select with last-anchor range. Cmd-click toggles a
+  tile and sets the anchor; shift-click selects the visible-list range
+  from the anchor.
+- Persistent favourites (★) on every tile. Stored in clientStorage with
+  the rest of `UiState` (`favourites: string[]`).
+- Custom drag-image preview. We snapshot a small 220 px hover card with
+  hero photo + title + price via `setDragImage`, replacing the browser's
+  default full-tile bitmap.
+- Hover-peek side panel after 450 ms tile hover. Auto-flips to the left
+  when there isn't room on the right.
+- `NumberTicker` — RAF-animated tween component used for the result
+  count in `SortBar` so it eases between values rather than snapping.
+
+**Chunk 2 — Toast + palette + presets + confetti**
+- Bottom Toast with 5 s timeout + Undo button. The Undo button appears
+  whenever the latest `INSERT_RESULT` carried node ids; clicking it
+  emits `UNDO` and the main thread removes those nodes.
+- ⌘K command palette with fuzzy substring matching. Commands: Drop,
+  Random, Refresh, Find all, mode/platform/locale/theme switching,
+  Save preset, Apply preset (one entry per saved preset).
+- Saved presets capture `mode + platform + locale + gridColumns + sort`
+  under a user-supplied name. Persisted in clientStorage UiState.
+- Confetti burst on the first successful drop per session.
+
+**Chunk 3 — Canvas ↔ plugin awareness**
+- New `HIGHLIGHT_OFFER` channel (main → UI). Pulses the matching tile
+  when a tagged HTG card is selected on the canvas.
+- New `SELECTION_TARGET` channel (main → UI). Surfaces the currently
+  selected non-HTG frame so the UI can show a "Drop into 'X'" banner.
+- New `UNDO` channel (UI → main). Removes nodes from the most recent
+  toast.
+- New `FIND_ALL` channel (UI → main). Selects every HTG-tagged frame
+  on the current page and zooms to fit.
+- Drag-onto-frame triggers `populate` when the frame has `#fieldName`
+  children (already plumbed in chunks 3 and 4 of the main router).
+
+**Chunk 4 — Drop INTO selected frame**
+- `DropTargetBanner` with a Replace toggle. Renders above the search bar
+  whenever a non-HTG frame is selected.
+- `fillIntoTarget` helper appends the new card as a child of the target,
+  optionally clearing existing children when Replace is on.
+- `resolveDropTarget` picks one of `populate | fill | viewport` based on
+  selection + `#fieldName` presence.
+
+### 0.6.0 — 2026-04-25 — UX polish wave one
+
+- Randomize button (header) + R keyboard shortcut. Pulls from the
+  currently filtered/sorted list.
+- Drag tiles onto the canvas to drop a card directly. UI emits the new
+  `DROP` message; main routes the drop based on the current selection.
+- Dark mode (Auto / Light / Dark). Auto follows Figma's `html.figma-dark`
+  class; Light and Dark force the theme via `html[data-theme]`.
+- Sticky breadcrumb in the detail view so the back button stays
+  reachable while scrolling long section grids.
+- Resizable plugin window. Bottom-right corner handle live-resizes via
+  the new `RESIZE` message and persists the final size via
+  `SAVE_UI_SIZE` → clientStorage `htgUiSize`. Min 360×480, max 900×1200.
+
 ### 0.5.0 — 2026-04-23 — Full mobile detail page (12 sections, platform-aware)
 
 Inspired by the iOS details-scroll frame supplied in Figma. Expands

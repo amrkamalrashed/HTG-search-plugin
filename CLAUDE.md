@@ -40,6 +40,10 @@ integration later.
 - Mock data source only (no API access yet).
 - Card design targets the real HomeToGo search-results card (screenshot in
   `docs/BRAND.md`). Designers will supply the official component later.
+- v0.6 / v0.7 — UX polish wave: dark mode, resizable window, drag-onto-canvas,
+  ⌘K command palette, multi-select, favourites, toast + undo, drop-into-frame
+  with Replace toggle, canvas ↔ plugin awareness, presets, confetti. See
+  `CHANGELOG.md` for the per-chunk breakdown.
 
 ## Architecture at a glance
 
@@ -62,8 +66,12 @@ src/
     index.tsx
     App.tsx         # Level-1 search + Level-2 detail state machine
     styles.css
+    theme.ts        # Auto/Light/Dark theme application (data-theme attr)
+    dragImage.ts    # Custom drag-image factory (setDragImage)
     components/     # Header, LocaleBar, SearchBar, FilterBar, SortBar,
-                    # ProductTile, PreviewModal, DetailView
+                    # ProductTile, PreviewModal, DetailView,
+                    # ResizeHandle, HoverPeek, NumberTicker, Toast,
+                    # CommandPalette, Confetti, DropTargetBanner
   shared/       # Consumed by both threads (no DOM / no figma.* API).
     types.ts        # Offer + ReviewDetails + PriceBreakdown + enums
     messages.ts     # Insert*Payload + SectionKind + UiState
@@ -131,8 +139,10 @@ strikethrough price. See `docs/BRAND.md` for the palette.
 | Add a new offer field | `src/shared/types.ts` → `src/data/products.json` → `src/shared/layer-names.ts` (add key + formatter) → `src/main/generate.ts` (render it) |
 | Add an amenity icon | `src/main/icons.ts` (add SVG) → `AMENITY_TO_ICON` in `src/main/generate.ts` |
 | Change card visuals | `src/main/generate.ts` + tokens in `src/main/brand.ts` |
-| Change plugin UI look | `src/ui/styles.css` + CSS-var tokens at top |
+| Change plugin UI look | `src/ui/styles.css` + CSS-var tokens at top (light + dark sets) |
 | Add a filter chip | `src/ui/components/FilterBar.tsx` + `Filters` type + matching filter in `App.tsx` |
+| Add a palette command | `paletteCommands` array in `src/ui/App.tsx` |
+| Add a new message channel | `src/shared/messages.ts` (handler interface) → wire `on/emit` in `src/main/index.ts` and `src/ui/App.tsx` |
 | Wire to a real API | Replace the `productsJson` import in `src/main/index.ts` with a `fetch` in the UI thread; add domain to `package.json` → `figma-plugin.networkAccess.allowedDomains` |
 
 ## Gotchas (from the research)

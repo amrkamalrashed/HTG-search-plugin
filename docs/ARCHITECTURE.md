@@ -108,8 +108,28 @@ from it.
      re-sync.
    - figma.viewport.scrollAndZoomIntoView + figma.notify
 
-4. No response message back; toast + scroll are enough feedback for PoC.
+4. Main emits `INSERT_RESULT` back to the UI with the top-level node ids
+   so the UI can show a Toast with an Undo button.
 ```
+
+### v0.6 / v0.7 message channels
+
+The plugin now has a richer two-way message bus. Every channel is
+typed in `src/shared/messages.ts` and consumed via `emit/on`:
+
+| Channel | Direction | Payload | Purpose |
+|---------|-----------|---------|---------|
+| `INSERT` | UI → main | `InsertCardsPayload \| InsertSectionsPayload` | Existing card/section insert |
+| `DROP` | UI → main | `DropPayload` (offerId, coords, replaceOnDrop) | Tile dropped on canvas |
+| `UNDO` | UI → main | `{ nodeIds: string[] }` | Toast Undo button |
+| `FIND_ALL` | UI → main | — | Select every HTG-tagged node on the page |
+| `REFRESH` | UI → main | — | Re-render selected HTG cards |
+| `RESIZE` | UI → main | `UiSize` | Live resize while dragging the handle |
+| `SAVE_STATE` | UI → main | `UiState` | Persist UI state to clientStorage |
+| `SAVE_UI_SIZE` | UI → main | `UiSize` | Persist final size on resize commit |
+| `INSERT_RESULT` | main → UI | `InsertResultPayload` | Toast message + Undo node ids |
+| `HIGHLIGHT_OFFER` | main → UI | `{ offerId: string \| null }` | Pulse a tile when its card is selected |
+| `SELECTION_TARGET` | main → UI | `SelectionTargetInfo \| null` | Drive the Drop banner |
 
 ## Adaptive card
 
@@ -160,6 +180,27 @@ them against the current data without losing presentation.
 | Single | Loose card(s) on page | none (card is itself vertical auto-layout) |
 | List | Wrapper frame, padding 20, gap 16 | `layoutMode: VERTICAL, primaryAxis: AUTO` |
 | Grid | Wrapper frame, 2 cols, gaps 16 | `layoutMode: HORIZONTAL, layoutWrap: WRAP, primaryAxis: FIXED` (width = 2×card + gap + padding) |
+
+## Drop routing (v0.7)
+
+`handleDrop` in `src/main/index.ts` dispatches via `resolveDropTarget`:
+
+```
+selection has #fields  → populate (Replace toggle ignored)
+selection w/o #fields  → fill    (Replace=on clears children first)
+no selection           → viewport (drop at canvas coords)
+```
+
+`fillIntoTarget(target, child, replace)` in `src/main/populate.ts`
+clears the target's existing children when `replace` is true and
+appends the new card; otherwise it just appends. `hasFieldNames(target)`
+short-circuits via `findOne` so it returns as soon as one matching
+layer is found.
+
+The UI surfaces the active drop target via the
+[`DropTargetBanner`](../src/ui/components/DropTargetBanner.tsx)
+component, which receives a `SelectionTargetInfo` from main on every
+canvas selection change.
 
 ## Keeping v2 cheap
 

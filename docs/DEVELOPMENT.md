@@ -60,7 +60,24 @@ correctly.
 ### Change the plugin UI visual
 
 Edit `src/ui/styles.css` (top-level CSS variables carry the palette) and the
-Preact components under `src/ui/components/`.
+Preact components under `src/ui/components/`. The light tokens live under
+`:root`; the dark overrides live under
+`html.figma-dark:not([data-theme="light"]), html[data-theme="dark"]`. To
+add a new themed value, declare it in both blocks.
+
+### Add a command palette entry
+
+Edit the `paletteCommands` array in `src/ui/App.tsx`. Each command is an
+object with `{ id, label, hint?, run }`. The command palette filters by
+fuzzy substring match on `label`, so make labels descriptive.
+
+### Add a new message channel
+
+1. Add the handler interface to `src/shared/messages.ts` (e.g.
+   `MyHandler extends EventHandler { name: 'MY_CHANNEL'; ... }`).
+2. Subscribe with `on<MyHandler>(...)` in `src/main/index.ts` (main → UI)
+   or `src/ui/App.tsx` (UI → main, inside a `useEffect`).
+3. Emit with `emit<MyHandler>('MY_CHANNEL', payload)` from the other side.
 
 ### Add a filter
 

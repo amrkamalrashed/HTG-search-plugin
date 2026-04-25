@@ -101,3 +101,15 @@ Create a frame named `HTG Card` containing:
 - A `TEXT` layer named `#pricePerNight`
 
 Select it, run the plugin, pick a property, click **Insert**. Done.
+
+## Drag and drop (v0.7)
+
+You can also **drag a tile from the plugin onto your frame** instead of
+clicking Insert:
+
+- Drop on a frame whose children include `#fieldName` layers → those
+  layers populate, exactly as if you'd clicked Insert in Single mode.
+- Drop on any other selected frame → the generated HTG card is filled
+  in as a child of that frame. The "Drop into 'X'" banner inside the
+  plugin lets you toggle **Replace** to clear existing children first.
+- Drop on empty canvas → the card lands at the drop point.
