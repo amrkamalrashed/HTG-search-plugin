@@ -5,6 +5,32 @@ Dates are in ISO-8601 (YYYY-MM-DD).
 
 ## [Unreleased]
 
+### 0.8.0 — 2026-04-25 — Data layer moves to the UI thread (v2-ready)
+
+The catalogue used to load on the main thread (which works for the
+bundled PoC JSON but doesn't for a real API — the QuickJS sandbox
+has limited networking). This release moves the seam to the right
+place so the v2 API swap is a one-line change.
+
+- New `src/ui/offers-source.ts` exporting `OffersSource`,
+  `SearchQuery`, `JsonOffersSource`, and a `parseApiOffer` /
+  `ApiOffersSource` placeholder.
+- `OffersSource.search(query)` takes locale + text + filters + sort
+  + limit + cursor — the same query shape a real API would expect.
+  Today's `JsonOffersSource` runs that locally; v2's
+  `ApiOffersSource` will forward it as query parameters.
+- `LoadedPayload` no longer ships `offers`. Main boots with just
+  saved state + size; UI fetches the catalogue itself.
+- New `SYNC_OFFERS` channel (UI → main) so main keeps a cache for
+  Refresh / DROP / native-drop offer-by-id lookups.
+- App.tsx gets loading + error states. While the source is fetching,
+  the grid renders 6 skeleton tiles with a dark-mode-aware shimmer.
+  On error, an empty-state with a Retry button bumps a tick that
+  re-triggers the effect.
+- `localize()` and the `i18n` block on `Offer` stay for now — the
+  PoC JSON still uses them — but they get a `// v2: delete` comment.
+  When the API returns locale-specific data directly, these go away.
+
 ### 0.7.2 — 2026-04-25 — Spec alignment pass
 
 Cleanup pass to bring the v0.7 surface in line with the spec wording

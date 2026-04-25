@@ -50,10 +50,14 @@ src/
 │       ├── amenities.ts
 │       ├── reviews.ts
 │       └── priceBreakdown.ts
-├── ui/                    # iframe
+├── ui/                    # iframe (real browser, owns fetch)
 │   ├── index.tsx          # render(App)
 │   ├── App.tsx            # state machine (Level 1 + Level 2), emits INSERT
-│   ├── styles.css         # CSS Modules, HTG tokens as custom properties
+│   ├── offers-source.ts   # OffersSource + JsonOffersSource + parseApiOffer (v2)
+│   ├── confetti.ts        # imperative runConfetti() (no React tree)
+│   ├── theme.ts           # applyTheme() + isDark()
+│   ├── dragImage.ts       # custom setDragImage() ghost factory
+│   ├── styles.css         # CSS Modules, HomeDrop tokens as custom properties
 │   └── components/
 │       ├── Header.tsx     # logo + Single/List/Grid toggle + refresh btn
 │       ├── LocaleBar.tsx  # locale + platform pills
@@ -190,6 +194,84 @@ them against the current data without losing presentation.
 | Single | Loose card(s) on page | none (card is itself vertical auto-layout) |
 | List | Wrapper frame, padding 20, gap 16 | `layoutMode: VERTICAL, primaryAxis: AUTO` |
 | Grid | Wrapper frame, 2 cols, gaps 16 | `layoutMode: HORIZONTAL, layoutWrap: WRAP, primaryAxis: FIXED` (width = 2×card + gap + padding) |
+
+## Data layer (v0.8)
+
+The catalogue lives behind the `OffersSource` interface in
+`src/ui/offers-source.ts`:
+
+```ts
+interface OffersSource {
+  search(query: SearchQuery): Promise<Offer[]>;
+  getById(id: string, locale: Locale): Promise<Offer | null>;
+}
+
+interface SearchQuery {
+  locale: Locale;
+  text?: string;
+  filters?: { propertyType?, minRating?, priceMax?, minGuests? };
+  sort?: SortKey;
+  limit?: number;
+  cursor?: string;     // server-driven pagination, v2 only
+}
+```
+
+The seam lives on the **UI thread**, not main, because the QuickJS
+sandbox can't do real fetches — the iframe is where `fetch()` works.
+`App.tsx` instantiates the source once and runs a `useEffect` that
+calls `source.search(query)` whenever `locale | search | filters |
+sort` changes. The result becomes `offers` state.
+
+### Boot + sync flow
+
+```
+1. Plugin opens
+   main: showUI({ width, height }, { savedState, uiSize })
+   → UI receives savedState only — NOT the catalogue.
+
+2. UI mounts. useEffect fires source.search({ locale, ... }).
+   → Today: JsonOffersSource resolves immediately.
+   → v2:   ApiOffersSource calls fetch(); skeleton tiles cover the wait.
+
+3. UI receives offers. Two things happen:
+   a. setOffers(...)   — the grid renders.
+   b. emit<SyncOffersHandler>('SYNC_OFFERS', { offers, locale })
+      → main caches them in OFFER_BY_ID for Refresh/DROP lookups.
+
+4. User changes locale → step 2 re-runs with new query.locale.
+   Server returns localized data; SYNC_OFFERS re-syncs the cache.
+
+5. User clicks Refresh on selected canvas cards.
+   main looks up offerId in its cache → rebuilds via buildCard.
+   No round-trip back to the UI required.
+```
+
+### Loading + error UX
+
+While `source.search()` is pending, the grid shows **6 skeleton
+tiles** with an animated shimmer (dark-mode-aware). On rejection,
+the empty-state shows the error message and a Retry button that
+bumps a tick and re-runs the effect. Locale switches show the
+loading state for as long as the new fetch takes.
+
+### Why v2 is a one-line swap
+
+Today's `App.tsx` is:
+
+```ts
+const [source] = useState<OffersSource>(() => defaultOffersSource);
+```
+
+v2 becomes:
+
+```ts
+const [source] = useState<OffersSource>(() => new ApiOffersSource(API_URL));
+```
+
+Plus deleting `localize()` and the `i18n` block on `Offer` (the API
+returns localized data directly via `Accept-Language` / `?locale=de`).
+The card renderer, populate path, locale selector, drop banner — all
+unchanged.
 
 ## Drop routing (v0.7)
 

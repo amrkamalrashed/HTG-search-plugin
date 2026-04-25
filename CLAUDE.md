@@ -66,13 +66,15 @@ src/
   ui/           # Preact iframe. Search + detail + pickers.
     index.tsx
     App.tsx         # Level-1 search + Level-2 detail state machine
-    styles.css
+    offers-source.ts # OffersSource interface + JsonOffersSource + v2 stub
+    confetti.ts     # Imperative runConfetti() (no React tree)
     theme.ts        # Auto/Light/Dark theme application (data-theme attr)
     dragImage.ts    # Custom drag-image factory (setDragImage)
+    styles.css
     components/     # Header, LocaleBar, SearchBar, FilterBar, SortBar,
                     # ProductTile, PreviewModal, DetailView,
                     # ResizeHandle, HoverPeek, NumberTicker, Toast,
-                    # CommandPalette, Confetti, DropTargetBanner
+                    # CommandPalette, DropTargetBanner, PresetsMenu
   shared/       # Consumed by both threads (no DOM / no figma.* API).
     types.ts        # Offer + ReviewDetails + PriceBreakdown + enums
     messages.ts     # Insert*Payload + SectionKind + UiState
@@ -99,6 +101,7 @@ All handler interfaces live in `src/shared/messages.ts`. Wire names
 |----------------------|-----------|----------------------------------------|-------------------------------------------|
 | `'INSERT'`           | UI → main | `InsertCardsPayload \| InsertSectionsPayload` (may include `dropInto: DropInto`) | The main CTA — drop a card / list / grid / section |
 | `'DROP'`             | UI → main | `DropPayload`                          | Tile dragend (legacy emit-based path)     |
+| `'SYNC_OFFERS'`      | UI → main | `{ offers: Offer[]; locale: Locale }`  | Push the freshly-fetched catalogue so main can resolve refresh-by-id |
 | `'UNDO'`             | UI → main | `{ nodeIds: string[] }`                | Toast Undo button                         |
 | `'FIND_ALL'`         | UI → main | —                                      | Select every HomeDrop-tagged node on page |
 | `'REFRESH'`          | UI → main | —                                      | Re-render selected HomeDrop nodes         |
@@ -188,7 +191,8 @@ strikethrough price. See `docs/BRAND.md` for the palette.
 | Add a filter chip | `src/ui/components/FilterBar.tsx` + `Filters` type + matching filter in `App.tsx` |
 | Add a palette command | `paletteCommands` array in `src/ui/App.tsx` |
 | Add a new message channel | `src/shared/messages.ts` (handler interface) → wire `on/emit` in `src/main/index.ts` and `src/ui/App.tsx` |
-| Wire to a real API | Replace the `productsJson` import in `src/main/index.ts` with a `fetch` in the UI thread; add domain to `package.json` → `figma-plugin.networkAccess.allowedDomains` |
+| Wire to a real API | Implement `ApiOffersSource` in `src/ui/offers-source.ts` (the file already has a commented sketch). Swap `defaultOffersSource` → `new ApiOffersSource(url)` in `App.tsx`. Add the API host + image CDN to `package.json` → `figma-plugin.networkAccess.allowedDomains`. Delete `localize()` + the `i18n` block on `Offer` once the API returns locale-specific data directly. |
+| Add a new data field | Add it to `Offer` in `src/shared/types.ts`. Either populate `products.json` (for the PoC) or extend `parseApiOffer()` (for v2). Render it in `src/main/generate.ts` and add a `#fieldName` mapping in `src/shared/layer-names.ts`. |
 
 ## Gotchas (from the research)
 

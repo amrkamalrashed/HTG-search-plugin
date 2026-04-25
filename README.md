@@ -5,8 +5,11 @@ vacation-rental product data straight into your designs. Open it, browse
 10 mock properties, and click once (or drag a tile onto the canvas) to
 insert a fully-populated HomeToGo product card, a list, or a grid.
 
-> **Status:** Proof of concept. Data is a bundled JSON file (`src/data/products.json`).
-> v2 will wire this up to the internal HTG search/product API.
+> **Status:** Proof of concept. Data is a bundled JSON file
+> (`src/data/products.json`) consumed via `JsonOffersSource`. v2 swaps
+> in `ApiOffersSource` (one line in `src/ui/App.tsx`) and removes the
+> `i18n` block from `Offer` once the API returns locale-specific data
+> directly. See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md#data-layer-v08).
 
 ---
 
@@ -80,10 +83,10 @@ See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for the full tour.
 
 ```
 src/
-  main/      Figma sandbox code (all figma.* API calls)
-  ui/        Preact iframe UI (browse, search, filter, preview)
-  shared/    Types, message contracts, #fieldName spec, and localize()
-  data/      Mock JSON (10 offers, fully enriched + de/es/fr translated)
+  main/      Figma sandbox code (all figma.* API calls + drop routing)
+  ui/        Preact iframe UI — owns the OffersSource (browse/search/filter)
+  shared/    Types, message contracts, #fieldName spec, locale strings
+  data/      PoC JSON (10 offers, de/es/fr translations baked in — v2 drops this)
 tests/       Vitest unit tests for src/shared/ modules
 docs/
   SCOPE.md            What's in and out of the PoC
