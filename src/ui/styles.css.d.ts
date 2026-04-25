@@ -1,6 +1,4 @@
 declare const styles: {
-  readonly "amenityChip": string;
-  readonly "amenityGrid": string;
   readonly "btn": string;
   readonly "btnGhost": string;
   readonly "btnPrimary": string;
@@ -104,28 +102,6 @@ declare const styles: {
   readonly "marketSelectChevron": string;
   readonly "marketSelectFlag": string;
   readonly "marketSelectWrap": string;
-  readonly "modal": string;
-  readonly "modalActions": string;
-  readonly "modalActionsBtn": string;
-  readonly "modalBody": string;
-  readonly "modalClose": string;
-  readonly "modalDescription": string;
-  readonly "modalDragHint": string;
-  readonly "modalImage": string;
-  readonly "modalLocation": string;
-  readonly "modalOverlay": string;
-  readonly "modalPrice": string;
-  readonly "modalPriceOriginal": string;
-  readonly "modalPriceRow": string;
-  readonly "modalPriceSuffix": string;
-  readonly "modalProvider": string;
-  readonly "modalSection": string;
-  readonly "modalSectionLabel": string;
-  readonly "modalStat": string;
-  readonly "modalStatLabel": string;
-  readonly "modalStatValue": string;
-  readonly "modalStatsRow": string;
-  readonly "modalTitle": string;
   readonly "modeOption": string;
   readonly "modeOptionActive": string;
   readonly "modeToggle": string;
@@ -168,7 +144,6 @@ declare const styles: {
   readonly "sectionTileLabel": string;
   readonly "sectionTileSelected": string;
   readonly "sectionTileText": string;
-  readonly "slideUp": string;
   readonly "sortBar": string;
   readonly "sortBarRight": string;
   readonly "sortCount": string;

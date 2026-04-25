@@ -117,27 +117,6 @@ export interface InsertSectionsPayload {
 export type InsertPayload = InsertCardsPayload | InsertSectionsPayload;
 
 /**
- * Drop-onto-canvas payload (UI → main). Triggered by the native drag
- * from a tile. The UI sends absolute viewport pixel coords; main
- * converts those to figma viewport coords via figma.viewport math
- * (or, when available, uses canvasX / canvasY straight from
- * figma.on('drop') event data).
- */
-export interface DropPayload {
-  offerId: string;
-  /** UI iframe pixel coords relative to the viewport's top-left. */
-  clientX: number;
-  clientY: number;
-  /** Drop coords already in canvas space (set by figma.on('drop')). */
-  canvasX?: number;
-  canvasY?: number;
-  locale: Locale;
-  platform: Platform;
-  /** Mirrors DropInto.replaceContents when present. */
-  replaceOnDrop?: boolean;
-}
-
-/**
  * Initial data shipped from main → UI on showUI(). The catalogue itself
  * is no longer included here — the UI iframe owns the OffersSource and
  * fetches on mount. Main only ships state Figma already had access to
@@ -199,12 +178,6 @@ export interface ResizeHandler extends EventHandler {
 export interface RefreshHandler extends EventHandler {
   name: 'REFRESH';
   handler: () => void;
-}
-
-/** UI → main: drop a card at the given canvas coordinates. */
-export interface DropHandler extends EventHandler {
-  name: 'DROP';
-  handler: (payload: DropPayload) => void;
 }
 
 /** UI → main: undo the last toast operation by node id. */

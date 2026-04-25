@@ -106,12 +106,6 @@ export type StringKey =
   | 'uiNProperties'
   | 'uiNOfTotal'
   | 'uiSelectAProperty'
-  | 'uiInsert'
-  | 'uiInsertN'
-  | 'uiInsertAsList'
-  | 'uiInsertNAsList'
-  | 'uiInsertAsGrid'
-  | 'uiInsertNAsGrid'
   | 'uiHintClickSingle'
   | 'uiHintPickList'
   | 'uiHintPickGrid'
@@ -167,7 +161,6 @@ export type StringKey =
   | 'uiNightsTotalSuffix'
   | 'uiPerNightSlash'
   | 'uiOpenDetails'
-  | 'uiInsertCard'
   // v0.6 / v0.7 chrome
   | 'uiRandomize'
   | 'uiRandomizeTooltip'
@@ -315,12 +308,6 @@ export const STRINGS: Record<Locale, Record<StringKey, string>> = {
     uiNProperties: '{n} properties',
     uiNOfTotal: '{n} of {total}',
     uiSelectAProperty: 'Select a property',
-    uiInsert: 'Insert',
-    uiInsertN: 'Insert {n}',
-    uiInsertAsList: 'Insert as list',
-    uiInsertNAsList: 'Insert {n} as list',
-    uiInsertAsGrid: 'Insert as grid',
-    uiInsertNAsGrid: 'Insert {n} as grid',
     uiHintClickSingle: 'Click a property to select',
     uiHintPickList: 'Pick multiple to stack as a list',
     uiHintPickGrid: 'Pick multiple to arrange as a grid',
@@ -376,7 +363,6 @@ export const STRINGS: Record<Locale, Record<StringKey, string>> = {
     uiNightsTotalSuffix: '{n} nights: {total} total',
     uiPerNightSlash: '/ night',
     uiOpenDetails: 'Open details →',
-    uiInsertCard: 'Drop card',
     uiRandomize: 'Randomize',
     uiRandomizeTooltip: 'Pick a random property (R)',
     uiThemeAuto: 'Auto',
@@ -522,12 +508,6 @@ export const STRINGS: Record<Locale, Record<StringKey, string>> = {
     uiNProperties: '{n} Unterkünfte',
     uiNOfTotal: '{n} von {total}',
     uiSelectAProperty: 'Unterkunft auswählen',
-    uiInsert: 'Einfügen',
-    uiInsertN: '{n} einfügen',
-    uiInsertAsList: 'Als Liste einfügen',
-    uiInsertNAsList: '{n} als Liste einfügen',
-    uiInsertAsGrid: 'Als Raster einfügen',
-    uiInsertNAsGrid: '{n} als Raster einfügen',
     uiHintClickSingle: 'Unterkunft anklicken, um auszuwählen',
     uiHintPickList: 'Mehrere wählen, um als Liste zu stapeln',
     uiHintPickGrid: 'Mehrere wählen, um als Raster anzuordnen',
@@ -583,7 +563,6 @@ export const STRINGS: Record<Locale, Record<StringKey, string>> = {
     uiNightsTotalSuffix: '{n} Nächte: {total} gesamt',
     uiPerNightSlash: '/ Nacht',
     uiOpenDetails: 'Details öffnen →',
-    uiInsertCard: 'Karte ablegen',
     uiRandomize: 'Zufall',
     uiRandomizeTooltip: 'Zufällige Unterkunft wählen (R)',
     uiThemeAuto: 'Auto',
@@ -729,12 +708,6 @@ export const STRINGS: Record<Locale, Record<StringKey, string>> = {
     uiNProperties: '{n} alojamientos',
     uiNOfTotal: '{n} de {total}',
     uiSelectAProperty: 'Selecciona un alojamiento',
-    uiInsert: 'Insertar',
-    uiInsertN: 'Insertar {n}',
-    uiInsertAsList: 'Insertar como lista',
-    uiInsertNAsList: 'Insertar {n} como lista',
-    uiInsertAsGrid: 'Insertar como cuadrícula',
-    uiInsertNAsGrid: 'Insertar {n} como cuadrícula',
     uiHintClickSingle: 'Haz clic en un alojamiento para seleccionarlo',
     uiHintPickList: 'Elige varios para apilarlos como lista',
     uiHintPickGrid: 'Elige varios para organizarlos en cuadrícula',
@@ -790,7 +763,6 @@ export const STRINGS: Record<Locale, Record<StringKey, string>> = {
     uiNightsTotalSuffix: '{n} noches: {total} en total',
     uiPerNightSlash: '/ noche',
     uiOpenDetails: 'Abrir detalles →',
-    uiInsertCard: 'Soltar tarjeta',
     uiRandomize: 'Aleatorio',
     uiRandomizeTooltip: 'Elegir alojamiento al azar (R)',
     uiThemeAuto: 'Auto',
@@ -936,12 +908,6 @@ export const STRINGS: Record<Locale, Record<StringKey, string>> = {
     uiNProperties: '{n} logements',
     uiNOfTotal: '{n} sur {total}',
     uiSelectAProperty: 'Sélectionnez un logement',
-    uiInsert: 'Insérer',
-    uiInsertN: 'Insérer {n}',
-    uiInsertAsList: 'Insérer en liste',
-    uiInsertNAsList: 'Insérer {n} en liste',
-    uiInsertAsGrid: 'Insérer en grille',
-    uiInsertNAsGrid: 'Insérer {n} en grille',
     uiHintClickSingle: 'Cliquez sur un logement pour le sélectionner',
     uiHintPickList: 'Choisissez-en plusieurs pour une liste',
     uiHintPickGrid: 'Choisissez-en plusieurs pour une grille',
@@ -997,7 +963,6 @@ export const STRINGS: Record<Locale, Record<StringKey, string>> = {
     uiNightsTotalSuffix: '{n} nuits : {total} au total',
     uiPerNightSlash: '/ nuit',
     uiOpenDetails: 'Voir les détails →',
-    uiInsertCard: 'Déposer la fiche',
     uiRandomize: 'Aléatoire',
     uiRandomizeTooltip: 'Choisir un logement au hasard (R)',
     uiThemeAuto: 'Auto',
