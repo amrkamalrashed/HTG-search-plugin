@@ -130,13 +130,21 @@ async function buildWebCard(offer: Offer, locale: Locale): Promise<FrameNode> {
   const imageWidth = 340;
   const actionsWidth = 200;
 
+  // Web card geometry:
+  //   - HORIZONTAL auto-layout
+  //   - primary axis (width)  → FIXED at spec.cardWidth
+  //   - counter axis (height) → AUTO, so the card hugs the tallest
+  //     child (which is the content column).
+  // We deliberately do NOT set minHeight: that would lock the card at
+  // 320 px even when the offer has fewer amenities / no rating /
+  // shorter title. Instead the card hugs and the image + actions
+  // columns stretch to match.
   const card = figma.createFrame();
   card.name = `HTG Card · ${offer.title}`;
   card.layoutMode = 'HORIZONTAL';
   card.primaryAxisSizingMode = 'FIXED';
   card.counterAxisSizingMode = 'AUTO';
-  card.resize(spec.cardWidth, spec.cardHeight);
-  card.minHeight = spec.cardHeight;
+  card.resizeWithoutConstraints(spec.cardWidth, 1);
   card.cornerRadius = spec.radius;
   card.fills = [{ type: 'SOLID', color: BRAND.white }];
   card.strokes = [{ type: 'SOLID', color: BRAND.border }];
@@ -252,12 +260,15 @@ async function buildWebCard(offer: Offer, locale: Locale): Promise<FrameNode> {
 
   card.appendChild(content);
 
-  // Actions column
+  // Actions column. layoutAlign STRETCH on a HORIZONTAL parent makes
+  // it stretch vertically to match the card's hugged height (driven
+  // by the content column). We keep its width FIXED but its height
+  // AUTO so it doesn't impose a floor of its own.
   const actions = vframe('actions', 8);
   actions.layoutAlign = 'STRETCH';
-  actions.primaryAxisSizingMode = 'FIXED';
+  actions.primaryAxisSizingMode = 'AUTO';
   actions.counterAxisSizingMode = 'FIXED';
-  actions.resize(actionsWidth, spec.cardHeight);
+  actions.resizeWithoutConstraints(actionsWidth, 1);
   actions.paddingLeft = actions.paddingRight = spec.padding;
   actions.paddingTop = actions.paddingBottom = spec.padding;
   actions.counterAxisAlignItems = 'MAX';
