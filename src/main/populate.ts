@@ -15,6 +15,39 @@ function isTarget(node: BaseNode): node is TargetNode {
 }
 
 /**
+ * Fill a single node from the offer if its name matches a layer key.
+ * Returns true when the node was successfully populated.
+ */
+export async function populateNode(
+  node: SceneNode,
+  offer: Offer,
+  locale: Locale = 'en',
+): Promise<boolean> {
+  if (!node.name.startsWith('#')) return false;
+  const key = matchLayerKey(node.name);
+  if (!key) return false;
+
+  if (isImageKey(key)) {
+    if (node.type !== 'RECTANGLE' && node.type !== 'FRAME' && node.type !== 'ELLIPSE') {
+      return false;
+    }
+    const url = imageUrlForKey(key, offer);
+    if (!url) return false;
+    const hash = await loadImageHash(url);
+    if (!hash) return false;
+    applyImageFill(node as GeometryMixin, hash);
+    return true;
+  }
+
+  if (node.type !== 'TEXT') return false;
+  const value = textForKey(key, offer, locale);
+  if (value === null) return false;
+  await figma.loadFontAsync(node.fontName as FontName);
+  (node as TextNode).characters = value;
+  return true;
+}
+
+/**
  * Walks the subtree under `root` and populates any layer whose name matches
  * the #fieldName convention (see docs/LAYER_NAMING_SPEC.md). Returns the
  * number of layers populated.
@@ -26,29 +59,8 @@ export async function populateSelection(
 ): Promise<number> {
   let filled = 0;
   const candidates = root.findAll((n) => n.name.startsWith('#'));
-
   for (const node of candidates) {
-    const key = matchLayerKey(node.name);
-    if (!key) continue;
-
-    if (isImageKey(key)) {
-      if (node.type !== 'RECTANGLE' && node.type !== 'FRAME' && node.type !== 'ELLIPSE') continue;
-      const url = imageUrlForKey(key, offer);
-      if (!url) continue;
-      const hash = await loadImageHash(url);
-      if (hash) {
-        applyImageFill(node as GeometryMixin, hash);
-        filled++;
-      }
-      continue;
-    }
-
-    if (node.type !== 'TEXT') continue;
-    const value = textForKey(key, offer, locale);
-    if (value === null) continue;
-    await figma.loadFontAsync(node.fontName as FontName);
-    (node as TextNode).characters = value;
-    filled++;
+    if (await populateNode(node as SceneNode, offer, locale)) filled++;
   }
 
   root.setPluginData('htgOfferId', offer.id);
@@ -71,22 +83,25 @@ export function hasFieldNames(root: TargetNode): boolean {
 }
 
 /**
- * Drop `child` into `target`. When `opts.replaceContents` is true,
- * every existing child of `target` is removed first (the "Replace"
- * toggle in the drop banner). Otherwise the child is appended at the
- * end of the children list.
- *
- * The `[...target.children]` shallow copy is mandatory: removing
- * children while iterating the live `target.children` array would
- * skip every other entry as the indices shift.
+ * If the selection contains a single #fieldName-named node (text or image
+ * shape) at the top level, return it. Lets the user drop the card content
+ * into one specific layer without wrapping it in a frame first.
  */
-export function fillIntoTarget(
-  target: TargetNode,
-  child: SceneNode,
-  opts: { replaceContents?: boolean } = {},
-): void {
-  if (opts.replaceContents) {
-    for (const c of [...target.children]) c.remove();
+export function singleFieldNodeInSelection(
+  selection: readonly SceneNode[],
+): SceneNode | null {
+  for (const node of selection) {
+    if (
+      node.name.startsWith('#') &&
+      matchLayerKey(node.name) &&
+      // Only nodes we can actually fill — skip frames (those go through
+      // the multi-layer populateSelection path).
+      (node.type === 'TEXT' ||
+        node.type === 'RECTANGLE' ||
+        node.type === 'ELLIPSE')
+    ) {
+      return node;
+    }
   }
-  target.appendChild(child);
+  return null;
 }

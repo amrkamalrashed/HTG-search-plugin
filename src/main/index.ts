@@ -28,7 +28,9 @@ import { buildSection } from './sections';
 import {
   firstTargetInSelection,
   hasFieldNames,
+  populateNode,
   populateSelection,
+  singleFieldNodeInSelection,
 } from './populate';
 
 // Catalogue cache. Populated by the UI via SYNC_OFFERS on every
@@ -237,6 +239,29 @@ async function handleNativeDropOffer(
   const offer = OFFER_BY_ID[offerId];
   if (!offer) return;
 
+  // Dropped directly onto a #field-named text/shape: fill that one node.
+  const targetNode = event.node as SceneNode;
+  if (
+    targetNode &&
+    targetNode.name?.startsWith('#') &&
+    (targetNode.type === 'TEXT' ||
+      targetNode.type === 'RECTANGLE' ||
+      targetNode.type === 'ELLIPSE')
+  ) {
+    const ok = await populateNode(targetNode, offer, locale);
+    if (ok) {
+      const label = `Filled "${targetNode.name.replace(/^#/, '')}"`;
+      figma.notify(label);
+      emit<InsertedHandler>('INSERTED', {
+        createdNodeIds: [],
+        label,
+        kind: 'populated',
+      });
+      return;
+    }
+  }
+
+  // Dropped onto a frame with #field descendants: fill them all.
   const dropTarget = nativeDropTargetFrame(event);
   if (dropTarget && hasFieldNames(dropTarget)) {
     const filled = await populateSelection(dropTarget, offer, locale);
@@ -373,20 +398,41 @@ async function insertLevel1(payload: InsertCardsPayload): Promise<void> {
   const { offers, mode, gridColumns, locale, platform } = payload;
   if (offers.length === 0) return;
 
-  const target = firstTargetInSelection(figma.currentPage.selection);
-  if (target && mode === 'single' && offers.length === 1) {
-    const filled = await populateSelection(target, offers[0], locale);
-    if (filled > 0) {
-      const label = filled === 1 ? 'Filled 1 field' : `Filled ${filled} fields`;
-      figma.notify(label);
-      emit<InsertedHandler>('INSERTED', {
-        createdNodeIds: [],
-        label,
-        kind: 'populated',
-      });
-      return;
+  // Single-card single-offer with a populate-eligible selection routes
+  // through the populate path instead of dropping a new card. We support
+  // two shapes: a single #field text/shape layer (fill that one), or a
+  // frame whose descendants include #field layers (fill them all).
+  if (mode === 'single' && offers.length === 1) {
+    const sel = figma.currentPage.selection;
+    const single = singleFieldNodeInSelection(sel);
+    if (single) {
+      const ok = await populateNode(single, offers[0], locale);
+      if (ok) {
+        const label = `Filled "${single.name.replace(/^#/, '')}"`;
+        figma.notify(label);
+        emit<InsertedHandler>('INSERTED', {
+          createdNodeIds: [],
+          label,
+          kind: 'populated',
+        });
+        return;
+      }
     }
-    figma.notify('No #fields found — dropped a card instead');
+    const target = firstTargetInSelection(sel);
+    if (target) {
+      const filled = await populateSelection(target, offers[0], locale);
+      if (filled > 0) {
+        const label = filled === 1 ? 'Filled 1 field' : `Filled ${filled} fields`;
+        figma.notify(label);
+        emit<InsertedHandler>('INSERTED', {
+          createdNodeIds: [],
+          label,
+          kind: 'populated',
+        });
+        return;
+      }
+      figma.notify('No #fields found — dropped a card instead');
+    }
   }
 
   const created = await insertCards(offers, mode, gridColumns, locale, platform);
